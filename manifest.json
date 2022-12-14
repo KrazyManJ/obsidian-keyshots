@@ -1,0 +1,10 @@
+{
+	"id": "keyshots",
+	"name": "Keyshots",
+	"version": "1.0.0",
+	"minAppVersion": "0.15.0",
+	"description": "Adds classic hotkey/shortcuts commands from popular IDEs like Visual Studio Code or JetBrains Family.",
+	"author": "KrazyManJ",
+	"authorUrl": "https://github.com/KrazyManJ",
+	"isDesktopOnly": false
+}
