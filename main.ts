@@ -151,13 +151,13 @@ export default class KeyshotsPlugin extends Plugin {
 	async onload() {
 		this.addCommand({
 			id: 'move-line-up',
-			name: 'Move line Up',
+			name: 'Move line up',
 			hotkeys: [{ modifiers: ["Alt", "Shift"], key: "ArrowUp" }],
 			editorCallback: (editor) => moveLine(editor,-1,1)
 		});
 		this.addCommand({
 			id: 'move-line-down',
-			name: 'Move line Down',
+			name: 'Move line down',
 			hotkeys: [{ modifiers: ["Alt", "Shift"], key: "ArrowDown" }],
 			editorCallback: (editor) => moveLine(editor,1,editor.lineCount()-1)
 		});
@@ -174,14 +174,14 @@ export default class KeyshotsPlugin extends Plugin {
 			editorCallback: (editor) => addCarets(editor,1,editor.lineCount())
 		});
 		this.addCommand({
-			id: 'duplicate-line-down',
-			name: 'Duplicate line down (VSCode)',
-			editorCallback: (editor) => vscodeDuplicate(editor, 1)
-		});
-		this.addCommand({
 			id: 'duplicate-line-up',
 			name: 'Duplicate line up (VSCode)',
 			editorCallback: (editor) => vscodeDuplicate(editor, -1)
+		});
+		this.addCommand({
+			id: 'duplicate-line-down',
+			name: 'Duplicate line down (VSCode)',
+			editorCallback: (editor) => vscodeDuplicate(editor, 1)
 		});
 		this.addCommand({
 			id: 'duplicate-selection-or-line',
@@ -191,18 +191,19 @@ export default class KeyshotsPlugin extends Plugin {
 		});
 		this.addCommand({
 			id: 'change-readable-length',
-			name: "Change readable length",
+			name: "Change readable line length",
 			hotkeys: [{ modifiers: ["Mod", "Shift"], key: "R" }],
 			callback: () => this.app.vault.setConfig('readableLineLength', !this.app.vault.getConfig('readableLineLength'))
 		});
 		this.addCommand({
 			id: 'trim-selected-text',
 			name: "Trim selected text",
+			hotkeys: [{ modifiers: ["Alt"], key: "T" }],
 			editorCallback: (editor) => trimSelectedText(editor)
 		});
 		this.addCommand({
 			id: 'convert-spaces-to-underscores',
-			name: "Convert spaces <=> underscores",
+			name: "Convert selected text to spaces <=> underscores",
 			hotkeys: [{ modifiers: ["Alt"], key: "-" }],
 			editorCallback: (editor) => convertSpacesUnderScores(editor)
 		});
