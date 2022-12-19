@@ -145,6 +145,23 @@ function convertSpacesUnderScores(editor: Editor) {
 		}
 	})
 }
+function insertLine(editor: Editor, direction: number) {
+	const newSelections: EditorSelectionOrCaret[] = []
+	const a = (ln: number) => {
+		const tx = [editor.getLine(ln), "\n"]
+		if (direction < 0) tx.reverse()
+		editor.setLine(ln, tx.join(""))
+		newSelections.push({anchor:{ch:0,line:ln+(direction > 0 ? direction : 0)}})
+	}
+	editor.listSelections().sort((a,b) => a.anchor.line - b.anchor.line).forEach((sel,index) => {
+		if (isCaret(sel)) a(sel.anchor.line+index)
+		else {
+			const [from, to] = fromToPos(sel.anchor,sel.head)
+			a((direction > 0 ? to.line : from.line) + index)
+		}
+	})
+	editor.setSelections(newSelections)
+}
 
 export default class KeyshotsPlugin extends Plugin {
 
@@ -153,7 +170,7 @@ export default class KeyshotsPlugin extends Plugin {
 			id: 'move-line-up',
 			name: 'Move line up',
 			hotkeys: [{ modifiers: ["Alt", "Shift"], key: "ArrowUp" }],
-			editorCallback: (editor) => moveLine(editor,-1,1)
+			editorCallback: (editor) => moveLine(editor,-1,0)
 		});
 		this.addCommand({
 			id: 'move-line-down',
@@ -165,7 +182,7 @@ export default class KeyshotsPlugin extends Plugin {
 			id: 'add-carets-up',
 			name: 'Add caret cursors up',
 			hotkeys: [{ modifiers: ["Alt", "Mod"], key: "ArrowUp" }],
-			editorCallback: (editor) => addCarets(editor,-1,1)
+			editorCallback: (editor) => addCarets(editor,-1,0)
 		});
 		this.addCommand({
 			id: 'add-carets-down',
@@ -207,5 +224,17 @@ export default class KeyshotsPlugin extends Plugin {
 			hotkeys: [{ modifiers: ["Alt"], key: "-" }],
 			editorCallback: (editor) => convertSpacesUnderScores(editor)
 		});
+		this.addCommand({
+			id: 'insert-line-below',
+			name: "Insert line below",
+			hotkeys: [{ modifiers: ["Shift"], key: "Enter" }],
+			editorCallback: (editor) => insertLine(editor,1)
+		})
+		this.addCommand({
+			id: 'insert-line-above',
+			name: "Insert line above",
+			hotkeys: [{ modifiers: ["Shift","Mod"], key: "Enter" }],
+			editorCallback: (editor) => insertLine(editor,-1)
+		})
 	}
 }
