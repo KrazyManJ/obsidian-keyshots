@@ -1,23 +1,26 @@
-import {
-	App, Editor, EditorPosition, Command, EditorSelectionOrCaret, Hotkey, Modal, Notice, Plugin, PluginSettingTab, Setting
-} from 'obsidian';
+import { App, Editor, EditorPosition, EditorSelectionOrCaret, Plugin} from 'obsidian';
 
 
-function isCaret(sel: EditorSelectionOrCaret) {
-	return sel.anchor.ch === sel.head?.ch && sel.anchor.line === sel.head.line;
-}
-function fromToPos(one: EditorPosition, two: EditorPosition): [EditorPosition, EditorPosition] {
+const isCaret = (sel: EditorSelectionOrCaret) => sel.anchor.ch === sel.head?.ch && sel.anchor.line === sel.head.line;
+
+const fromToPos = (one: EditorPosition, two: EditorPosition): [EditorPosition, EditorPosition] => {
 	if (one.line == two.line) return one.ch > two.ch ? [two, one] : [one, two]
 	return one.line < two.line ? [one, two] : [two, one]
 }
-function expandLines(editor: Editor, from: EditorPosition, to: EditorPosition)
-	: [EditorPosition, EditorPosition] {
+const expandLines = (editor: Editor, from: EditorPosition, to: EditorPosition) : [EditorPosition, EditorPosition] => {
 	return [
 		{ ch: 0, line: from.line },
 		{ ch: editor.getLine(to.line).length, line: to.line }
 	]
 }
+const flipBooleanSetting = (app: App, setting: string) => app.vault.setConfig(setting, !app.vault.getConfig(setting))
 
+const replaceSelections = (editor: Editor, transformFct: (val: string) => string) => {
+	editor.listSelections().filter(sel => !isCaret(sel)).forEach(sel => { 
+		const [from, to] = fromToPos(sel.anchor, sel.head)
+		editor.replaceRange(transformFct(editor.getRange(from,to)),from,to)
+	})
+}
 
 function moveLine(editor: Editor, direction: number, border: number) {
 	const newSelections: EditorSelectionOrCaret[] = []
@@ -118,30 +121,19 @@ function addCarets(editor: Editor, direction: number, border: number) {
 	const scroll = { anchor: { ch: last.anchor.ch, line: last.anchor.line + direction*2 } }
 	editor.scrollIntoView({from:scroll.anchor, to:scroll.anchor})
 }
-function trimSelectedText(editor: Editor) {
-	editor.listSelections().forEach(sel => {
-		if (!isCaret(sel)) {
-			const [from,to] = fromToPos(sel.anchor,sel.head)
-			editor.replaceRange(editor.getRange(from, to).trim(), from, to)
-		}
-	})
-}
 function convertSpacesUnderScores(editor: Editor) {
-	editor.listSelections().forEach(sel => {
-		if (!isCaret(sel)) {
-			const [from, to] = fromToPos(sel.anchor, sel.head)
-			const tx = editor.getRange(from, to)
-			const [underI, spaceI] = [tx.indexOf("_"), tx.indexOf(" ")]
+	editor.listSelections().filter(sel => !isCaret(sel)).forEach(sel => {
+		const [from, to] = fromToPos(sel.anchor, sel.head)
+		const tx = editor.getRange(from, to)
+		const [underI, spaceI] = [tx.indexOf("_"), tx.indexOf(" ")]
+		const replaceToUnder = (s:string) => s.replace(/ /gm, "_")
+		const replaceToSpace = (s:string) => s.replace(/_/gm, " ")
 
-			const replaceToUnder = (s:string) => s.replace(/ /gm, "_")
-			const replaceToSpace = (s:string) => s.replace(/_/gm, " ")
-
-			if (underI !== -1 || spaceI !== -1) {
-				if (underI === -1) editor.replaceRange(replaceToUnder(tx),from,to)
-				else if (spaceI === -1) editor.replaceRange(replaceToSpace(tx),from,to)
-				else if (underI > spaceI) editor.replaceRange(replaceToUnder(tx),from,to)
-				else editor.replaceRange(replaceToSpace(tx),from,to)
-			}
+		if (underI !== -1 || spaceI !== -1) {
+			if (underI === -1) editor.replaceRange(replaceToUnder(tx),from,to)
+			else if (spaceI === -1) editor.replaceRange(replaceToSpace(tx),from,to)
+			else if (underI > spaceI) editor.replaceRange(replaceToUnder(tx),from,to)
+			else editor.replaceRange(replaceToSpace(tx),from,to)
 		}
 	})
 }
@@ -162,42 +154,78 @@ function insertLine(editor: Editor, direction: number) {
 	})
 	editor.setSelections(newSelections)
 }
+function convertURI(editor: Editor) {
+	replaceSelections(editor, (s) => {
+		try {
+			const decoded = decodeURI(s)
+			if (decoded === s) throw new Error()
+			return decoded;
+		}
+		catch { return encodeURI(s) }
+	})
+}
+
+const titleCase = (s:string) => s.replace(/\w\S*/g,(txt) => txt.charAt(0).toUpperCase() + txt.substring(1).toLowerCase())
 
 export default class KeyshotsPlugin extends Plugin {
 
 	async onload() {
+		/*
+		========================================================================
+			SETTINGS
+		========================================================================
+		*/
+		this.addCommand({
+			id: 'change-readable-length',
+			name: "Change readable line length",
+			hotkeys: [{ modifiers: ["Mod", "Shift"], key: "R" }],
+			callback: () => flipBooleanSetting(this.app,'readableLineLength')
+		});
+		this.addCommand({
+			id: 'toggle-line-numbers',
+			name: "Toggle line numbers",
+			hotkeys: [{ modifiers: ["Mod", "Shift"], key: "L" }],
+			callback: () => flipBooleanSetting(this.app,'showLineNumber')
+		});
+		/*
+		========================================================================
+			EDITOR MOVEMENT/ADD/REMOVE
+		========================================================================
+		*/
 		this.addCommand({
 			id: 'move-line-up',
 			name: 'Move line up',
 			hotkeys: [{ modifiers: ["Alt", "Shift"], key: "ArrowUp" }],
-			editorCallback: (editor) => moveLine(editor,-1,0)
+			editorCallback: (editor) => moveLine(editor, -1, 0)
 		});
 		this.addCommand({
 			id: 'move-line-down',
 			name: 'Move line down',
 			hotkeys: [{ modifiers: ["Alt", "Shift"], key: "ArrowDown" }],
-			editorCallback: (editor) => moveLine(editor,1,editor.lineCount()-1)
+			editorCallback: (editor) => moveLine(editor, 1, editor.lineCount()-1)
 		});
 		this.addCommand({
 			id: 'add-carets-up',
 			name: 'Add caret cursors up',
 			hotkeys: [{ modifiers: ["Alt", "Mod"], key: "ArrowUp" }],
-			editorCallback: (editor) => addCarets(editor,-1,0)
+			editorCallback: (editor) => addCarets(editor, -1, 0)
 		});
 		this.addCommand({
 			id: 'add-carets-down',
 			name: 'Add caret cursors down',
 			hotkeys: [{ modifiers: ["Alt", "Mod"], key: "ArrowDown" }],
-			editorCallback: (editor) => addCarets(editor,1,editor.lineCount())
+			editorCallback: (editor) => addCarets(editor, 1, editor.lineCount())
 		});
 		this.addCommand({
 			id: 'duplicate-line-up',
-			name: 'Duplicate line up (VSCode)',
+			name: 'Duplicate line up (Visual Studio Code)',
+			hotkeys: undefined,
 			editorCallback: (editor) => vscodeDuplicate(editor, -1)
 		});
 		this.addCommand({
 			id: 'duplicate-line-down',
-			name: 'Duplicate line down (VSCode)',
+			name: 'Duplicate line down (Visual Studio Code)',
+			hotkeys: undefined,
 			editorCallback: (editor) => vscodeDuplicate(editor, 1)
 		});
 		this.addCommand({
@@ -207,16 +235,33 @@ export default class KeyshotsPlugin extends Plugin {
 			editorCallback: (editor) => jetBrainsDuplicate(editor)
 		});
 		this.addCommand({
-			id: 'change-readable-length',
-			name: "Change readable line length",
-			hotkeys: [{ modifiers: ["Mod", "Shift"], key: "R" }],
-			callback: () => this.app.vault.setConfig('readableLineLength', !this.app.vault.getConfig('readableLineLength'))
-		});
+			id: 'insert-line-below',
+			name: "Insert line below",
+			hotkeys: [{ modifiers: ["Shift"], key: "Enter" }],
+			editorCallback: (editor) => insertLine(editor, 1)
+		})
+		this.addCommand({
+			id: 'insert-line-above',
+			name: "Insert line above",
+			hotkeys: [{ modifiers: ["Shift","Mod"], key: "Enter" }],
+			editorCallback: (editor) => insertLine(editor, -1)
+		})
+		this.addCommand({
+			id: 'join-lines',
+			name: "Join Lines",
+			hotkeys: [{ modifiers: ["Shift", "Mod"], key: "j" }],
+			editorCallback: (editor) => replaceSelections(editor,(s)=>s.replace(/\n/g,""))
+		})
+		/*
+		========================================================================
+			SELECTION TRANSFORMATIONS
+		========================================================================
+		*/
 		this.addCommand({
 			id: 'trim-selected-text',
 			name: "Trim selected text",
 			hotkeys: [{ modifiers: ["Alt"], key: "T" }],
-			editorCallback: (editor) => trimSelectedText(editor)
+			editorCallback: (editor) => replaceSelections(editor, (s) => s.trim())
 		});
 		this.addCommand({
 			id: 'convert-spaces-to-underscores',
@@ -225,16 +270,28 @@ export default class KeyshotsPlugin extends Plugin {
 			editorCallback: (editor) => convertSpacesUnderScores(editor)
 		});
 		this.addCommand({
-			id: 'insert-line-below',
-			name: "Insert line below",
-			hotkeys: [{ modifiers: ["Shift"], key: "Enter" }],
-			editorCallback: (editor) => insertLine(editor,1)
+			id: 'encode-or-decode-uri',
+			name: "Encode / Decode URI",
+			hotkeys: [{ modifiers: ["Mod","Alt"], key: "u" }],
+			editorCallback: (editor) => convertURI(editor)
 		})
 		this.addCommand({
-			id: 'insert-line-above',
-			name: "Insert line above",
-			hotkeys: [{ modifiers: ["Shift","Mod"], key: "Enter" }],
-			editorCallback: (editor) => insertLine(editor,-1)
+			id: 'transform-to-lowercase',
+			name: "Transform selection to lowercase",
+			hotkeys: [{ modifiers: ["Alt"], key: "l" }],
+			editorCallback: (editor) => replaceSelections(editor,(s)=>s.toLowerCase())
+		})
+		this.addCommand({
+			id: 'transform-to-uppercase',
+			name: "Transform selection to uppercase",
+			hotkeys: [{ modifiers: ["Alt"], key: "u" }],
+			editorCallback: (editor) => replaceSelections(editor,(s)=>s.toUpperCase())
+		})
+		this.addCommand({
+			id: 'transform-to-titlecase',
+			name: "Transform selection to titlecase (Capitalize)",
+			hotkeys: [{ modifiers: ["Alt"], key: "c" }],
+			editorCallback: (editor) => replaceSelections(editor, (s) => titleCase(s))
 		})
 	}
 }
