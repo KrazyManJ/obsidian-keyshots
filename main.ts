@@ -167,6 +167,44 @@ function convertURI(editor: Editor) {
 
 const titleCase = (s:string) => s.replace(/\w\S*/g,(txt) => txt.charAt(0).toUpperCase() + txt.substring(1).toLowerCase())
 
+function splitSelectedTextOnNewLine(editor: Editor) {
+	const newSelections: EditorSelectionOrCaret[] = []
+	let index = 0
+	editor.listSelections().sort((a,b) => a.anchor.line - b.anchor.line).forEach(sel => {
+		if (isCaret(sel)) newSelections.push(sel)
+		else {
+			const [from, to] = fromToPos(
+				{ch:sel.anchor.ch,line:sel.anchor.line+index},
+				{ch:sel.head.ch,line:sel.head.line+index}
+			)
+			const tx = editor.getRange(from, to)
+			editor.replaceRange("\n" + tx + "\n", from, to)
+			newSelections.push({
+				anchor: { ch: 0, line:from.line+1 },
+				head: { ch: editor.getLine(to.line+1).length, line:to.line+1 }
+			})
+			index += (tx.match(/\n/g) || []).length+1
+		}
+	})
+	editor.setSelections(newSelections)
+}
+
+function sortSelectedLines(editor: Editor) {
+	const newSelections: EditorSelectionOrCaret[] = []
+	editor.listSelections().filter(f => !isCaret(f)).forEach(sel => {
+		const [from, to] = expandLines(editor, ...fromToPos(sel.anchor, sel.head))
+		console.log(editor.getRange(from, to).split("\n"))
+		editor.replaceRange(
+			editor.getRange(from, to).split("\n")
+				.sort((a, b) => a.localeCompare(b, undefined, { numeric: true, sensitivity: "base" }))
+				.join("\n")
+			, from, to)
+		const [nFrom,nTo] = expandLines(editor,from,to)
+		newSelections.push({anchor:nFrom,head:nTo})
+	})
+	editor.setSelections(newSelections)
+}
+
 export default class KeyshotsPlugin extends Plugin {
 
 	async onload() {
@@ -176,8 +214,8 @@ export default class KeyshotsPlugin extends Plugin {
 		========================================================================
 		*/
 		this.addCommand({
-			id: 'change-readable-length',
-			name: "Change readable line length",
+			id: 'toggle-readable-length',
+			name: "Toggle readable line length",
 			hotkeys: [{ modifiers: ["Mod", "Shift"], key: "R" }],
 			callback: () => flipBooleanSetting(this.app,'readableLineLength')
 		});
@@ -206,13 +244,13 @@ export default class KeyshotsPlugin extends Plugin {
 		});
 		this.addCommand({
 			id: 'add-carets-up',
-			name: 'Add caret cursors up',
+			name: 'Add caret cursor up',
 			hotkeys: [{ modifiers: ["Alt", "Mod"], key: "ArrowUp" }],
 			editorCallback: (editor) => addCarets(editor, -1, 0)
 		});
 		this.addCommand({
 			id: 'add-carets-down',
-			name: 'Add caret cursors down',
+			name: 'Add caret cursor down',
 			hotkeys: [{ modifiers: ["Alt", "Mod"], key: "ArrowDown" }],
 			editorCallback: (editor) => addCarets(editor, 1, editor.lineCount())
 		});
@@ -247,10 +285,16 @@ export default class KeyshotsPlugin extends Plugin {
 			editorCallback: (editor) => insertLine(editor, -1)
 		})
 		this.addCommand({
-			id: 'join-lines',
-			name: "Join Lines",
+			id: 'join-selected-lines',
+			name: "Join selected lines",
 			hotkeys: [{ modifiers: ["Shift", "Mod"], key: "j" }],
-			editorCallback: (editor) => replaceSelections(editor,(s)=>s.replace(/\n/g,""))
+			editorCallback: (editor) => replaceSelections(editor, (s) => s.replace(/\n/g,""))
+		})
+		this.addCommand({
+			id: 'split-selections-on-new-line',
+			name: "Split selections on new line",
+			hotkeys: [{ modifiers: ["Alt"], key: "s" }],
+			editorCallback: (editor) => splitSelectedTextOnNewLine(editor)
 		})
 		/*
 		========================================================================
@@ -258,40 +302,46 @@ export default class KeyshotsPlugin extends Plugin {
 		========================================================================
 		*/
 		this.addCommand({
-			id: 'trim-selected-text',
-			name: "Trim selected text",
+			id: 'trim-selections',
+			name: "Trim selections",
 			hotkeys: [{ modifiers: ["Alt"], key: "T" }],
 			editorCallback: (editor) => replaceSelections(editor, (s) => s.trim())
 		});
 		this.addCommand({
-			id: 'convert-spaces-to-underscores',
-			name: "Convert selected text to spaces <=> underscores",
+			id: 'transform-from-to-snake-case',
+			name: "Transform selections from / to Snakecase",
 			hotkeys: [{ modifiers: ["Alt"], key: "-" }],
 			editorCallback: (editor) => convertSpacesUnderScores(editor)
 		});
 		this.addCommand({
 			id: 'encode-or-decode-uri',
-			name: "Encode / Decode URI",
+			name: "Encode / Decode URI selections",
 			hotkeys: [{ modifiers: ["Mod","Alt"], key: "u" }],
 			editorCallback: (editor) => convertURI(editor)
 		})
 		this.addCommand({
-			id: 'transform-to-lowercase',
-			name: "Transform selection to lowercase",
+			id: 'transform-selections-to-lowercase',
+			name: "Transform selections to Lowercase",
 			hotkeys: [{ modifiers: ["Alt"], key: "l" }],
-			editorCallback: (editor) => replaceSelections(editor,(s)=>s.toLowerCase())
+			editorCallback: (editor) => replaceSelections(editor, (s) => s.toLowerCase())
 		})
 		this.addCommand({
-			id: 'transform-to-uppercase',
-			name: "Transform selection to uppercase",
+			id: 'transform-selections-to-uppercase',
+			name: "Transform selections to Uppercase",
 			hotkeys: [{ modifiers: ["Alt"], key: "u" }],
-			editorCallback: (editor) => replaceSelections(editor,(s)=>s.toUpperCase())
+			editorCallback: (editor) => replaceSelections(editor, (s) => s.toUpperCase())
 		})
 		this.addCommand({
-			id: 'transform-to-titlecase',
-			name: "Transform selection to titlecase (Capitalize)",
+			id: 'transform-selections-to-titlecase',
+			name: "Transform selections to Titlecase (Capitalize)",
 			hotkeys: [{ modifiers: ["Alt"], key: "c" }],
 			editorCallback: (editor) => replaceSelections(editor, (s) => titleCase(s))
+		})
+		this.addCommand({
+			id: 'sort-selected-lines',
+			name: "Sort selected lines",
+			hotkeys: [{ modifiers: ["Mod","Shift"], key: "s" }],
+			editorCallback: (editor) => sortSelectedLines(editor)
 		})
 	}
 }

@@ -1,12 +1,20 @@
 <h1 align=center>Keyshots</h1>
 
-Adds classic hotkey/shortcuts commands from popular IDEs like Visual Studio Code or JetBrains Family. Adds actions like...
+<p align=center><i>Turn your Obsidian into compact text editor!</i></p>
+
+---
+
+Keyshots is an [Obsidian](https://obsidian.md) plugin that adds classic hotkey/shortcuts commands from popular IDEs like Visual Studio Code or JetBrains Family. 
+
+Apart from that, i want to add as much my custom and usefull commands as possible!
+
+Adds actions like...
 
 ...move line up or down (<kbd>Shift + Alt + ↑</kbd> / <kbd>Shift + Alt + ↓</kbd>) ...
 
 ![](assets/line_move.gif)
 
-...add caret cursors up or down (<kbd>Ctrl + Alt + ↑</kbd> / <kbd>Ctrl + Alt + ↓</kbd>) ...
+...add caret cursor up or down (<kbd>Ctrl + Alt + ↑</kbd> / <kbd>Ctrl + Alt + ↓</kbd>) ...
 
 ![](assets/add_caret.gif)
 
@@ -18,8 +26,42 @@ Adds classic hotkey/shortcuts commands from popular IDEs like Visual Studio Code
 
 ![](assets/duplicate_text.gif)
 
-...change readable line length inside editor (<kbd>Ctrl + Shift + R</kbd>) ...
+...toggle readable line length inside editor (<kbd>Ctrl + Shift + R</kbd>) ...
 
-![](assets/change_readable_line_length.gif)
+![](assets/toggle_readable_line_length.gif)
 
-...**And much more**!
+...toggle line numbers inside editor (<kbd>Ctrl + Shift + L</kbd>) ...
+
+![](assets/toggle_line_numbers.gif)
+
+...encode or decode URI text (<kbd>Ctrl + Alt + U</kbd>) ...
+
+![](assets/uri_encode_decode.gif)
+
+...transform selected texts to Lowercase (<kbd>Alt + L</kbd>) / Uppercase (<kbd>Alt + U</kbd>) / Titlecase (<kbd>Alt + C</kbd>) ...
+
+![](assets/transform_text.gif)
+
+...join selected lines to one line (<kbd>Crtl + Shift + J</kbd>) ...
+
+![](assets/join_lines.gif)
+
+...split selections on new line (<kbd>Alt + S</kbd>) and trim selection (<kbd>Alt + T</kbd>) ...
+
+![](assets/split_sel_on_line_and_trim.gif)
+
+...sort selected lines with alphanumeric comparison (<kbd>Ctrl + Shift + S</kbd>) ...
+
+![](assets/sort_selected_lines.gif)
+
+...transform selections to or from snakecase (<kbd>Alt + -</kbd>) ...
+
+![](assets/transform_to_from_snakecase.gif)
+
+...**And more commands comming soon**!
+
+## ⚠️ Read before usage:
+
+- `Duplicate line or selection` command is defaultly on the same hotkey as `delete line` command (<kbd>Ctrl + D</kbd>). That is because JetBrains IDEs have it the same way. Before usage change this action hotkey based on your preference or basically clear `Delete line` command!
+
+- For most of these commands, it requires more than one undo/revert actions, because these commands contain more than one instruction.
