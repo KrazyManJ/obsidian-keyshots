@@ -10,7 +10,7 @@ Apart from that, i want to add as much my custom and usefull commands as possibl
 
 Adds actions like...
 
-...move line up or down (<kbd>Shift + Alt + ↑</kbd> / <kbd>Shift + Alt + ↓</kbd>) ...
+...move line up or down (**Visual Studio Code**: <kbd>Alt + ↑</kbd> / <kbd>Alt + ↓</kbd>; **Jetbrains**: <kbd>Shift + Alt + ↑</kbd> / <kbd>Shift + Alt + ↓</kbd>) ...
 
 ![](assets/line_move.gif)
 
@@ -22,9 +22,13 @@ Adds actions like...
 
 ![](assets/insert_line.gif)
 
-...duplicate text or selection (<kbd>Ctrl + D</kbd>) ...
+...duplicate line up or down (**Visual Studio Code duplication style**) (<kbd>Shift + Alt + ↑</kbd> / <kbd>Shift + Alt + ↓</kbd>) ...
 
-![](assets/duplicate_text.gif)
+![](assets/vscode_duplicate_line.gif)
+
+...duplicate text or selection (**Jetbrains duplication style**) (<kbd>Ctrl + D</kbd>) ...
+
+![](assets/jetbrains_duplicate.gif)
 
 ...toggle readable line length inside editor (<kbd>Ctrl + Shift + R</kbd>) ...
 
@@ -59,6 +63,15 @@ Adds actions like...
 ![](assets/transform_to_from_snakecase.gif)
 
 ...**And more commands comming soon**!
+
+## 🎛️ Settings
+
+Added in version 1.2.0, adds ability to choose default hotkeys mappings by IDEs presets.
+
+Now you can choose from these IDEs:
+
+- Visual Studio Code
+- JetBrains IDEs Family (IntelliJ IDEA, PyCharm, WebStorm, ... )
 
 ## ⚠️ Read before usage:
 
