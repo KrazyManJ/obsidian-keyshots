@@ -280,10 +280,7 @@ export default class KeyshotsPlugin extends Plugin {
 	}
 
 	async loadCommands() {
-		
 		if (this.command_ids !== undefined) this.command_ids.forEach((a) => this.app.commands.removeCommand(a))
-		
-
 		const IDS: string[] = []
 		const MAP: KeyshotsMap = KEYSHOTS_MAPS[this.settings.ide_mappings]
 		IDS.push(
@@ -449,7 +446,7 @@ class KeyshotsSettingTab extends PluginSettingTab {
 		containerEl.createEl('h1', { text: "Keyshots Settings" })
 		new Setting(containerEl)
 			.setName("IDE Keys Mapping")
-			.setDesc("Change default hotkeys based on IDE, that you are comfortable with!")
+			.setDesc("Change default hotkeys based on IDE, that you are comfortable with. This does not overwrite your custom hotkeys!")
 			.addDropdown(cb => cb
 				.addOption("vscode", "Visual Studio Code")
 				.addOption("jetbrains", "JetBrains IDEs (IntelliJ IDEA, Pycharm, ... )")
