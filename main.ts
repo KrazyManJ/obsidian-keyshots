@@ -1,4 +1,26 @@
-import { App, Editor, EditorPosition, EditorSelectionOrCaret, Plugin, PluginSettingTab, Setting, Hotkey} from 'obsidian';
+import { App, Editor, EditorPosition, VaultConfig, EditorSelectionOrCaret, Plugin, PluginSettingTab, Setting, Hotkey, EditorSelection} from 'obsidian';
+
+/*
+========================================================================
+	NON-API TYPING
+========================================================================
+*/
+declare module 'obsidian' {
+	interface VaultConfig {
+		readableLineLength: boolean,
+		showLineNumber: boolean
+	}
+	interface Vault {
+		getConfig<T extends keyof VaultConfig>(config: T): VaultConfig[T];
+		setConfig<T extends keyof VaultConfig>(config: T, value: VaultConfig[T]): void;
+	}
+	interface CommandManager {
+		removeCommand(id: string): void;
+	}
+	interface App {
+		commands: CommandManager
+	}
+}
 
 
 const isCaret = (sel: EditorSelectionOrCaret) => sel.anchor.ch === sel.head?.ch && sel.anchor.line === sel.head.line;
@@ -13,7 +35,7 @@ const expandLines = (editor: Editor, from: EditorPosition, to: EditorPosition) :
 		{ ch: editor.getLine(to.line).length, line: to.line }
 	]
 }
-const flipBooleanSetting = (app: App, setting: string) => app.vault.setConfig(setting, !app.vault.getConfig(setting))
+const flipBooleanSetting = (app: App, setting: keyof VaultConfig) => app.vault.setConfig(setting, !app.vault.getConfig(setting))
 
 const replaceSelections = (editor: Editor, transformFct: (val: string) => string) => {
 	editor.listSelections().filter(sel => !isCaret(sel)).forEach(sel => { 
@@ -22,18 +44,27 @@ const replaceSelections = (editor: Editor, transformFct: (val: string) => string
 	})
 }
 
+const selectionsProcessor = (
+	editor: Editor,
+	arrCallback: ((arr: EditorSelection[]) => EditorSelection[]) | undefined,
+	fct: (sel: EditorSelection, index: number) => EditorSelectionOrCaret
+) => {
+	const newSelections: EditorSelectionOrCaret[] = [];
+	(arrCallback !== undefined ? arrCallback(editor.listSelections()) : editor.listSelections())
+		.forEach((sel, index) => newSelections.push(fct(sel, index)))
+	editor.setSelections(newSelections)
+}
+
 function moveLine(editor: Editor, direction: number, border: number) {
-	const newSelections: EditorSelectionOrCaret[] = []
-	editor.listSelections().forEach(sel => {
+	selectionsProcessor(editor, undefined, (sel) => {
 		if (isCaret(sel)) {
 			const pos = sel.anchor
 			if (pos.line !== border) {
 				const [txA, txB] = [editor.getLine(pos.line), editor.getLine(pos.line+direction)]
 				editor.setLine(pos.line + direction,txA)
 				editor.setLine(pos.line, txB)
-				newSelections.push({ anchor: { line: sel.anchor.line + direction, ch: sel.anchor.ch } })
+				return { anchor: { line: sel.anchor.line + direction, ch: sel.anchor.ch } }
 			}
-			else newSelections.push(sel)
 		}
 		else {
 			const [from, to] = fromToPos(sel.anchor,sel.head)
@@ -49,50 +80,40 @@ function moveLine(editor: Editor, direction: number, border: number) {
 					editor.replaceRange(txB, lfrom, lto)
 					editor.setLine(borderLine + direction, txA)
 				}
-				newSelections.push(
-					{
-						anchor: { ch: from.ch, line: from.line+direction},
-						head: {ch: to.ch, line: to.line+direction}
-					}
-				)
+				return {
+					anchor: { ch: from.ch, line: from.line+direction},
+					head: {ch: to.ch, line: to.line+direction}
+				}
 			}
-			else newSelections.push(sel)
 		}
+		return sel
 	})
-	editor.setSelections(newSelections)
 }
 function jetBrainsDuplicate(editor:Editor) {
-	const newSelections: EditorSelectionOrCaret[] = []
-	editor.listSelections().forEach(sel => {
+	selectionsProcessor(editor, undefined, (sel) => {
 		if (isCaret(sel)) {
 			const ln = sel.anchor.line
 			const tx = editor.getLine(ln)
 			editor.setLine(ln, tx + "\n" + tx)
-			newSelections.push({ anchor: { line: sel.anchor.line + 1, ch: sel.anchor.ch } })
+			return { anchor: { line: sel.anchor.line + 1, ch: sel.anchor.ch } }
 		}
 		else {
 			const [from, to] = fromToPos(sel.anchor,sel.head)
 			const tx = editor.getRange(from, to)
 			editor.replaceRange(tx, from, from)
-			if (sel.anchor.line === sel.head.line) {
-				newSelections.push({ anchor: to, head: { line: to.line, ch: to.ch + tx.length } })
-			}
-			else {
-				newSelections.push({ anchor: to, head: { line: to.line+(to.line-from.line), ch: to.ch } })
-			}
+			return (sel.anchor.line === sel.head.line)
+				? { anchor: to, head: { line: to.line, ch: to.ch + tx.length } }
+				: { anchor: to, head: { line: to.line+(to.line-from.line), ch: to.ch } }
 		}
 	})
-	editor.setSelections(newSelections)
 }
 function vscodeDuplicate(editor: Editor, direction: number) {
-	const newSelections: EditorSelectionOrCaret[] = []
-	editor.listSelections().forEach(sel => {
+	selectionsProcessor(editor, undefined, (sel) => {
 		if (isCaret(sel)) {
 			const ln = sel.anchor.line
 			const tx = editor.getLine(ln)
 			editor.setLine(ln, tx + "\n" + tx)
-			if (direction > 0) newSelections.push({ anchor: { line: sel.anchor.line + 1, ch: sel.anchor.ch } })
-			else newSelections.push(sel)
+			if (direction > 0) return { anchor: { line: sel.anchor.line + 1, ch: sel.anchor.ch } }
 		}
 		else {
 			const [from, to] = fromToPos(sel.anchor,sel.head)
@@ -100,15 +121,14 @@ function vscodeDuplicate(editor: Editor, direction: number) {
 			const tx = editor.getRange(lfrom, lto)
 			editor.replaceRange(tx + "\n" + tx, lfrom, lto)
 			if (direction > 0) {
-				newSelections.push({
+				return {
 					anchor: { ch: sel.anchor.ch, line: sel.anchor.line + (to.line - from.line + 1) },
 					head: { ch: sel.head.ch, line: sel.head.line + (to.line - from.line + 1) }
-				})
+				}
 			}
-			else newSelections.push(sel)
 		}
+		return sel
 	})
-	editor.setSelections(newSelections)
 }
 function addCarets(editor: Editor, direction: number, border: number) {
 	const newSelections: EditorSelectionOrCaret[] = editor.listSelections()
@@ -122,39 +142,33 @@ function addCarets(editor: Editor, direction: number, border: number) {
 	editor.scrollIntoView({from:scroll.anchor, to:scroll.anchor})
 }
 function convertSpacesUnderScores(editor: Editor) {
-	editor.listSelections().filter(sel => !isCaret(sel)).forEach(sel => {
-		const [from, to] = fromToPos(sel.anchor, sel.head)
-		const tx = editor.getRange(from, to)
+	replaceSelections(editor, (tx) => {
 		const [underI, spaceI] = [tx.indexOf("_"), tx.indexOf(" ")]
 		const replaceToUnder = (s:string) => s.replace(/ /gm, "_")
 		const replaceToSpace = (s:string) => s.replace(/_/gm, " ")
-
-		if (underI !== -1 || spaceI !== -1) {
-			if (underI === -1) editor.replaceRange(replaceToUnder(tx),from,to)
-			else if (spaceI === -1) editor.replaceRange(replaceToSpace(tx),from,to)
-			else if (underI > spaceI) editor.replaceRange(replaceToUnder(tx),from,to)
-			else editor.replaceRange(replaceToSpace(tx),from,to)
-		}
+		if (underI !== -1 || spaceI !== -1) return tx
+		if (underI === -1) return replaceToUnder(tx)
+		if (spaceI === -1) return replaceToSpace(tx)
+		if (underI > spaceI) return replaceToUnder(tx)
+		return replaceToSpace(tx)
 	})
 }
 function insertLine(editor: Editor, direction: number) {
-	const newSelections: EditorSelectionOrCaret[] = []
-	const a = (ln: number) => {
-		const tx = [editor.getLine(ln), "\n"]
-		if (direction < 0) tx.reverse()
-		editor.setLine(ln, tx.join(""))
-		newSelections.push({anchor:{ch:0,line:ln+(direction > 0 ? direction : 0)}})
-	}
-	editor.listSelections().sort((a,b) => a.anchor.line - b.anchor.line).forEach((sel,index) => {
-		if (isCaret(sel)) a(sel.anchor.line+index)
+	selectionsProcessor(editor, (s) => s.sort((a, b) => a.anchor.line - b.anchor.line), (sel, index) => {
+		const a = (ln: number) => {
+			const tx = [editor.getLine(ln), "\n"]
+			if (direction < 0) tx.reverse()
+			editor.setLine(ln, tx.join(""))
+			return {anchor:{ch:0,line:ln+(direction > 0 ? direction : 0)}}
+		}
+		if (isCaret(sel)) return a(sel.anchor.line+index)
 		else {
 			const [from, to] = fromToPos(sel.anchor,sel.head)
-			a((direction > 0 ? to.line : from.line) + index)
+			return a((direction > 0 ? to.line : from.line) + index)
 		}
 	})
-	editor.setSelections(newSelections)
 }
-function convertURI(editor: Editor) {
+const convertURI = (editor: Editor) => {
 	replaceSelections(editor, (s) => {
 		try {
 			const decoded = decodeURI(s)
@@ -168,10 +182,9 @@ function convertURI(editor: Editor) {
 const titleCase = (s:string) => s.replace(/\w\S*/g,(txt) => txt.charAt(0).toUpperCase() + txt.substring(1).toLowerCase())
 
 function splitSelectedTextOnNewLine(editor: Editor) {
-	const newSelections: EditorSelectionOrCaret[] = []
 	let index = 0
-	editor.listSelections().sort((a,b) => a.anchor.line - b.anchor.line).forEach(sel => {
-		if (isCaret(sel)) newSelections.push(sel)
+	selectionsProcessor(editor, arr => arr.sort((a,b) => a.anchor.line - b.anchor.line), sel => {
+		if (isCaret(sel)) return sel
 		else {
 			const [from, to] = fromToPos(
 				{ch:sel.anchor.ch,line:sel.anchor.line+index},
@@ -179,19 +192,17 @@ function splitSelectedTextOnNewLine(editor: Editor) {
 			)
 			const tx = editor.getRange(from, to)
 			editor.replaceRange("\n" + tx + "\n", from, to)
-			newSelections.push({
-				anchor: { ch: 0, line:from.line+1 },
-				head: { ch: editor.getLine(to.line+1).length, line:to.line+1 }
-			})
 			index += (tx.match(/\n/g) || []).length+1
+			return {
+				anchor: { ch: 0, line: from.line + 1 },
+				head: { ch: editor.getLine(to.line + 1).length, line: to.line + 1 }
+			}
 		}
 	})
-	editor.setSelections(newSelections)
 }
 
 function sortSelectedLines(editor: Editor) {
-	const newSelections: EditorSelectionOrCaret[] = []
-	editor.listSelections().filter(f => !isCaret(f)).forEach(sel => {
+	selectionsProcessor(editor, arr => arr.filter(f => !isCaret(f)), sel => {
 		const [from, to] = expandLines(editor, ...fromToPos(sel.anchor, sel.head))
 		console.log(editor.getRange(from, to).split("\n"))
 		editor.replaceRange(
@@ -200,9 +211,9 @@ function sortSelectedLines(editor: Editor) {
 				.join("\n")
 			, from, to)
 		const [nFrom,nTo] = expandLines(editor,from,to)
-		newSelections.push({anchor:nFrom,head:nTo})
+		return {anchor:nFrom,head:nTo}
 	})
-	editor.setSelections(newSelections)
+
 }
 
 interface KeyshotsSettings {
