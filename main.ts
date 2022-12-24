@@ -224,7 +224,7 @@ const DEFAULT_SETTINGS: KeyshotsSettings = {
 	ide_mappings: "vscode"
 }
 
-interface KeyshotsMap {
+declare interface KeyshotsMap {
 	toggle_readable_length?: Hotkey[]
 	toggle_line_numbers?: Hotkey[]
 	move_line_up?: Hotkey[]
@@ -266,17 +266,24 @@ const DEFAULT_MAP: KeyshotsMap = {
 }
 
 const KEYSHOTS_MAPS: {[key: string]: KeyshotsMap} = {
-	"vscode": Object.assign({}, DEFAULT_MAP, {
+	"vscode": {
 		move_line_up: [{ modifiers: ["Alt"], key: "ArrowUp" }],
 		move_line_down: [{ modifiers: ["Alt"], key: "ArrowDown" }],
 		duplicate_line_up: [{ modifiers: ["Alt", "Shift"], key: "ArrowUp" }],
 		duplicate_line_down: [{ modifiers: ["Alt", "Shift"], key: "ArrowDown" }]
-	}),
-	"jetbrains":  Object.assign({}, DEFAULT_MAP, {
+	},
+	"jetbrains": {
 		move_line_up: [{ modifiers: ["Alt", "Shift"], key: "ArrowUp" }],
 		move_line_down: [{ modifiers: ["Alt", "Shift"], key: "ArrowDown" }],
 		duplicate_selection_or_line: [{ modifiers: ["Mod"], key: "D" }],
-	})
+	},
+	"visual_studio": {
+		move_line_up: [{ modifiers: ["Alt"], key: "ArrowUp" }],
+		move_line_down: [{ modifiers: ["Alt"], key: "ArrowDown" }],
+		add_carets_up: [{ modifiers: ["Alt", "Shift"], key: "ArrowUp" }],
+		add_carets_down: [{ modifiers: ["Alt", "Shift"], key: "ArrowDown" }],
+		duplicate_selection_or_line: [{ modifiers: ["Mod"], key: "D" }],
+	}
 }
 
 export default class KeyshotsPlugin extends Plugin {
@@ -293,7 +300,7 @@ export default class KeyshotsPlugin extends Plugin {
 	async loadCommands() {
 		if (this.command_ids !== undefined) this.command_ids.forEach((a) => this.app.commands.removeCommand(a))
 		const IDS: string[] = []
-		const MAP: KeyshotsMap = KEYSHOTS_MAPS[this.settings.ide_mappings]
+		const MAP: KeyshotsMap = Object.assign({}, DEFAULT_MAP, KEYSHOTS_MAPS[this.settings.ide_mappings])
 		IDS.push(
 			/*
 			========================================================================
@@ -461,6 +468,7 @@ class KeyshotsSettingTab extends PluginSettingTab {
 			.addDropdown(cb => cb
 				.addOption("vscode", "Visual Studio Code")
 				.addOption("jetbrains", "JetBrains IDEs (IntelliJ IDEA, Pycharm, ... )")
+				.addOption("visual_studio", "Microsoft Visual Studio")
 				.setValue(this.plugin.settings.ide_mappings)
 				.onChange(async (value) => {
 					this.plugin.settings.ide_mappings = value
