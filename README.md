@@ -72,6 +72,7 @@ Now you can choose from these IDEs:
 
 - Visual Studio Code
 - JetBrains IDEs Family (IntelliJ IDEA, PyCharm, WebStorm, ... )
+- Microsoft Visual Studio (**NEW IN** 1.3.0)
 
 ## ⚠️ Read before usage:
 
