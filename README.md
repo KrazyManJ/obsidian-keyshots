@@ -70,6 +70,7 @@ Added in version 1.2.0, adds ability to choose default hotkeys mappings by IDEs 
 
 Now you can choose from these IDEs:
 
+- Clear (everything blank; set in default when keyshots are installed) (**NEW IN** 1.4.0)
 - Visual Studio Code
 - JetBrains IDEs Family (IntelliJ IDEA, PyCharm, WebStorm, ... )
 - Microsoft Visual Studio (**NEW IN** 1.3.0)
