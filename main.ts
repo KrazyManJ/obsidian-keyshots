@@ -1,4 +1,4 @@
-import { App, Editor, EditorPosition, VaultConfig, EditorSelectionOrCaret, Plugin, PluginSettingTab, Setting, Hotkey, EditorSelection} from 'obsidian';
+import { App, Editor, EditorPosition, VaultConfig, EditorSelectionOrCaret, Plugin, PluginSettingTab, Setting, Hotkey, EditorSelection, EditorRange} from 'obsidian';
 
 /*
 ========================================================================
@@ -53,6 +53,18 @@ const selectionsProcessor = (
 	(arrCallback !== undefined ? arrCallback(editor.listSelections()) : editor.listSelections())
 		.forEach((sel, index) => newSelections.push(fct(sel, index)))
 	editor.setSelections(newSelections)
+}
+
+const lineSubstring = (text:string, start: EditorPosition, end?: EditorPosition) => {
+	if (end === undefined) return text.split("\n").slice(start.line).join("\n").substring(start.ch)
+	return text.split("\n").slice(0, end.line).join("\n").substring(0,text.split("\n").slice(0, end.line).join("\n").length-end.ch)
+}
+
+const selectionsEqual = (one: EditorSelection, two: EditorSelection) => {
+	return one.anchor.ch === two.anchor.ch 
+	&& one.anchor.line === two.anchor.line
+	&& one.head.line === two.head.line
+	&& one.head.ch === two.head.ch
 }
 
 function moveLine(editor: Editor, direction: number, border: number) {
@@ -204,7 +216,6 @@ function splitSelectedTextOnNewLine(editor: Editor) {
 function sortSelectedLines(editor: Editor) {
 	selectionsProcessor(editor, arr => arr.filter(f => !isCaret(f)), sel => {
 		const [from, to] = expandLines(editor, ...fromToPos(sel.anchor, sel.head))
-		console.log(editor.getRange(from, to).split("\n"))
 		editor.replaceRange(
 			editor.getRange(from, to).split("\n")
 				.sort((a, b) => a.localeCompare(b, undefined, { numeric: true, sensitivity: "base" }))
@@ -213,7 +224,70 @@ function sortSelectedLines(editor: Editor) {
 		const [nFrom,nTo] = expandLines(editor,from,to)
 		return {anchor:nFrom,head:nTo}
 	})
-
+}
+function selectWordInstances(editor: Editor){
+	const selections: EditorSelection[] = editor.listSelections()
+	let range: EditorRange | undefined;
+	if (selections.filter(s => isCaret(s)).length > 0){
+		selections.filter(s => isCaret(s)).forEach((sel,i) => {
+			const txt = editor.getLine(sel.anchor.line)
+			const postCh = (txt.substring(sel.anchor.ch).match(/^[\w]+/i) || [""])[0].length
+			const preCh = (txt.substring(0,sel.anchor.ch).match(/[\w]+$/i) || [""])[0].length
+			selections[i] = {
+				anchor: {line: sel.anchor.line, ch: sel.anchor.ch-preCh},
+				head: {line: sel.anchor.line, ch: sel.anchor.ch+postCh}
+			}
+		})
+	}
+	else if (
+		selections.filter(s => !isCaret(s)).length === selections.length 
+		&& selections.every((val,_i,arr) => editor.getRange(...fromToPos(arr[0].anchor,arr[0].head)) === editor.getRange(...fromToPos(val.anchor,val.head)))
+	) {
+		let lowestSelList = selections.filter(s => s.head.line === Math.max(...selections.map(s => s.head.line)))
+		const lowestSel = lowestSelList.filter(s => s.head.ch === Math.max(...lowestSelList.map(s => s.head.ch)))[0]
+		let [from,to] = fromToPos(lowestSel.anchor,lowestSel.head)
+		const tx = editor.getRange(from,to)
+		const match = lineSubstring(editor.getValue(),to).match(tx)
+		if (match !== null){
+			const [scrlFrom,scrlTo] = [
+				{ line: to.line , ch: to.ch+(match.index || 0) },
+				{ line: to.line , ch: to.ch+(match.index || 0)+tx.length }
+			]
+			selections.push({anchor: scrlFrom, head: scrlTo})
+			range = {from: scrlFrom, to: scrlTo}
+		}
+		else {
+			let searchText = editor.getValue()
+			let shift = 0
+			let match = searchText.match(tx)
+			while (match !== null){
+				const prevTx = editor.getValue().substring(0,shift+(match?.index ||0))
+				const line = prevTx.split("\n").length-1
+				const char = prevTx.split("\n")[line].length
+				const [selStart,selEnd] = [
+					{line:line,ch:char},{
+						line:line+tx.split("\n").length-1,
+						ch:tx.split("\n").length > 1
+						? tx.split("\n")[tx.split("\n").length-1].length
+						: char+tx.length
+					}
+				]
+				const sel = {anchor:selStart,head:selEnd}
+				if (selections.filter(s => selectionsEqual(sel,s)).length === 0){
+					selections.push(sel)
+					range = {from: selStart, to: selEnd}
+					break;
+				}
+				else {
+					shift += (match?.index || 0)+tx.length
+					searchText = searchText.substring((match?.index || 0)+tx.length)
+				}
+				match = searchText.match(tx)
+			}
+		}
+	}
+	editor.setSelections(selections);
+	if (range !== undefined) editor.scrollIntoView(range);
 }
 
 interface KeyshotsSettings {
@@ -245,6 +319,7 @@ declare interface KeyshotsMap {
 	transform_selections_to_uppercase?: Hotkey[]
 	transform_selections_to_titlecase?: Hotkey[]
 	sort_selected_lines?: Hotkey[]
+	select_multiple_word_instances?: Hotkey[]
 }
 
 const DEFAULT_MAP: KeyshotsMap = {
@@ -270,7 +345,8 @@ const KEYSHOTS_MAPS: {[key: string]: KeyshotsMap} = {
 		move_line_up: [{ modifiers: ["Alt"], key: "ArrowUp" }],
 		move_line_down: [{ modifiers: ["Alt"], key: "ArrowDown" }],
 		duplicate_line_up: [{ modifiers: ["Alt", "Shift"], key: "ArrowUp" }],
-		duplicate_line_down: [{ modifiers: ["Alt", "Shift"], key: "ArrowDown" }]
+		duplicate_line_down: [{ modifiers: ["Alt", "Shift"], key: "ArrowDown" }],
+		select_multiple_word_instances: [{ modifiers: ["Mod"], key: "D" }]
 	},
 	"jetbrains": { ...DEFAULT_MAP,
 		move_line_up: [{ modifiers: ["Alt", "Shift"], key: "ArrowUp" }],
@@ -437,6 +513,12 @@ export default class KeyshotsPlugin extends Plugin {
 				name: "Sort selected lines",
 				hotkeys: MAP.sort_selected_lines,
 				editorCallback: (editor) => sortSelectedLines(editor)
+			}).id,
+			this.addCommand({
+				id: 'select-multiple-word-instances',
+				name: "Select multiple word instances",
+				hotkeys: MAP.select_multiple_word_instances,
+				editorCallback: (editor) => selectWordInstances(editor)
 			}).id
 		)
 		this.command_ids = new Set(IDS);
