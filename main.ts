@@ -22,6 +22,10 @@ declare module 'obsidian' {
 	}
 }
 
+enum VerticalDirection {
+	UP = -1,
+	DOWN = 1
+}
 
 const isCaret = (sel: EditorSelectionOrCaret) => sel.anchor.ch === sel.head?.ch && sel.anchor.line === sel.head.line;
 const isSelection = (sel: EditorSelectionOrCaret) => !isCaret(sel)
@@ -35,6 +39,8 @@ const normalizeSelection = (sel: EditorSelection): EditorSelection => {
 const selToPos = (sel: EditorSelection):[EditorPosition,EditorPosition] => [sel.anchor, sel.head]
 const posToSel = (anchor: EditorPosition, head: EditorPosition):EditorSelection => { return {anchor: anchor, head: head} }
 const getRangeSel = (editor: Editor, sel: EditorSelection):string => editor.getRange(...selToPos(normalizeSelection(sel)))
+const rangeToSelection = (range: EditorRange): EditorSelection => { return {anchor: range.from, head: range.to} }
+const selectionToRange = (range: EditorSelection): EditorRange => { return {from: range.anchor, to: range.head} }
 
 const expandSelection = (editor: Editor, sel: EditorSelection) : EditorSelection => {
 	sel = normalizeSelection(sel)
@@ -75,7 +81,7 @@ const selectionsEqual = (one: EditorSelection, two: EditorSelection) => {
 	&& one.head.ch === two.head.ch
 }
 
-function moveLine(editor: Editor, direction: number, border: number) {
+function moveLine(editor: Editor, direction: VerticalDirection, border: number) {
 	selectionsProcessor(editor, undefined, (sel) => {
 		if (isCaret(sel)) {
 			const pos = sel.anchor
@@ -127,7 +133,7 @@ function jetBrainsDuplicate(editor:Editor) {
 		}
 	})
 }
-function vscodeDuplicate(editor: Editor, direction: number) {
+function vscodeDuplicate(editor: Editor, direction: VerticalDirection) {
 	selectionsProcessor(editor, undefined, (sel) => {
 		if (isCaret(sel)) {
 			const ln = sel.anchor.line
@@ -150,7 +156,7 @@ function vscodeDuplicate(editor: Editor, direction: number) {
 		return sel
 	})
 }
-function addCarets(editor: Editor, direction: number, border: number) {
+function addCarets(editor: Editor, direction: VerticalDirection, border: number) {
 	const newSelections: EditorSelectionOrCaret[] = editor.listSelections()
 	const caretSelectsOnly = newSelections.filter(val => isCaret(val))
 	if (caretSelectsOnly.length === 0) return;
@@ -173,7 +179,7 @@ function convertSpacesUnderScores(editor: Editor) {
 		return replaceToSpace(tx)
 	})
 }
-function insertLine(editor: Editor, direction: number) {
+function insertLine(editor: Editor, direction: VerticalDirection) {
 	selectionsProcessor(editor, (s) => s.sort((a, b) => a.anchor.line - b.anchor.line), (sel, index) => {
 		const a = (ln: number) => {
 			const tx = [editor.getLine(ln), "\n"]
@@ -241,7 +247,13 @@ const lowestSelection = (selections: EditorSelection[]): EditorSelection => {
 		normalizeSelection(sel).head.ch === Math.max(...arr.map(s =>normalizeSelection(s).head.ch))
 	)[0]
 }
-
+const selectionValuesEqual = (editor: Editor, selections: EditorSelection[], case_sensitive: boolean): boolean => {
+	return selections.every((val,_i,arr) => {
+		const [one,two] = [arr[0],val].map(s => editor.getRange(...selToPos(normalizeSelection(s))))
+		if (!case_sensitive) return one.toLowerCase() === two.toLowerCase()
+		return one === two
+	})
+}
 
 function selectWord(editor: Editor, sel: EditorSelection): EditorSelection{
 	sel = normalizeSelection(sel)
@@ -257,28 +269,18 @@ function selectWord(editor: Editor, sel: EditorSelection): EditorSelection{
 function selectWordInstances(editor: Editor, case_sensitive: boolean){
 	const selections: EditorSelection[] = editor.listSelections()
 	let range: EditorRange | undefined;
-	if (selections.filter(isCaret).length > 0) selections.filter(isCaret)
-		.forEach((sel,i) => selections[i] = selectWord(editor,sel))
-	else if (
-		selections.filter(isSelection).length === selections.length 
-		&& selections.every((val,_i,arr) => {
-			const one = editor.getRange(...selToPos(normalizeSelection(arr[0])))
-			const two = editor.getRange(...selToPos(normalizeSelection(val)))
-			if (!case_sensitive) return one.toLowerCase() === two.toLowerCase()
-			return one === two
-		})
-	) {
+	if (selections.filter(isCaret).length > 0) selections.filter(isCaret).forEach((sel,i) => selections[i] = selectWord(editor,sel))
+	else if (selections.filter(isSelection).length === selections.length && selectionValuesEqual(editor,selections,case_sensitive)) {
 		let {anchor: from, head: to} = normalizeSelection(lowestSelection(selections))
-		console.log(editor.posToOffset(from))
 		const tx = !case_sensitive ? editor.getRange(from,to).toLowerCase() : editor.getRange(from,to)
 		const match = lineSubstring(!case_sensitive ? editor.getValue().toLowerCase() : editor.getValue(),to).match(tx)
 		if (match !== null){
-			const [scrlFrom,scrlTo] = [
-				{ line: to.line , ch: to.ch+(match.index || 0) },
-				{ line: to.line , ch: to.ch+(match.index || 0)+tx.length }
-			]
-			selections.push({anchor: scrlFrom, head: scrlTo})
-			range = {from: scrlFrom, to: scrlTo}
+			const sel = {
+				anchor: editor.offsetToPos(editor.posToOffset(to)+(match.index||0)),
+				head: editor.offsetToPos(editor.posToOffset(to)+(match.index||0)+tx.length)
+			}
+			selections.push(sel)
+			range = selectionToRange(sel)
 		}
 		else {
 			let searchText = !case_sensitive ? editor.getValue().toLowerCase() : editor.getValue()
@@ -286,20 +288,10 @@ function selectWordInstances(editor: Editor, case_sensitive: boolean){
 			let match = searchText.match(tx)
 			while (match !== null){
 				const prevTx = (!case_sensitive ? editor.getValue().toLowerCase() : editor.getValue()).substring(0,shift+(match?.index ||0))
-				const line = prevTx.split("\n").length-1
-				const char = prevTx.split("\n")[line].length
-				const [selStart,selEnd] = [
-					{line:line,ch:char},{
-						line:line+tx.split("\n").length-1,
-						ch:tx.split("\n").length > 1
-						? tx.split("\n")[tx.split("\n").length-1].length
-						: char+tx.length
-					}
-				]
-				const sel = {anchor:selStart,head:selEnd}
+				const sel = {anchor: editor.offsetToPos(prevTx.length),head: editor.offsetToPos(prevTx.length+tx.length)}
 				if (selections.filter(s => selectionsEqual(sel,s)).length === 0){
 					selections.push(sel)
-					range = {from: selStart, to: selEnd}
+					range = selectionToRange(sel)
 					break;
 				}
 				else {
@@ -313,21 +305,24 @@ function selectWordInstances(editor: Editor, case_sensitive: boolean){
 	editor.setSelections(selections);
 	if (range !== undefined) editor.scrollIntoView(range);
 }
+
+
 function selectAllWordInstances(editor: Editor, case_sensitive: boolean){
 	const selections: EditorSelection[] = editor.listSelections()
 	selections.filter(isCaret).forEach((sel,i) => selections[i] = selectWord(editor,sel))
-	if (
-		selections.filter(isSelection).length === selections.length 
-		&& selections.every((val,_i,arr) => getRangeSel(editor,arr[0]) === getRangeSel(editor,arr[0]))
-	){
+	if (selections.filter(isSelection).length === selections.length && selectionValuesEqual(editor,selections,case_sensitive)){
 		const tx = getRangeSel(editor,selections[0])
 		Array.from(editor.getValue().matchAll(new RegExp(tx,"g"+(case_sensitive?"":"i"))), v => v.index || 0)
-		.forEach(v => {
-			selections.push({anchor: {line: 0, ch: v},head: {line: 0, ch: v+tx.length}})
-		})
+		.forEach(v => {selections.push({anchor: {line: 0, ch: v},head: {line: 0, ch: v+tx.length}})})
 	}
 	else return;
 	editor.setSelections(selections);
+}
+
+class KeyshotsExecutor {
+	static toggle_readable_length() {
+
+	}
 }
 
 interface KeyshotsSettings {
@@ -450,37 +445,37 @@ export default class KeyshotsPlugin extends Plugin {
 				id: 'move-line-up',
 				name: 'Move line up',
 				hotkeys: MAP.move_line_up,
-				editorCallback: (editor) => moveLine(editor, -1, 0)
+				editorCallback: (editor) => moveLine(editor, VerticalDirection.UP, 0)
 			}).id,
 			this.addCommand({
 				id: 'move-line-down',
 				name: 'Move line down',
 				hotkeys: MAP.move_line_down,
-				editorCallback: (editor) => moveLine(editor, 1, editor.lineCount()-1)
+				editorCallback: (editor) => moveLine(editor, VerticalDirection.DOWN, editor.lineCount()-1)
 			}).id,
 			this.addCommand({
 				id: 'add-carets-up',
 				name: 'Add caret cursor up',
 				hotkeys: MAP.add_carets_up,
-				editorCallback: (editor) => addCarets(editor, -1, 0)
+				editorCallback: (editor) => addCarets(editor, VerticalDirection.UP, 0)
 			}).id,
 			this.addCommand({
 				id: 'add-carets-down',
 				name: 'Add caret cursor down',
 				hotkeys: MAP.add_carets_down,
-				editorCallback: (editor) => addCarets(editor, 1, editor.lineCount())
+				editorCallback: (editor) => addCarets(editor, VerticalDirection.DOWN, editor.lineCount())
 			}).id,
 			this.addCommand({
 				id: 'duplicate-line-up',
 				name: 'Duplicate line up (Visual Studio Code)',
 				hotkeys: MAP.duplicate_line_up,
-				editorCallback: (editor) => vscodeDuplicate(editor, -1)
+				editorCallback: (editor) => vscodeDuplicate(editor, VerticalDirection.UP)
 			}).id,
 			this.addCommand({
 				id: 'duplicate-line-down',
 				name: 'Duplicate line down (Visual Studio Code)',
 				hotkeys: MAP.duplicate_line_down,
-				editorCallback: (editor) => vscodeDuplicate(editor, 1)
+				editorCallback: (editor) => vscodeDuplicate(editor, VerticalDirection.DOWN)
 			}).id,
 			this.addCommand({
 				id: 'duplicate-selection-or-line',
@@ -492,13 +487,13 @@ export default class KeyshotsPlugin extends Plugin {
 				id: 'insert-line-below',
 				name: "Insert line below",
 				hotkeys: MAP.insert_line_below,
-				editorCallback: (editor) => insertLine(editor, 1)
+				editorCallback: (editor) => insertLine(editor, VerticalDirection.UP)
 			}).id,
 			this.addCommand({
 				id: 'insert-line-above',
 				name: "Insert line above",
 				hotkeys: MAP.insert_line_above,
-				editorCallback: (editor) => insertLine(editor, -1)
+				editorCallback: (editor) => insertLine(editor, VerticalDirection.DOWN)
 			}).id,
 			this.addCommand({
 				id: 'join-selected-lines',
