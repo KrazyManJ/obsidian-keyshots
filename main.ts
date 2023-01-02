@@ -289,6 +289,29 @@ function selectWordInstances(editor: Editor){
 	editor.setSelections(selections);
 	if (range !== undefined) editor.scrollIntoView(range);
 }
+function selectAllWordInstances(editor: Editor){
+	const selections: EditorSelection[] = editor.listSelections()
+	if (selections.filter(isCaret).length > 0){
+		selections.filter(isCaret).forEach((sel,i) => {
+			const txt = editor.getLine(sel.anchor.line)
+			selections[i] = {
+				anchor: {line: sel.anchor.line, ch: sel.anchor.ch-(txt.substring(0,sel.anchor.ch).match(/[\w]+$/i) || [""])[0].length},
+				head: {line: sel.anchor.line, ch: sel.anchor.ch+(txt.substring(sel.anchor.ch).match(/^[\w]+/i) || [""])[0].length}
+			}
+		})
+	}
+	if (
+		selections.filter(s => !isCaret(s)).length === selections.length 
+		&& selections.every((val,_i,arr) => editor.getRange(...fromToPos(arr[0].anchor,arr[0].head)) === editor.getRange(...fromToPos(val.anchor,val.head)))
+	){
+		const tx = editor.getRange(...fromToPos(selections[0].anchor,selections[0].head))
+		Array.from(editor.getValue().matchAll(new RegExp(tx,"g")), v => v.index || 0).forEach(v => {
+			selections.push({anchor: {line: 0, ch: v},head: {line: 0, ch: v+tx.length}})
+		})
+	}
+	else return;
+	editor.setSelections(selections);
+}
 
 interface KeyshotsSettings {
 	ide_mappings: string;
@@ -320,11 +343,11 @@ declare interface KeyshotsMap {
 	transform_selections_to_titlecase?: Hotkey[]
 	sort_selected_lines?: Hotkey[]
 	select_multiple_word_instances?: Hotkey[]
+	select_all_word_instances?: Hotkey[]
 }
 
 const DEFAULT_MAP: KeyshotsMap = {
 	toggle_readable_length: [{ modifiers: ["Mod", "Shift"], key: "R" }],
-	toggle_line_numbers: [{ modifiers: ["Mod", "Shift"], key: "L" }],
 	add_carets_up: [{ modifiers: ["Alt", "Mod"], key: "ArrowUp" }],
 	add_carets_down: [{ modifiers: ["Alt", "Mod"], key: "ArrowDown" }],
 	insert_line_below: [{ modifiers: ["Shift"], key: "Enter" }],
@@ -346,7 +369,8 @@ const KEYSHOTS_MAPS: {[key: string]: KeyshotsMap} = {
 		move_line_down: [{ modifiers: ["Alt"], key: "ArrowDown" }],
 		duplicate_line_up: [{ modifiers: ["Alt", "Shift"], key: "ArrowUp" }],
 		duplicate_line_down: [{ modifiers: ["Alt", "Shift"], key: "ArrowDown" }],
-		select_multiple_word_instances: [{ modifiers: ["Mod"], key: "D" }]
+		select_multiple_word_instances: [{ modifiers: ["Mod"], key: "D" }],
+		select_all_word_instances: [{ modifiers: ["Ctrl","Shift"], key: "L"}]
 	},
 	"jetbrains": { ...DEFAULT_MAP,
 		move_line_up: [{ modifiers: ["Alt", "Shift"], key: "ArrowUp" }],
@@ -519,6 +543,12 @@ export default class KeyshotsPlugin extends Plugin {
 				name: "Select multiple word instances",
 				hotkeys: MAP.select_multiple_word_instances,
 				editorCallback: (editor) => selectWordInstances(editor)
+			}).id,
+			this.addCommand({
+				id: 'select-all-word-instances',
+				name: "Select all word instances",
+				hotkeys: MAP.select_all_word_instances,
+				editorCallback: (editor) => selectAllWordInstances(editor)
 			}).id
 		)
 		this.command_ids = new Set(IDS);
