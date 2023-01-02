@@ -225,7 +225,7 @@ function sortSelectedLines(editor: Editor) {
 		return {anchor:nFrom,head:nTo}
 	})
 }
-function selectWordInstances(editor: Editor){
+function selectWordInstances(editor: Editor, case_sensitive: boolean){
 	const selections: EditorSelection[] = editor.listSelections()
 	let range: EditorRange | undefined;
 	if (selections.filter(s => isCaret(s)).length > 0){
@@ -241,13 +241,18 @@ function selectWordInstances(editor: Editor){
 	}
 	else if (
 		selections.filter(s => !isCaret(s)).length === selections.length 
-		&& selections.every((val,_i,arr) => editor.getRange(...fromToPos(arr[0].anchor,arr[0].head)) === editor.getRange(...fromToPos(val.anchor,val.head)))
+		&& selections.every((val,_i,arr) => {
+			const one = editor.getRange(...fromToPos(arr[0].anchor,arr[0].head))
+			const two = editor.getRange(...fromToPos(val.anchor,val.head))
+			if (!case_sensitive) return one.toLowerCase() === two.toLowerCase()
+			return one === two
+		})
 	) {
 		let lowestSelList = selections.filter(s => s.head.line === Math.max(...selections.map(s => s.head.line)))
 		const lowestSel = lowestSelList.filter(s => s.head.ch === Math.max(...lowestSelList.map(s => s.head.ch)))[0]
 		let [from,to] = fromToPos(lowestSel.anchor,lowestSel.head)
-		const tx = editor.getRange(from,to)
-		const match = lineSubstring(editor.getValue(),to).match(tx)
+		const tx = !case_sensitive ? editor.getRange(from,to).toLowerCase() : editor.getRange(from,to)
+		const match = lineSubstring(!case_sensitive ? editor.getValue().toLowerCase() : editor.getValue(),to).match(tx)
 		if (match !== null){
 			const [scrlFrom,scrlTo] = [
 				{ line: to.line , ch: to.ch+(match.index || 0) },
@@ -257,11 +262,11 @@ function selectWordInstances(editor: Editor){
 			range = {from: scrlFrom, to: scrlTo}
 		}
 		else {
-			let searchText = editor.getValue()
+			let searchText = !case_sensitive ? editor.getValue().toLowerCase() : editor.getValue()
 			let shift = 0
 			let match = searchText.match(tx)
 			while (match !== null){
-				const prevTx = editor.getValue().substring(0,shift+(match?.index ||0))
+				const prevTx = (!case_sensitive ? editor.getValue().toLowerCase() : editor.getValue()).substring(0,shift+(match?.index ||0))
 				const line = prevTx.split("\n").length-1
 				const char = prevTx.split("\n")[line].length
 				const [selStart,selEnd] = [
@@ -289,7 +294,8 @@ function selectWordInstances(editor: Editor){
 	editor.setSelections(selections);
 	if (range !== undefined) editor.scrollIntoView(range);
 }
-function selectAllWordInstances(editor: Editor){
+function selectAllWordInstances(editor: Editor, case_sensitive: boolean){
+	console.log(case_sensitive)
 	const selections: EditorSelection[] = editor.listSelections()
 	if (selections.filter(isCaret).length > 0){
 		selections.filter(isCaret).forEach((sel,i) => {
@@ -305,7 +311,7 @@ function selectAllWordInstances(editor: Editor){
 		&& selections.every((val,_i,arr) => editor.getRange(...fromToPos(arr[0].anchor,arr[0].head)) === editor.getRange(...fromToPos(val.anchor,val.head)))
 	){
 		const tx = editor.getRange(...fromToPos(selections[0].anchor,selections[0].head))
-		Array.from(editor.getValue().matchAll(new RegExp(tx,"g")), v => v.index || 0).forEach(v => {
+		Array.from(editor.getValue().matchAll(new RegExp(tx,"g"+(case_sensitive?"":"i"))), v => v.index || 0).forEach(v => {
 			selections.push({anchor: {line: 0, ch: v},head: {line: 0, ch: v+tx.length}})
 		})
 	}
@@ -315,10 +321,14 @@ function selectAllWordInstances(editor: Editor){
 
 interface KeyshotsSettings {
 	ide_mappings: string;
+	s_m_w_i_case_sensitive: boolean;
+	s_a_w_i_case_sensitive: boolean;
 }
 
 const DEFAULT_SETTINGS: KeyshotsSettings = {
-	ide_mappings: "clear"
+	ide_mappings: "clear",
+	s_a_w_i_case_sensitive: true,
+	s_m_w_i_case_sensitive: true,
 }
 
 declare interface KeyshotsMap {
@@ -542,13 +552,13 @@ export default class KeyshotsPlugin extends Plugin {
 				id: 'select-multiple-word-instances',
 				name: "Select multiple word instances",
 				hotkeys: MAP.select_multiple_word_instances,
-				editorCallback: (editor) => selectWordInstances(editor)
+				editorCallback: (editor) => selectWordInstances(editor, this.settings.s_m_w_i_case_sensitive)
 			}).id,
 			this.addCommand({
 				id: 'select-all-word-instances',
 				name: "Select all word instances",
 				hotkeys: MAP.select_all_word_instances,
-				editorCallback: (editor) => selectAllWordInstances(editor)
+				editorCallback: (editor) => selectAllWordInstances(editor, this.settings.s_a_w_i_case_sensitive)
 			}).id
 		)
 		this.command_ids = new Set(IDS);
@@ -575,6 +585,7 @@ class KeyshotsSettingTab extends PluginSettingTab {
 		const { containerEl } = this;
 		containerEl.empty()
 		containerEl.createEl('h1', { text: "Keyshots Settings" })
+		containerEl.createEl('h2', { text: "⌨️ Default keys" })
 		new Setting(containerEl)
 			.setName("IDE Keys Mapping")
 			.setDesc("Change default hotkeys based on IDE, that you are comfortable with. This does not overwrite your custom hotkeys!")
@@ -587,6 +598,34 @@ class KeyshotsSettingTab extends PluginSettingTab {
 				.onChange(async (value) => {
 					this.plugin.settings.ide_mappings = value
 					await this.plugin.loadCommands()
+					await this.plugin.saveSettings()
+				})
+			)
+		containerEl.createEl('h2', { text: "⚙️ Other settings" })
+		const smwi_name = document.createDocumentFragment()
+		smwi_name.createEl("kbd",{text:"select-multiple-word-instances"})
+		smwi_name.append(" case sensitivity")
+		new Setting(containerEl)
+			.setName(smwi_name)
+			.setDesc("Determines if command should check case sensitivity while matching several text pieces.")
+			.addToggle(cb => cb
+				.setValue(this.plugin.settings.s_m_w_i_case_sensitive)
+				.onChange(async (value) => {
+					this.plugin.settings.s_m_w_i_case_sensitive = value
+					await this.plugin.saveSettings()
+				})
+
+			)
+		const sawi_name = document.createDocumentFragment()
+		sawi_name.createEl("kbd",{text:"select-all-word-instances"})
+		sawi_name.append(" case sensitivity")
+		new Setting(containerEl)
+			.setName(sawi_name)
+			.setDesc("Determines if command should check case sensitivity while matching all text pieces.")
+			.addToggle(cb => cb
+				.setValue(this.plugin.settings.s_a_w_i_case_sensitive)
+				.onChange(async (value) => {
+					this.plugin.settings.s_a_w_i_case_sensitive = value
 					await this.plugin.saveSettings()
 				})
 			)
