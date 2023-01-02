@@ -1,4 +1,4 @@
-import { App, Editor, EditorPosition, VaultConfig, EditorSelectionOrCaret, Plugin, PluginSettingTab, Setting, Hotkey, EditorSelection, EditorRange} from 'obsidian';
+import { App, Editor, EditorPosition, VaultConfig, EditorSelectionOrCaret, Plugin, PluginSettingTab, Setting, Hotkey, EditorSelection, EditorRange, EditorCommandName, EditorTransaction} from 'obsidian';
 
 /*
 ========================================================================
@@ -24,22 +24,30 @@ declare module 'obsidian' {
 
 
 const isCaret = (sel: EditorSelectionOrCaret) => sel.anchor.ch === sel.head?.ch && sel.anchor.line === sel.head.line;
+const isSelection = (sel: EditorSelectionOrCaret) => !isCaret(sel)
 
-const fromToPos = (one: EditorPosition, two: EditorPosition): [EditorPosition, EditorPosition] => {
-	if (one.line == two.line) return one.ch > two.ch ? [two, one] : [one, two]
-	return one.line < two.line ? [one, two] : [two, one]
+const normalizeSelection = (sel: EditorSelection): EditorSelection => {
+	if (sel.anchor.line == sel.head.line) 
+	return sel.anchor.ch > sel.head.ch ? {anchor: sel.head, head: sel.anchor} : {anchor: sel.anchor, head: sel.head}
+	return sel.anchor.line < sel.head.line ? {anchor: sel.anchor, head: sel.head} : {anchor: sel.head, head: sel.anchor}
 }
-const expandLines = (editor: Editor, from: EditorPosition, to: EditorPosition) : [EditorPosition, EditorPosition] => {
-	return [
-		{ ch: 0, line: from.line },
-		{ ch: editor.getLine(to.line).length, line: to.line }
-	]
+
+const selToPos = (sel: EditorSelection):[EditorPosition,EditorPosition] => [sel.anchor, sel.head]
+const posToSel = (anchor: EditorPosition, head: EditorPosition):EditorSelection => { return {anchor: anchor, head: head} }
+const getRangeSel = (editor: Editor, sel: EditorSelection):string => editor.getRange(...selToPos(normalizeSelection(sel)))
+
+const expandSelection = (editor: Editor, sel: EditorSelection) : EditorSelection => {
+	sel = normalizeSelection(sel)
+	return {
+		anchor: { ch: 0, line: sel.anchor.line },
+		head: { ch: editor.getLine(sel.head.line).length, line: sel.head.line }
+	}
 }
 const flipBooleanSetting = (app: App, setting: keyof VaultConfig) => app.vault.setConfig(setting, !app.vault.getConfig(setting))
 
 const replaceSelections = (editor: Editor, transformFct: (val: string) => string) => {
-	editor.listSelections().filter(sel => !isCaret(sel)).forEach(sel => { 
-		const [from, to] = fromToPos(sel.anchor, sel.head)
+	editor.listSelections().filter(isSelection).forEach(sel => { 
+		const { anchor:from, head:to } = normalizeSelection(sel)
 		editor.replaceRange(transformFct(editor.getRange(from,to)),from,to)
 	})
 }
@@ -79,10 +87,10 @@ function moveLine(editor: Editor, direction: number, border: number) {
 			}
 		}
 		else {
-			const [from, to] = fromToPos(sel.anchor,sel.head)
+			const {anchor:from, head:to} = normalizeSelection(sel)
 			const borderLine = direction < 0 ? from.line : to.line
 			if (borderLine !== border) {
-				const [lfrom, lto] = expandLines(editor,from,to)
+				const {anchor:lfrom, head:lto} = expandSelection(editor,sel)
 				const [txA,txB] = [editor.getRange(lfrom,lto),editor.getLine(borderLine + direction)]
 				if (direction > 0) {
 					editor.setLine(borderLine + direction, txA)
@@ -110,7 +118,7 @@ function jetBrainsDuplicate(editor:Editor) {
 			return { anchor: { line: sel.anchor.line + 1, ch: sel.anchor.ch } }
 		}
 		else {
-			const [from, to] = fromToPos(sel.anchor,sel.head)
+			const {anchor:from, head:to} = normalizeSelection(sel)
 			const tx = editor.getRange(from, to)
 			editor.replaceRange(tx, from, from)
 			return (sel.anchor.line === sel.head.line)
@@ -128,8 +136,8 @@ function vscodeDuplicate(editor: Editor, direction: number) {
 			if (direction > 0) return { anchor: { line: sel.anchor.line + 1, ch: sel.anchor.ch } }
 		}
 		else {
-			const [from, to] = fromToPos(sel.anchor,sel.head)
-			const [lfrom, lto] = expandLines(editor,from,to)
+			const {anchor:from, head:to} = normalizeSelection(sel)
+			const {anchor:lfrom, head:lto} = expandSelection(editor,normalizeSelection(sel))
 			const tx = editor.getRange(lfrom, lto)
 			editor.replaceRange(tx + "\n" + tx, lfrom, lto)
 			if (direction > 0) {
@@ -175,7 +183,7 @@ function insertLine(editor: Editor, direction: number) {
 		}
 		if (isCaret(sel)) return a(sel.anchor.line+index)
 		else {
-			const [from, to] = fromToPos(sel.anchor,sel.head)
+			const {anchor:from, head:to} = normalizeSelection(sel)
 			return a((direction > 0 ? to.line : from.line) + index)
 		}
 	})
@@ -198,10 +206,10 @@ function splitSelectedTextOnNewLine(editor: Editor) {
 	selectionsProcessor(editor, arr => arr.sort((a,b) => a.anchor.line - b.anchor.line), sel => {
 		if (isCaret(sel)) return sel
 		else {
-			const [from, to] = fromToPos(
-				{ch:sel.anchor.ch,line:sel.anchor.line+index},
-				{ch:sel.head.ch,line:sel.head.line+index}
-			)
+			const {anchor:from, head:to} = normalizeSelection({
+				anchor: {ch:sel.anchor.ch,line:sel.anchor.line+index},
+				head: {ch:sel.head.ch,line:sel.head.line+index}
+			})
 			const tx = editor.getRange(from, to)
 			editor.replaceRange("\n" + tx + "\n", from, to)
 			index += (tx.match(/\n/g) || []).length+1
@@ -214,43 +222,54 @@ function splitSelectedTextOnNewLine(editor: Editor) {
 }
 
 function sortSelectedLines(editor: Editor) {
-	selectionsProcessor(editor, arr => arr.filter(f => !isCaret(f)), sel => {
-		const [from, to] = expandLines(editor, ...fromToPos(sel.anchor, sel.head))
+	selectionsProcessor(editor, arr => arr.filter(isSelection), sel => {
+		const {anchor:from, head:to}= expandSelection(editor, normalizeSelection(sel))
 		editor.replaceRange(
-			editor.getRange(from, to).split("\n")
+			editor.getRange(from, to)
+				.split("\n")
 				.sort((a, b) => a.localeCompare(b, undefined, { numeric: true, sensitivity: "base" }))
 				.join("\n")
 			, from, to)
-		const [nFrom,nTo] = expandLines(editor,from,to)
-		return {anchor:nFrom,head:nTo}
+		return expandSelection(editor,normalizeSelection(sel))
 	})
 }
+
+const lowestSelection = (selections: EditorSelection[]): EditorSelection => {
+	return selections.filter((sel,_i,arr) => 
+		normalizeSelection(sel).head.line === Math.max(...arr.map(s => normalizeSelection(s).head.line))
+	).filter((sel,_i,arr) =>
+		normalizeSelection(sel).head.ch === Math.max(...arr.map(s =>normalizeSelection(s).head.ch))
+	)[0]
+}
+
+
+function selectWord(editor: Editor, sel: EditorSelection): EditorSelection{
+	sel = normalizeSelection(sel)
+	const txt = editor.getLine(sel.anchor.line)
+	const postCh = (txt.substring(sel.anchor.ch).match(/^[\w]+/i) || [""])[0].length
+	const preCh = (txt.substring(0,sel.anchor.ch).match(/[\w]+$/i) || [""])[0].length
+	return {
+		anchor: {line: sel.anchor.line, ch: sel.anchor.ch-preCh},
+		head: {line: sel.anchor.line, ch: sel.anchor.ch+postCh}
+	}
+}
+
 function selectWordInstances(editor: Editor, case_sensitive: boolean){
 	const selections: EditorSelection[] = editor.listSelections()
 	let range: EditorRange | undefined;
-	if (selections.filter(s => isCaret(s)).length > 0){
-		selections.filter(s => isCaret(s)).forEach((sel,i) => {
-			const txt = editor.getLine(sel.anchor.line)
-			const postCh = (txt.substring(sel.anchor.ch).match(/^[\w]+/i) || [""])[0].length
-			const preCh = (txt.substring(0,sel.anchor.ch).match(/[\w]+$/i) || [""])[0].length
-			selections[i] = {
-				anchor: {line: sel.anchor.line, ch: sel.anchor.ch-preCh},
-				head: {line: sel.anchor.line, ch: sel.anchor.ch+postCh}
-			}
-		})
-	}
+	if (selections.filter(isCaret).length > 0) selections.filter(isCaret)
+		.forEach((sel,i) => selections[i] = selectWord(editor,sel))
 	else if (
-		selections.filter(s => !isCaret(s)).length === selections.length 
+		selections.filter(isSelection).length === selections.length 
 		&& selections.every((val,_i,arr) => {
-			const one = editor.getRange(...fromToPos(arr[0].anchor,arr[0].head))
-			const two = editor.getRange(...fromToPos(val.anchor,val.head))
+			const one = editor.getRange(...selToPos(normalizeSelection(arr[0])))
+			const two = editor.getRange(...selToPos(normalizeSelection(val)))
 			if (!case_sensitive) return one.toLowerCase() === two.toLowerCase()
 			return one === two
 		})
 	) {
-		let lowestSelList = selections.filter(s => s.head.line === Math.max(...selections.map(s => s.head.line)))
-		const lowestSel = lowestSelList.filter(s => s.head.ch === Math.max(...lowestSelList.map(s => s.head.ch)))[0]
-		let [from,to] = fromToPos(lowestSel.anchor,lowestSel.head)
+		let {anchor: from, head: to} = normalizeSelection(lowestSelection(selections))
+		console.log(editor.posToOffset(from))
 		const tx = !case_sensitive ? editor.getRange(from,to).toLowerCase() : editor.getRange(from,to)
 		const match = lineSubstring(!case_sensitive ? editor.getValue().toLowerCase() : editor.getValue(),to).match(tx)
 		if (match !== null){
@@ -295,23 +314,15 @@ function selectWordInstances(editor: Editor, case_sensitive: boolean){
 	if (range !== undefined) editor.scrollIntoView(range);
 }
 function selectAllWordInstances(editor: Editor, case_sensitive: boolean){
-	console.log(case_sensitive)
 	const selections: EditorSelection[] = editor.listSelections()
-	if (selections.filter(isCaret).length > 0){
-		selections.filter(isCaret).forEach((sel,i) => {
-			const txt = editor.getLine(sel.anchor.line)
-			selections[i] = {
-				anchor: {line: sel.anchor.line, ch: sel.anchor.ch-(txt.substring(0,sel.anchor.ch).match(/[\w]+$/i) || [""])[0].length},
-				head: {line: sel.anchor.line, ch: sel.anchor.ch+(txt.substring(sel.anchor.ch).match(/^[\w]+/i) || [""])[0].length}
-			}
-		})
-	}
+	selections.filter(isCaret).forEach((sel,i) => selections[i] = selectWord(editor,sel))
 	if (
-		selections.filter(s => !isCaret(s)).length === selections.length 
-		&& selections.every((val,_i,arr) => editor.getRange(...fromToPos(arr[0].anchor,arr[0].head)) === editor.getRange(...fromToPos(val.anchor,val.head)))
+		selections.filter(isSelection).length === selections.length 
+		&& selections.every((val,_i,arr) => getRangeSel(editor,arr[0]) === getRangeSel(editor,arr[0]))
 	){
-		const tx = editor.getRange(...fromToPos(selections[0].anchor,selections[0].head))
-		Array.from(editor.getValue().matchAll(new RegExp(tx,"g"+(case_sensitive?"":"i"))), v => v.index || 0).forEach(v => {
+		const tx = getRangeSel(editor,selections[0])
+		Array.from(editor.getValue().matchAll(new RegExp(tx,"g"+(case_sensitive?"":"i"))), v => v.index || 0)
+		.forEach(v => {
 			selections.push({anchor: {line: 0, ch: v},head: {line: 0, ch: v+tx.length}})
 		})
 	}
@@ -409,7 +420,7 @@ export default class KeyshotsPlugin extends Plugin {
 	}
 
 	async loadCommands() {
-		if (this.command_ids !== undefined) this.command_ids.forEach((a) => this.app.commands.removeCommand(a))
+		if (this.command_ids !== undefined) this.command_ids.forEach(this.app.commands.removeCommand)
 		const IDS: string[] = []
 		const MAP: KeyshotsMap = KEYSHOTS_MAPS[this.settings.ide_mappings]
 		IDS.push(
@@ -503,6 +514,23 @@ export default class KeyshotsPlugin extends Plugin {
 			}).id,
 			/*
 			========================================================================
+				SELECTION CREATION
+			========================================================================
+			*/
+			this.addCommand({
+				id: 'select-multiple-word-instances',
+				name: "Select multiple word instances",
+				hotkeys: MAP.select_multiple_word_instances,
+				editorCallback: (editor) => selectWordInstances(editor, this.settings.s_m_w_i_case_sensitive)
+			}).id,
+			this.addCommand({
+				id: 'select-all-word-instances',
+				name: "Select all word instances",
+				hotkeys: MAP.select_all_word_instances,
+				editorCallback: (editor) => selectAllWordInstances(editor, this.settings.s_a_w_i_case_sensitive)
+			}).id,
+			/*
+			========================================================================
 				SELECTION TRANSFORMATIONS
 			========================================================================
 			*/
@@ -547,18 +575,6 @@ export default class KeyshotsPlugin extends Plugin {
 				name: "Sort selected lines",
 				hotkeys: MAP.sort_selected_lines,
 				editorCallback: (editor) => sortSelectedLines(editor)
-			}).id,
-			this.addCommand({
-				id: 'select-multiple-word-instances',
-				name: "Select multiple word instances",
-				hotkeys: MAP.select_multiple_word_instances,
-				editorCallback: (editor) => selectWordInstances(editor, this.settings.s_m_w_i_case_sensitive)
-			}).id,
-			this.addCommand({
-				id: 'select-all-word-instances',
-				name: "Select all word instances",
-				hotkeys: MAP.select_all_word_instances,
-				editorCallback: (editor) => selectAllWordInstances(editor, this.settings.s_a_w_i_case_sensitive)
 			}).id
 		)
 		this.command_ids = new Set(IDS);
@@ -570,6 +586,27 @@ export default class KeyshotsPlugin extends Plugin {
 
 	async saveSettings() {
 		await this.saveData(this.settings);
+	}
+}
+
+class DocumentFragmentBuilder{
+	#fragment: DocumentFragment
+	constructor(){
+		this.#fragment = document.createDocumentFragment()
+	}
+
+	appendText(text:string){
+		this.#fragment.append(text)
+		return this
+	}
+
+	createElem(tag: keyof HTMLElementTagNameMap, o?: DomElementInfo | string){
+		this.#fragment.createEl(tag,o)
+		return this
+	}
+
+	toFragment(): DocumentFragment{
+		return this.#fragment
 	}
 }
 
@@ -589,11 +626,19 @@ class KeyshotsSettingTab extends PluginSettingTab {
 		new Setting(containerEl)
 			.setName("IDE Keys Mapping")
 			.setDesc("Change default hotkeys based on IDE, that you are comfortable with. This does not overwrite your custom hotkeys!")
+			.setDesc(new DocumentFragmentBuilder()
+				.appendText("Change default hotkeys based on IDE, that you are comfortable with.")
+				.createElem("br")
+				.createElem("b", {text: "❗This does not overwrite your custom Keyshots hotkeys configuration!"})
+				.toFragment()
+			)
 			.addDropdown(cb => cb
-				.addOption("vscode", "Visual Studio Code")
-				.addOption("jetbrains", "JetBrains IDEs (IntelliJ IDEA, Pycharm, ... )")
-				.addOption("visual_studio", "Microsoft Visual Studio")
-				.addOption("clear", "Clear (everything blank; default)")
+				.addOptions({
+					"clear": "Clear (everything blank; default)",
+					"vscode": "Visual Studio Code",
+					"jetbrains": "JetBrains IDEs (IntelliJ IDEA, Pycharm, ... )",
+					"visual_studio": "Microsoft Visual Studio"
+				})
 				.setValue(this.plugin.settings.ide_mappings)
 				.onChange(async (value) => {
 					this.plugin.settings.ide_mappings = value
@@ -602,11 +647,12 @@ class KeyshotsSettingTab extends PluginSettingTab {
 				})
 			)
 		containerEl.createEl('h2', { text: "⚙️ Other settings" })
-		const smwi_name = document.createDocumentFragment()
-		smwi_name.createEl("kbd",{text:"select-multiple-word-instances"})
-		smwi_name.append(" case sensitivity")
 		new Setting(containerEl)
-			.setName(smwi_name)
+			.setName(new DocumentFragmentBuilder()
+				.createElem("kbd",{text:"select-multiple-word-instances"})
+				.appendText(" case sensitivity")
+				.toFragment()
+			)
 			.setDesc("Determines if command should check case sensitivity while matching several text pieces.")
 			.addToggle(cb => cb
 				.setValue(this.plugin.settings.s_m_w_i_case_sensitive)
@@ -614,13 +660,13 @@ class KeyshotsSettingTab extends PluginSettingTab {
 					this.plugin.settings.s_m_w_i_case_sensitive = value
 					await this.plugin.saveSettings()
 				})
-
 			)
-		const sawi_name = document.createDocumentFragment()
-		sawi_name.createEl("kbd",{text:"select-all-word-instances"})
-		sawi_name.append(" case sensitivity")
 		new Setting(containerEl)
-			.setName(sawi_name)
+			.setName(new DocumentFragmentBuilder()
+				.createElem("kbd",{text:"select-all-word-instances"})
+				.appendText(" case sensitivity")
+				.toFragment()
+			)
 			.setDesc("Determines if command should check case sensitivity while matching all text pieces.")
 			.addToggle(cb => cb
 				.setValue(this.plugin.settings.s_a_w_i_case_sensitive)
