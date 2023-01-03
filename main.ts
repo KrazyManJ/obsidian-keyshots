@@ -1,4 +1,4 @@
-import { App, Editor, EditorPosition, VaultConfig, EditorSelectionOrCaret, Plugin, PluginSettingTab, Setting, Hotkey, EditorSelection, EditorRange, EditorCommandName, EditorTransaction} from 'obsidian';
+import { App, Editor, EditorPosition, VaultConfig, Plugin, PluginSettingTab, Setting, Hotkey, EditorSelection, EditorRange, EditorCommandName, EditorTransaction} from 'obsidian';
 
 /*
 ========================================================================
@@ -22,13 +22,11 @@ declare module 'obsidian' {
 	}
 }
 
-enum VerticalDirection {
-	UP = -1,
-	DOWN = 1
-}
+enum VerticalDirection { UP = -1, DOWN = 1 }
 
-const isCaret = (sel: EditorSelectionOrCaret) => sel.anchor.ch === sel.head?.ch && sel.anchor.line === sel.head.line;
-const isSelection = (sel: EditorSelectionOrCaret) => !isCaret(sel)
+
+const isCaret = (sel: EditorSelection) => sel.anchor.ch === sel.head?.ch && sel.anchor.line === sel.head.line;
+const isSelection = (sel: EditorSelection) => !isCaret(sel)
 
 const normalizeSelection = (sel: EditorSelection): EditorSelection => {
 	if (sel.anchor.line == sel.head.line) 
@@ -61,17 +59,13 @@ const replaceSelections = (editor: Editor, transformFct: (val: string) => string
 const selectionsProcessor = (
 	editor: Editor,
 	arrCallback: ((arr: EditorSelection[]) => EditorSelection[]) | undefined,
-	fct: (sel: EditorSelection, index: number) => EditorSelectionOrCaret
+	fct: (sel: EditorSelection, index: number) => EditorSelection
 ) => {
-	const newSelections: EditorSelectionOrCaret[] = [];
-	(arrCallback !== undefined ? arrCallback(editor.listSelections()) : editor.listSelections())
+	const newSelections: EditorSelection[] = [];
+	(arrCallback !== undefined 
+		? arrCallback(editor.listSelections()) : editor.listSelections())
 		.forEach((sel, index) => newSelections.push(fct(sel, index)))
 	editor.setSelections(newSelections)
-}
-
-const lineSubstring = (text:string, start: EditorPosition, end?: EditorPosition) => {
-	if (end === undefined) return text.split("\n").slice(start.line).join("\n").substring(start.ch)
-	return text.split("\n").slice(0, end.line).join("\n").substring(0,text.split("\n").slice(0, end.line).join("\n").length-end.ch)
 }
 
 const selectionsEqual = (one: EditorSelection, two: EditorSelection) => {
@@ -89,7 +83,10 @@ function moveLine(editor: Editor, direction: VerticalDirection, border: number) 
 				const [txA, txB] = [editor.getLine(pos.line), editor.getLine(pos.line+direction)]
 				editor.setLine(pos.line + direction,txA)
 				editor.setLine(pos.line, txB)
-				return { anchor: { line: sel.anchor.line + direction, ch: sel.anchor.ch } }
+				return { 
+					anchor: { line: sel.anchor.line + direction, ch: sel.anchor.ch },
+					head: { line: sel.anchor.line + direction, ch: sel.anchor.ch } 
+				}
 			}
 		}
 		else {
@@ -98,14 +95,9 @@ function moveLine(editor: Editor, direction: VerticalDirection, border: number) 
 			if (borderLine !== border) {
 				const {anchor:lfrom, head:lto} = expandSelection(editor,sel)
 				const [txA,txB] = [editor.getRange(lfrom,lto),editor.getLine(borderLine + direction)]
-				if (direction > 0) {
-					editor.setLine(borderLine + direction, txA)
-					editor.replaceRange(txB, lfrom, lto)
-				}
-				else {
-					editor.replaceRange(txB, lfrom, lto)
-					editor.setLine(borderLine + direction, txA)
-				}
+				const fcts = [() => editor.replaceRange(txB, lfrom, lto), () => editor.setLine(borderLine + direction, txA)]
+				if (direction > 0) fcts.reverse()
+				fcts.forEach((fct) => fct())
 				return {
 					anchor: { ch: from.ch, line: from.line+direction},
 					head: {ch: to.ch, line: to.line+direction}
@@ -121,15 +113,16 @@ function jetBrainsDuplicate(editor:Editor) {
 			const ln = sel.anchor.line
 			const tx = editor.getLine(ln)
 			editor.setLine(ln, tx + "\n" + tx)
-			return { anchor: { line: sel.anchor.line + 1, ch: sel.anchor.ch } }
+			return { 
+				anchor: { line: sel.anchor.line + 1, ch: sel.anchor.ch },
+				head: { line: sel.anchor.line + 1, ch: sel.anchor.ch }
+			}
 		}
 		else {
 			const {anchor:from, head:to} = normalizeSelection(sel)
 			const tx = editor.getRange(from, to)
 			editor.replaceRange(tx, from, from)
-			return (sel.anchor.line === sel.head.line)
-				? { anchor: to, head: { line: to.line, ch: to.ch + tx.length } }
-				: { anchor: to, head: { line: to.line+(to.line-from.line), ch: to.ch } }
+			return { anchor: to, head: editor.offsetToPos(editor.posToOffset(to)+tx.length)}
 		}
 	})
 }
@@ -139,7 +132,10 @@ function vscodeDuplicate(editor: Editor, direction: VerticalDirection) {
 			const ln = sel.anchor.line
 			const tx = editor.getLine(ln)
 			editor.setLine(ln, tx + "\n" + tx)
-			if (direction > 0) return { anchor: { line: sel.anchor.line + 1, ch: sel.anchor.ch } }
+			if (direction > 0) return { 
+				anchor: { line: sel.anchor.line + 1, ch: sel.anchor.ch },
+				head: { line: sel.anchor.line + 1, ch: sel.anchor.ch }
+			}
 		}
 		else {
 			const {anchor:from, head:to} = normalizeSelection(sel)
@@ -157,12 +153,15 @@ function vscodeDuplicate(editor: Editor, direction: VerticalDirection) {
 	})
 }
 function addCarets(editor: Editor, direction: VerticalDirection, border: number) {
-	const newSelections: EditorSelectionOrCaret[] = editor.listSelections()
+	const newSelections: EditorSelection[] = editor.listSelections()
 	const caretSelectsOnly = newSelections.filter(val => isCaret(val))
 	if (caretSelectsOnly.length === 0) return;
 	const last = caretSelectsOnly[direction > 0? caretSelectsOnly.length - 1 : 0]
 	if (last.anchor.line === border) return;
-	newSelections.push({ anchor: { ch: last.anchor.ch, line: last.anchor.line + direction } })
+	newSelections.push({ 
+		anchor: { ch: last.anchor.ch, line: last.anchor.line + direction },
+		head: { ch: last.anchor.ch, line: last.anchor.line + direction }
+	})
 	editor.setSelections(newSelections)
 	const scroll = { anchor: { ch: last.anchor.ch, line: last.anchor.line + direction*2 } }
 	editor.scrollIntoView({from:scroll.anchor, to:scroll.anchor})
@@ -185,7 +184,10 @@ function insertLine(editor: Editor, direction: VerticalDirection) {
 			const tx = [editor.getLine(ln), "\n"]
 			if (direction < 0) tx.reverse()
 			editor.setLine(ln, tx.join(""))
-			return {anchor:{ch:0,line:ln+(direction > 0 ? direction : 0)}}
+			return {
+				anchor:{ch:0,line:ln+(direction > 0 ? direction : 0)},
+				head:{ch:0,line:ln+(direction > 0 ? direction : 0)},
+			}
 		}
 		if (isCaret(sel)) return a(sel.anchor.line+index)
 		else {
@@ -273,7 +275,8 @@ function selectWordInstances(editor: Editor, case_sensitive: boolean){
 	else if (selections.filter(isSelection).length === selections.length && selectionValuesEqual(editor,selections,case_sensitive)) {
 		let {anchor: from, head: to} = normalizeSelection(lowestSelection(selections))
 		const tx = !case_sensitive ? editor.getRange(from,to).toLowerCase() : editor.getRange(from,to)
-		const match = lineSubstring(!case_sensitive ? editor.getValue().toLowerCase() : editor.getValue(),to).match(tx)
+		const match = (!case_sensitive ? editor.getValue().toLowerCase() : editor.getValue())
+			.substring(editor.posToOffset(to)).match(tx)
 		if (match !== null){
 			const sel = {
 				anchor: editor.offsetToPos(editor.posToOffset(to)+(match.index||0)),
@@ -317,12 +320,6 @@ function selectAllWordInstances(editor: Editor, case_sensitive: boolean){
 	}
 	else return;
 	editor.setSelections(selections);
-}
-
-class KeyshotsExecutor {
-	static toggle_readable_length() {
-
-	}
 }
 
 interface KeyshotsSettings {
@@ -415,7 +412,7 @@ export default class KeyshotsPlugin extends Plugin {
 	}
 
 	async loadCommands() {
-		if (this.command_ids !== undefined) this.command_ids.forEach(this.app.commands.removeCommand)
+		if (this.command_ids !== undefined) this.command_ids.forEach(cmd => this.app.commands.removeCommand(cmd))
 		const IDS: string[] = []
 		const MAP: KeyshotsMap = KEYSHOTS_MAPS[this.settings.ide_mappings]
 		IDS.push(
@@ -484,15 +481,15 @@ export default class KeyshotsPlugin extends Plugin {
 				editorCallback: (editor) => jetBrainsDuplicate(editor)
 			}).id,
 			this.addCommand({
-				id: 'insert-line-below',
-				name: "Insert line below",
-				hotkeys: MAP.insert_line_below,
-				editorCallback: (editor) => insertLine(editor, VerticalDirection.UP)
-			}).id,
-			this.addCommand({
 				id: 'insert-line-above',
 				name: "Insert line above",
 				hotkeys: MAP.insert_line_above,
+				editorCallback: (editor) => insertLine(editor, VerticalDirection.UP)
+			}).id,
+			this.addCommand({
+				id: 'insert-line-below',
+				name: "Insert line below",
+				hotkeys: MAP.insert_line_below,
 				editorCallback: (editor) => insertLine(editor, VerticalDirection.DOWN)
 			}).id,
 			this.addCommand({
@@ -628,12 +625,10 @@ class KeyshotsSettingTab extends PluginSettingTab {
 				.toFragment()
 			)
 			.addDropdown(cb => cb
-				.addOptions({
-					"clear": "Clear (everything blank; default)",
-					"vscode": "Visual Studio Code",
-					"jetbrains": "JetBrains IDEs (IntelliJ IDEA, Pycharm, ... )",
-					"visual_studio": "Microsoft Visual Studio"
-				})
+				.addOption("clear", "Clear (everything blank; default)")
+				.addOption("vscode", "Visual Studio Code")
+				.addOption("jetbrains", "JetBrains IDEs (IntelliJ IDEA, Pycharm, ... )")
+				.addOption("visual_studio", "Microsoft Visual Studio")
 				.setValue(this.plugin.settings.ide_mappings)
 				.onChange(async (value) => {
 					this.plugin.settings.ide_mappings = value
