@@ -78,5 +78,3 @@ Now you can choose from these IDEs:
 ## ⚠️ Read before usage:
 
 - `Duplicate line or selection (JetBrains IDEs)` command is defaultly on the same hotkey as `delete line` command (<kbd>Ctrl + D</kbd>). That is because JetBrains IDEs have it the same way. Before usage change this action hotkey based on your preference or basically clear `Delete line` command!
-
-- For most of these commands, it requires more than one undo/revert actions, because these commands contain more than one instruction.

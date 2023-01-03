@@ -75,36 +75,28 @@ const selectionsEqual = (one: EditorSelection, two: EditorSelection) => {
 	&& one.head.ch === two.head.ch
 }
 
-function moveLine(editor: Editor, direction: VerticalDirection, border: number) {
+function moveLine(editor: Editor, direction: VerticalDirection, border: number){
 	selectionsProcessor(editor, undefined, (sel) => {
-		if (isCaret(sel)) {
-			const pos = sel.anchor
-			if (pos.line !== border) {
-				const [txA, txB] = [editor.getLine(pos.line), editor.getLine(pos.line+direction)]
-				editor.setLine(pos.line + direction,txA)
-				editor.setLine(pos.line, txB)
-				return { 
-					anchor: { line: sel.anchor.line + direction, ch: sel.anchor.ch },
-					head: { line: sel.anchor.line + direction, ch: sel.anchor.ch } 
-				}
-			}
-		}
+		const normSel = normalizeSelection(sel)
+		if (direction === 1 ? normSel.head.line === border : normSel.anchor.line === border) return sel
+		const { anchor: from, head: to} = expandSelection(editor,{
+			anchor: { line: normSel.anchor.line+(direction === -1 ? direction : 0) , ch: normSel.anchor.ch },
+			head: { line: normSel.head.line+(direction === 1 ? direction : 0) , ch: normSel.head.ch }
+		})
+		const tx = editor.getRange(from,to)
+		if (isCaret(sel)) editor.replaceRange(tx.split("\n").reverse().join("\n"),from,to)
 		else {
-			const {anchor:from, head:to} = normalizeSelection(sel)
-			const borderLine = direction < 0 ? from.line : to.line
-			if (borderLine !== border) {
-				const {anchor:lfrom, head:lto} = expandSelection(editor,sel)
-				const [txA,txB] = [editor.getRange(lfrom,lto),editor.getLine(borderLine + direction)]
-				const fcts = [() => editor.replaceRange(txB, lfrom, lto), () => editor.setLine(borderLine + direction, txA)]
-				if (direction > 0) fcts.reverse()
-				fcts.forEach((fct) => fct())
-				return {
-					anchor: { ch: from.ch, line: from.line+direction},
-					head: {ch: to.ch, line: to.line+direction}
-				}
-			}
+			const pieces = [
+				tx.split("\n").slice(...(direction === 1 ? [-1] : [0,1]))[0],
+				tx.split("\n").slice(...(direction === 1 ? [undefined,-1] : [1])).join("\n")
+			]
+			if (direction === -1) pieces.reverse()
+			editor.replaceRange(pieces.join("\n"),from,to)
 		}
-		return sel
+		return {
+			anchor: {line: sel.anchor.line+direction, ch: sel.anchor.ch},
+			head: {line: sel.head.line+direction, ch: sel.head.ch}
+		}
 	})
 }
 function jetBrainsDuplicate(editor:Editor) {
