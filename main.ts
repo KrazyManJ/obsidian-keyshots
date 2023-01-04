@@ -7,8 +7,10 @@ import { App, Editor, EditorPosition, VaultConfig, Plugin, PluginSettingTab, Set
 */
 declare module 'obsidian' {
 	interface VaultConfig {
-		readableLineLength: boolean,
+		readableLineLength: boolean
 		showLineNumber: boolean
+		livePreview: boolean
+		showInlineTitle: boolean
 	}
 	interface Vault {
 		getConfig<T extends keyof VaultConfig>(config: T): VaultConfig[T];
@@ -349,6 +351,8 @@ declare interface KeyshotsMap {
 	sort_selected_lines?: Hotkey[]
 	select_multiple_word_instances?: Hotkey[]
 	select_all_word_instances?: Hotkey[]
+	toggle_inline_title?: Hotkey[]
+	toggle_live_preview?: Hotkey[]
 }
 
 const DEFAULT_MAP: KeyshotsMap = {
@@ -415,15 +419,27 @@ export default class KeyshotsPlugin extends Plugin {
 			*/
 			this.addCommand({
 				id: 'toggle-readable-length',
-				name: "Toggle readable line length",
+				name: "Toggle readable line length (setting)",
 				hotkeys: MAP.toggle_readable_length,
 				callback: () => flipBooleanSetting(this.app,'readableLineLength')
 			}).id,
 			this.addCommand({
 				id: 'toggle-line-numbers',
-				name: "Toggle line numbers",
+				name: "Toggle line numbers (setting)",
 				hotkeys: MAP.toggle_line_numbers,
 				callback: () => flipBooleanSetting(this.app,'showLineNumber')
+			}).id,
+			this.addCommand({
+				id: 'toggle-inline-title',
+				name: "Toggle inline title (setting)",
+				hotkeys: MAP.toggle_inline_title,
+				callback: () => flipBooleanSetting(this.app,'showInlineTitle')
+			}).id,
+			this.addCommand({
+				id: 'toggle-live-preview',
+				name: "Toggle live preview (setting)",
+				hotkeys: MAP.toggle_live_preview,
+				callback: () => flipBooleanSetting(this.app,'livePreview')
 			}).id,
 			/*
 			========================================================================
