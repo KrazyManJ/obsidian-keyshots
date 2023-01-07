@@ -1,4 +1,4 @@
-import { App, Editor, EditorPosition, VaultConfig, Plugin, PluginSettingTab, Setting, Hotkey, EditorSelection, EditorRange, EditorCommandName, EditorTransaction} from 'obsidian';
+import { App, Editor, EditorPosition, VaultConfig, Plugin, PluginSettingTab, Setting, Hotkey, EditorSelection, EditorRange, EditorCommandName, EditorTransaction, Notice} from 'obsidian';
 
 /*
 ========================================================================
@@ -49,6 +49,12 @@ const expandSelection = (editor: Editor, sel: EditorSelection) : EditorSelection
 		head: { ch: editor.getLine(sel.head.line).length, line: sel.head.line }
 	}
 }
+const invertSelection = (sel: EditorSelection): EditorSelection => {
+	const t = sel.anchor
+	sel.anchor = sel.head
+	sel.head = t
+	return sel
+}
 const flipBooleanSetting = (app: App, setting: keyof VaultConfig) => app.vault.setConfig(setting, !app.vault.getConfig(setting))
 
 const replaceSelections = (editor: Editor, transformFct: (val: string) => string) => {
@@ -63,11 +69,11 @@ const selectionsProcessor = (
 	arrCallback: ((arr: EditorSelection[]) => EditorSelection[]) | undefined,
 	fct: (sel: EditorSelection, index: number) => EditorSelection
 ) => {
-	const newSelections: EditorSelection[] = [];
+	const selections: EditorSelection[] = [];
 	(arrCallback !== undefined 
 		? arrCallback(editor.listSelections()) : editor.listSelections())
-		.forEach((sel, index) => newSelections.push(fct(sel, index)))
-	editor.setSelections(newSelections)
+		.forEach((sel, index) => selections.push(fct(sel, index)))
+	if (selections.length > 0) editor.setSelections(selections)
 }
 
 const selectionsEqual = (one: EditorSelection, two: EditorSelection) => {
@@ -303,7 +309,6 @@ function selectWordInstances(editor: Editor, case_sensitive: boolean){
 	if (range !== undefined) editor.scrollIntoView(range);
 }
 
-
 function selectAllWordInstances(editor: Editor, case_sensitive: boolean){
 	const selections: EditorSelection[] = editor.listSelections()
 	selections.filter(isCaret).forEach((sel,i) => selections[i] = selectWord(editor,sel))
@@ -316,84 +321,129 @@ function selectAllWordInstances(editor: Editor, case_sensitive: boolean){
 	editor.setSelections(selections);
 }
 
+function expandSelections(editor: Editor){
+	selectionsProcessor(editor,undefined,sel => 
+		editor.posToOffset(sel.anchor) <= editor.posToOffset(sel.head) 
+		? expandSelection(editor,sel)
+		: invertSelection(expandSelection(editor,sel))
+	)
+}
+
+async function toggleCaseSensitivity(plugin: KeyshotsPlugin){
+	plugin.settings.case_sensitive = !plugin.settings.case_sensitive
+	const val = plugin.settings.case_sensitive
+	new Notice(`${val ? "🔒" : "🔓"} Keyshots actions are now case ${val ? "" : "in"}sensitive!`)
+	await plugin.saveSettings()
+}
+
+function splitSelectionsByLines(editor: Editor){
+	const selections: EditorSelection[] = [];
+	editor.listSelections().forEach(sel => {
+		if (isCaret(sel) || sel.anchor.line === sel.head.line) selections.push(sel)
+		else {
+			const {anchor:from, head: to} = normalizeSelection(sel)
+			selections.push({anchor:from,head:{line: from.line, ch: editor.getLine(from.line).length}})
+			for (let i = from.line+1; i < to.line; i++)selections.push({anchor:{line:i,ch:0},head:{line:i,ch:editor.getLine(i).length}})
+			selections.push({anchor:{line:to.line,ch:0},head:to})
+		}
+	})
+	editor.setSelections(selections)
+}
+
 interface KeyshotsSettings {
 	ide_mappings: string;
-	s_m_w_i_case_sensitive: boolean;
-	s_a_w_i_case_sensitive: boolean;
+	keyshot_mappings: boolean;
+	case_sensitive: boolean;
 }
 
 const DEFAULT_SETTINGS: KeyshotsSettings = {
 	ide_mappings: "clear",
-	s_a_w_i_case_sensitive: true,
-	s_m_w_i_case_sensitive: true,
+	keyshot_mappings: true,
+	case_sensitive: true
 }
 
 declare interface KeyshotsMap {
-	toggle_readable_length?: Hotkey[]
-	toggle_line_numbers?: Hotkey[]
-	move_line_up?: Hotkey[]
-	move_line_down?: Hotkey[]
-	add_carets_up?: Hotkey[]
 	add_carets_down?: Hotkey[]
-	duplicate_line_up?: Hotkey[]
+	add_carets_up?: Hotkey[]
 	duplicate_line_down?: Hotkey[]
+	duplicate_line_up?: Hotkey[]
 	duplicate_selection_or_line?: Hotkey[]
-	insert_line_below?: Hotkey[]
-	insert_line_above?: Hotkey[]
-	join_selected_lines?: Hotkey[]
-	split_selections_on_new_line?: Hotkey[]
-	trim_selections?: Hotkey[]
-	transform_from_to_snake_case?: Hotkey[]
 	encode_or_decode_uri?: Hotkey[]
-	transform_selections_to_lowercase?: Hotkey[]
-	transform_selections_to_uppercase?: Hotkey[]
-	transform_selections_to_titlecase?: Hotkey[]
-	sort_selected_lines?: Hotkey[]
-	select_multiple_word_instances?: Hotkey[]
+	expand_selections?: Hotkey[]
+	insert_line_above?: Hotkey[]
+	insert_line_below?: Hotkey[]
+	join_selected_lines?: Hotkey[]
+	move_line_down?: Hotkey[]
+	move_line_up?: Hotkey[]
 	select_all_word_instances?: Hotkey[]
+	select_multiple_word_instances?: Hotkey[]
+	sort_selected_lines?: Hotkey[]
+	split_selections_by_lines?: Hotkey[]
+	split_selections_on_new_line?: Hotkey[]
 	toggle_inline_title?: Hotkey[]
-	toggle_live_preview?: Hotkey[]
+	toggle_keyshots_case_sensitivity?: Hotkey[]
+	toggle_line_numbers?: Hotkey[]
+	toggle_readable_length?: Hotkey[]
+	transform_from_to_snake_case?: Hotkey[]
+	transform_selections_to_lowercase?: Hotkey[]
+	transform_selections_to_titlecase?: Hotkey[]
+	transform_selections_to_uppercase?: Hotkey[]
+	trim_selections?: Hotkey[]
 }
 
 const DEFAULT_MAP: KeyshotsMap = {
-	toggle_readable_length: [{ modifiers: ["Mod", "Shift"], key: "R" }],
-	add_carets_up: [{ modifiers: ["Alt", "Mod"], key: "ArrowUp" }],
 	add_carets_down: [{ modifiers: ["Alt", "Mod"], key: "ArrowDown" }],
-	insert_line_below: [{ modifiers: ["Shift"], key: "Enter" }],
-	insert_line_above: [{ modifiers: ["Shift", "Mod"], key: "Enter" }],
-	join_selected_lines: [{ modifiers: ["Shift", "Mod"], key: "j" }],
-	split_selections_on_new_line: [{ modifiers: ["Alt"], key: "s" }],
-	trim_selections: [{ modifiers: ["Alt"], key: "T" }],
-	transform_from_to_snake_case: [{ modifiers: ["Alt"], key: "-" }],
+	add_carets_up: [{ modifiers: ["Alt", "Mod"], key: "ArrowUp" }],
 	encode_or_decode_uri: [{ modifiers: ["Mod", "Alt"], key: "u" }],
+	insert_line_above: [{ modifiers: ["Shift", "Mod"], key: "Enter" }],
+	insert_line_below: [{ modifiers: ["Shift"], key: "Enter" }],
+	join_selected_lines: [{ modifiers: ["Shift", "Mod"], key: "j" }],
+	sort_selected_lines: [{ modifiers: ["Mod", "Shift"], key: "s" }],
+	split_selections_on_new_line: [{ modifiers: ["Alt"], key: "s" }],
+	toggle_inline_title: [{ modifiers: ["Mod", "Alt"], key: "T"}],
+	toggle_keyshots_case_sensitivity: [{ modifiers: ["Mod", "Alt"], key: "I"}],
+	toggle_line_numbers: [{ modifiers: ["Mod", "Alt"], key: "N"}],
+	toggle_readable_length: [{ modifiers: ["Mod", "Alt"], key: "R" }],
+	transform_from_to_snake_case: [{ modifiers: ["Alt"], key: "-" }],
 	transform_selections_to_lowercase: [{ modifiers: ["Alt"], key: "l" }],
 	transform_selections_to_titlecase: [{ modifiers: ["Alt"], key: "c" }],
 	transform_selections_to_uppercase: [{ modifiers: ["Alt"], key: "u" }],
-	sort_selected_lines: [{ modifiers: ["Mod", "Shift"], key: "s" }],
+	trim_selections: [{ modifiers: ["Alt"], key: "T" }],
 }
 
 const KEYSHOTS_MAPS: {[key: string]: KeyshotsMap} = {
-	"vscode": { ...DEFAULT_MAP,
-		move_line_up: [{ modifiers: ["Alt"], key: "ArrowUp" }],
-		move_line_down: [{ modifiers: ["Alt"], key: "ArrowDown" }],
-		duplicate_line_up: [{ modifiers: ["Alt", "Shift"], key: "ArrowUp" }],
+	"clear": {},
+	"keyshots": DEFAULT_MAP,
+	"vscode": {
+		add_carets_down: [{ modifiers: ["Alt", "Mod"], key: "ArrowDown" }],
+		add_carets_up: [{ modifiers: ["Alt", "Mod"], key: "ArrowUp" }],
 		duplicate_line_down: [{ modifiers: ["Alt", "Shift"], key: "ArrowDown" }],
-		select_multiple_word_instances: [{ modifiers: ["Mod"], key: "D" }],
-		select_all_word_instances: [{ modifiers: ["Ctrl","Shift"], key: "L"}]
-	},
-	"jetbrains": { ...DEFAULT_MAP,
-		move_line_up: [{ modifiers: ["Alt", "Shift"], key: "ArrowUp" }],
-		move_line_down: [{ modifiers: ["Alt", "Shift"], key: "ArrowDown" }],
-		duplicate_selection_or_line: [{ modifiers: ["Mod"], key: "D" }],
-	},
-	"visual_studio": { ...DEFAULT_MAP,
-		move_line_up: [{ modifiers: ["Alt"], key: "ArrowUp" }],
+		duplicate_line_up: [{ modifiers: ["Alt", "Shift"], key: "ArrowUp" }],
+		insert_line_above: [{ modifiers: ["Mod"], key: "Enter"}],
+		insert_line_below: [{ modifiers: ["Mod", "Shift"], key: "Enter" }],
+		join_selected_lines: [{ modifiers: ["Shift"], key: "j" }],
 		move_line_down: [{ modifiers: ["Alt"], key: "ArrowDown" }],
-		add_carets_up: [{ modifiers: ["Alt", "Shift"], key: "ArrowUp" }],
-		add_carets_down: [{ modifiers: ["Alt", "Shift"], key: "ArrowDown" }],
-		duplicate_selection_or_line: [{ modifiers: ["Mod"], key: "D" }],
+		move_line_up: [{ modifiers: ["Alt"], key: "ArrowUp" }],
+		select_all_word_instances: [{ modifiers: ["Ctrl","Shift"], key: "L"}],
+		select_multiple_word_instances: [{ modifiers: ["Mod"], key: "D" }],
 	},
-	"clear": {}
+	"jetbrains": {
+		duplicate_selection_or_line: [{ modifiers: ["Mod"], key: "D" }],
+		insert_line_above: [{ modifiers: ["Mod", "Alt"], key: "Enter"}],
+		insert_line_below: [{ modifiers: ["Shift"], key: "Enter" }],
+		join_selected_lines: [{ modifiers: ["Shift", "Mod"], key: "j" }],
+		move_line_down: [{ modifiers: ["Alt", "Shift"], key: "ArrowDown" }],
+		move_line_up: [{ modifiers: ["Alt", "Shift"], key: "ArrowUp" }],
+		select_all_word_instances: [{ modifiers: ["Mod","Alt","Shift"], key: "J"}],
+		select_multiple_word_instances: [{modifiers: ["Alt"], key: "J"}],
+	},
+	"visual_studio": {
+		add_carets_down: [{ modifiers: ["Alt", "Shift"], key: "ArrowDown" }],
+		add_carets_up: [{ modifiers: ["Alt", "Shift"], key: "ArrowUp" }],
+		duplicate_selection_or_line: [{ modifiers: ["Mod"], key: "D" }],
+		move_line_down: [{ modifiers: ["Alt"], key: "ArrowDown" }],
+		move_line_up: [{ modifiers: ["Alt"], key: "ArrowUp" }],
+	},
 }
 
 export default class KeyshotsPlugin extends Plugin {
@@ -410,11 +460,24 @@ export default class KeyshotsPlugin extends Plugin {
 	async loadCommands() {
 		if (this.command_ids !== undefined) this.command_ids.forEach(cmd => this.app.commands.removeCommand(cmd))
 		const IDS: string[] = []
-		const MAP: KeyshotsMap = KEYSHOTS_MAPS[this.settings.ide_mappings]
+		const MAP: KeyshotsMap = ["clear","keyshots"].contains(this.settings.ide_mappings) 
+			? KEYSHOTS_MAPS[this.settings.ide_mappings]
+			: {...(this.settings.keyshot_mappings ? DEFAULT_MAP : {}), ...KEYSHOTS_MAPS[this.settings.ide_mappings]}
 		IDS.push(
 			/*
 			========================================================================
-				SETTINGS
+				KEYSHOTS SETTINGS
+			========================================================================
+			*/
+			this.addCommand({
+				id: 'toggle-keyshots-case-sensitivity',
+				name: "Toggle Keyshots case sensitivity",
+				hotkeys: MAP.toggle_keyshots_case_sensitivity,
+				callback: () => toggleCaseSensitivity(this)
+			}).id,
+			/*
+			========================================================================
+				OBSIDIAN SETTINGS
 			========================================================================
 			*/
 			this.addCommand({
@@ -434,12 +497,6 @@ export default class KeyshotsPlugin extends Plugin {
 				name: "Toggle inline title (setting)",
 				hotkeys: MAP.toggle_inline_title,
 				callback: () => flipBooleanSetting(this.app,'showInlineTitle')
-			}).id,
-			this.addCommand({
-				id: 'toggle-live-preview',
-				name: "Toggle live preview (setting)",
-				hotkeys: MAP.toggle_live_preview,
-				callback: () => flipBooleanSetting(this.app,'livePreview')
 			}).id,
 			/*
 			========================================================================
@@ -521,13 +578,25 @@ export default class KeyshotsPlugin extends Plugin {
 				id: 'select-multiple-word-instances',
 				name: "Select multiple word instances",
 				hotkeys: MAP.select_multiple_word_instances,
-				editorCallback: (editor) => selectWordInstances(editor, this.settings.s_m_w_i_case_sensitive)
+				editorCallback: (editor) => selectWordInstances(editor, this.settings.case_sensitive)
 			}).id,
 			this.addCommand({
 				id: 'select-all-word-instances',
 				name: "Select all word instances",
 				hotkeys: MAP.select_all_word_instances,
-				editorCallback: (editor) => selectAllWordInstances(editor, this.settings.s_a_w_i_case_sensitive)
+				editorCallback: (editor) => selectAllWordInstances(editor, this.settings.case_sensitive)
+			}).id,
+			this.addCommand({
+				id: 'expand-selections',
+				name: "Expand selections",
+				hotkeys: MAP.expand_selections,
+				editorCallback: (editor) => expandSelections(editor)
+			}).id,
+			this.addCommand({
+				id: 'split-selections-by-lines',
+				name: "Split selections by lines",
+				hotkeys: MAP.split_selections_by_lines,
+				editorCallback: (editor) => splitSelectionsByLines(editor)
 			}).id,
 			/*
 			========================================================================
@@ -633,10 +702,13 @@ class KeyshotsSettingTab extends PluginSettingTab {
 				.toFragment()
 			)
 			.addDropdown(cb => cb
-				.addOption("clear", "Clear (everything blank; default)")
-				.addOption("vscode", "Visual Studio Code")
-				.addOption("jetbrains", "JetBrains IDEs (IntelliJ IDEA, Pycharm, ... )")
-				.addOption("visual_studio", "Microsoft Visual Studio")
+				.addOptions({
+					"clear": "Clear (everything blank; default)",
+					"vscode": "Visual Studio Code",
+					"jetbrains": "JetBrains IDEs (IntelliJ IDEA, Pycharm, ... )",
+					"visual_studio": "Microsoft Visual Studio",
+					"keyshots": "Keyshots default hotkeys mappings"
+				})
 				.setValue(this.plugin.settings.ide_mappings)
 				.onChange(async (value) => {
 					this.plugin.settings.ide_mappings = value
@@ -644,32 +716,36 @@ class KeyshotsSettingTab extends PluginSettingTab {
 					await this.plugin.saveSettings()
 				})
 			)
-		containerEl.createEl('h2', { text: "⚙️ Other settings" })
 		new Setting(containerEl)
-			.setName(new DocumentFragmentBuilder()
-				.createElem("kbd",{text:"select-multiple-word-instances"})
-				.appendText(" case sensitivity")
+			.setName("Default Keyshots hotkeys")
+			.setDesc(new DocumentFragmentBuilder()
+				.appendText("Sets default hotkeys for keyshots commands, that are not modified by IDE preset.")
+				.createElem("br")
+				.createElem("b",{text:"❗If you select clear preset, this setting will be ignored!"})
 				.toFragment()
 			)
-			.setDesc("Determines if command should check case sensitivity while matching several text pieces.")
 			.addToggle(cb => cb
-				.setValue(this.plugin.settings.s_m_w_i_case_sensitive)
+				.setValue(this.plugin.settings.keyshot_mappings)
 				.onChange(async (value) => {
-					this.plugin.settings.s_m_w_i_case_sensitive = value
+					this.plugin.settings.keyshot_mappings = value
+					await this.plugin.loadCommands()
 					await this.plugin.saveSettings()
 				})
 			)
+		containerEl.createEl('h2', { text: "🔧 Commands settings" })
 		new Setting(containerEl)
-			.setName(new DocumentFragmentBuilder()
-				.createElem("kbd",{text:"select-all-word-instances"})
-				.appendText(" case sensitivity")
+			.setName("Case sensitivity")
+			.setDesc(new DocumentFragmentBuilder()
+				.appendText("Determines if Keyshots commands should be case sensitive. For toggling while editing text just simply use ")
+				.createElem("kbd",{text: " Ctrl + Alt + I "})
+				.appendText(" hotkey if you are using default Keyshots binding!")
 				.toFragment()
+
 			)
-			.setDesc("Determines if command should check case sensitivity while matching all text pieces.")
 			.addToggle(cb => cb
-				.setValue(this.plugin.settings.s_a_w_i_case_sensitive)
+				.setValue(this.plugin.settings.case_sensitive)
 				.onChange(async (value) => {
-					this.plugin.settings.s_a_w_i_case_sensitive = value
+					this.plugin.settings.case_sensitive = value
 					await this.plugin.saveSettings()
 				})
 			)
