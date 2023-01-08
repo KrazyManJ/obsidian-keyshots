@@ -369,7 +369,7 @@ declare interface KeyshotsMap {
 	duplicate_line_up?: Hotkey[]
 	duplicate_selection_or_line?: Hotkey[]
 	encode_or_decode_uri?: Hotkey[]
-	expand_selections?: Hotkey[]
+	expand_line_selections?: Hotkey[]
 	insert_line_above?: Hotkey[]
 	insert_line_below?: Hotkey[]
 	join_selected_lines?: Hotkey[]
@@ -380,6 +380,7 @@ declare interface KeyshotsMap {
 	sort_selected_lines?: Hotkey[]
 	split_selections_by_lines?: Hotkey[]
 	split_selections_on_new_line?: Hotkey[]
+	toggle_case?: Hotkey[];
 	toggle_inline_title?: Hotkey[]
 	toggle_keyshots_case_sensitivity?: Hotkey[]
 	toggle_line_numbers?: Hotkey[]
@@ -587,9 +588,9 @@ export default class KeyshotsPlugin extends Plugin {
 				editorCallback: (editor) => selectAllWordInstances(editor, this.settings.case_sensitive)
 			}).id,
 			this.addCommand({
-				id: 'expand-selections',
-				name: "Expand selections",
-				hotkeys: MAP.expand_selections,
+				id: 'expand-line-selections',
+				name: "Expand line selections",
+				hotkeys: MAP.expand_line_selections,
 				editorCallback: (editor) => expandSelections(editor)
 			}).id,
 			this.addCommand({
@@ -638,6 +639,12 @@ export default class KeyshotsPlugin extends Plugin {
 				name: "Transform selections to Titlecase (Capitalize)",
 				hotkeys: MAP.transform_selections_to_titlecase,
 				editorCallback: (editor) => replaceSelections(editor, (s) => titleCase(s))
+			}).id,
+			this.addCommand({
+				id: 'toggle-case',
+				name: "Toggle case (JetBrains)",
+				hotkeys: MAP.toggle_case,
+				editorCallback: (editor) => replaceSelections(editor, (str) => str === str.toLowerCase() ? str.toUpperCase() : str.toLowerCase())
 			}).id,
 			this.addCommand({
 				id: 'sort-selected-lines',
