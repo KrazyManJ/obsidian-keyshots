@@ -19,8 +19,14 @@ declare module 'obsidian' {
 	interface CommandManager {
 		removeCommand(id: string): void;
 	}
+	interface SettingManager {
+		activeTab: object
+		open(): void
+		openTabById(id: string): void
+	}
 	interface App {
 		commands: CommandManager
+		setting: SettingManager
 	}
 }
 
@@ -360,6 +366,11 @@ function shuffleSelectedLines(editor: Editor, rounds: number) {
 	})
 }
 
+function openKeyshotsSettings(app: App){
+	if (app.setting.activeTab === null) app.setting.open()
+	app.setting.openTabById("keyshots")
+}
+
 interface KeyshotsSettings {
 	ide_mappings: string;
 	keyshot_mappings: boolean;
@@ -387,6 +398,7 @@ declare interface KeyshotsMap {
 	join_selected_lines?: Hotkey[]
 	move_line_down?: Hotkey[]
 	move_line_up?: Hotkey[]
+	open_keyshots_settings?: Hotkey[]
 	select_all_word_instances?: Hotkey[]
 	select_multiple_word_instances?: Hotkey[]
 	shuffle_selected_lines?: Hotkey[]
@@ -408,7 +420,7 @@ declare interface KeyshotsMap {
 
 const hotKey = (key:string, ...modifiers: Modifier[]): Hotkey[] => [{key:key, modifiers: modifiers}]
 
-const DEFAULT_MAP: KeyshotsMap = {
+export const DEFAULT_MAP: KeyshotsMap = {
 	add_carets_down: 						hotKey("ArrowDown","Mod","Alt"),
 	add_carets_up:							hotKey("ArrowUp","Mod","Alt"),
 	encode_or_decode_uri:					hotKey("U","Mod","Alt"),
@@ -427,7 +439,7 @@ const DEFAULT_MAP: KeyshotsMap = {
 	duplicate_line_up:						hotKey("ArrowUp","Shift","Alt"),
 	duplicate_line_down:					hotKey("ArrowDown","Shift","Alt"),
 	duplicate_selection_or_line:			hotKey("D","Mod","Alt"),
-	expand_line_selections:					hotKey("E","Alt"), //Conflict
+	expand_line_selections:					hotKey("E","Alt"),
 	toggle_case:							hotKey("U","Ctrl","Shift"),
 	toggle_readable_length:					hotKey("R","Mod","Alt"),
 	toggle_line_numbers:					hotKey("N","Mod","Alt"),
@@ -440,7 +452,7 @@ const DEFAULT_MAP: KeyshotsMap = {
 	transform_from_to_kebabcase:			hotKey("-","Alt"),
 }
 
-const KEYSHOTS_MAPS: {[key: string]: KeyshotsMap} = {
+export const KEYSHOTS_MAPS: {[key: string]: KeyshotsMap} = {
 	"clear": {},
 	"keyshots": DEFAULT_MAP,
 	"vscode": {
@@ -521,6 +533,12 @@ export default class KeyshotsPlugin extends Plugin {
 				name: "Toggle Keyshots case sensitivity",
 				hotkeys: MAP.toggle_keyshots_case_sensitivity,
 				callback: () => toggleCaseSensitivity(this)
+			}).id,
+			this.addCommand({
+				id: 'open-keyshots-settings',
+				name: "Open Keyshots settings",
+				hotkeys: MAP.open_keyshots_settings,
+				callback: () => openKeyshotsSettings(app)
 			}).id,
 			/*
 			========================================================================
