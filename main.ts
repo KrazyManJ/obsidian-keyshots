@@ -1,4 +1,4 @@
-import { App, Editor, EditorPosition, VaultConfig, Plugin, PluginSettingTab, Setting, Hotkey, EditorSelection, EditorRange, EditorCommandName, EditorTransaction, Notice} from 'obsidian';
+import { App, Editor, EditorPosition, VaultConfig, Plugin, PluginSettingTab, Setting, Hotkey, EditorSelection, EditorRange, EditorCommandName, EditorTransaction, Notice, SliderComponent} from 'obsidian';
 
 /*
 ========================================================================
@@ -350,16 +350,28 @@ function splitSelectionsByLines(editor: Editor){
 	editor.setSelections(selections)
 }
 
+function shuffleSelectedLines(editor: Editor, rounds: number) {
+	selectionsProcessor(editor, arr => arr.filter(isSelection), sel => {
+		const {anchor:from, head:to}= expandSelection(editor, normalizeSelection(sel))
+		let text = editor.getRange(from,to)
+		for (let i = 0; i < rounds; i++) text = text.split("\n").sort(() => Math.random()-0.5).join("\n")
+		editor.replaceRange(text, from, to)
+		return expandSelection(editor,normalizeSelection(sel))
+	})
+}
+
 interface KeyshotsSettings {
 	ide_mappings: string;
 	keyshot_mappings: boolean;
 	case_sensitive: boolean;
+	shuffle_rounds_amount: number
 }
 
 const DEFAULT_SETTINGS: KeyshotsSettings = {
 	ide_mappings: "clear",
 	keyshot_mappings: true,
-	case_sensitive: true
+	case_sensitive: true,
+	shuffle_rounds_amount: 10
 }
 
 declare interface KeyshotsMap {
@@ -377,6 +389,7 @@ declare interface KeyshotsMap {
 	move_line_up?: Hotkey[]
 	select_all_word_instances?: Hotkey[]
 	select_multiple_word_instances?: Hotkey[]
+	shuffle_selected_lines?: Hotkey[]
 	sort_selected_lines?: Hotkey[]
 	split_selections_by_lines?: Hotkey[]
 	split_selections_on_new_line?: Hotkey[]
@@ -651,6 +664,12 @@ export default class KeyshotsPlugin extends Plugin {
 				name: "Sort selected lines",
 				hotkeys: MAP.sort_selected_lines,
 				editorCallback: (editor) => sortSelectedLines(editor)
+			}).id,
+			this.addCommand({
+				id: 'shuffle-selected-lines',
+				name: "Shuffle selected lines",
+				hotkeys: MAP.shuffle_selected_lines,
+				editorCallback: (editor) => shuffleSelectedLines(editor, this.settings.shuffle_rounds_amount)
 			}).id
 		)
 		this.command_ids = new Set(IDS);
@@ -747,7 +766,6 @@ class KeyshotsSettingTab extends PluginSettingTab {
 				.createElem("kbd",{text: " Ctrl + Alt + I "})
 				.appendText(" hotkey if you are using default Keyshots binding!")
 				.toFragment()
-
 			)
 			.addToggle(cb => cb
 				.setValue(this.plugin.settings.case_sensitive)
@@ -755,6 +773,36 @@ class KeyshotsSettingTab extends PluginSettingTab {
 					this.plugin.settings.case_sensitive = value
 					await this.plugin.saveSettings()
 				})
+			)
+
+		let slider: SliderComponent;
+		new Setting(containerEl)
+			.setName("Shuffle rounds amount")
+			.setDesc(new DocumentFragmentBuilder()
+				.appendText("Number of rounds that will ")
+				.createElem("code",{text:"Shuffle selected lines"})
+				.appendText(" command take. The more rounds it will take, the more random it will be!")
+				.toFragment()
+
+			)
+			.addSlider(cb => {
+				slider = cb
+				slider.setValue(this.plugin.settings.shuffle_rounds_amount)
+					.setLimits(1,50,1)	
+					.setDynamicTooltip()
+					.onChange(async (value) => {
+						this.plugin.settings.shuffle_rounds_amount = value
+						await this.plugin.saveSettings()
+					})
+			})
+			.addButton(cb => cb
+				.setIcon("refresh-ccw")
+				.setTooltip("Reset to default")
+				.onClick(async ()=>{
+					this.plugin.settings.shuffle_rounds_amount = DEFAULT_SETTINGS.shuffle_rounds_amount
+					slider.setValue(DEFAULT_SETTINGS.shuffle_rounds_amount)
+					await this.plugin.saveSettings()
+				})	
 			)
 	}
 }
