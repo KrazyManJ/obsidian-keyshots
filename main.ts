@@ -82,6 +82,18 @@ const selectionsEqual = (one: EditorSelection, two: EditorSelection) => {
 	&& one.head.line === two.head.line
 	&& one.head.ch === two.head.ch
 }
+const convertOneToOtherChars = (editor: Editor, first: string, second: string) => {
+	replaceSelections(editor, (tx) => {
+		const [underI, spaceI] = [tx.indexOf(first), tx.indexOf(second)]
+		const replaceToUnder = (s:string) => s.replace(new RegExp(second,"gm"), first)
+		const replaceToSpace = (s:string) => s.replace(new RegExp(first,"gm"), second)
+		if (underI !== -1 || spaceI !== -1) return tx
+		if (underI === -1) return replaceToUnder(tx)
+		if (spaceI === -1) return replaceToSpace(tx)
+		if (underI > spaceI) return replaceToUnder(tx)
+		return replaceToSpace(tx)
+	})
+}
 
 function moveLine(editor: Editor, direction: VerticalDirection, border: number){
 	selectionsProcessor(editor, undefined, (sel) => {
@@ -165,18 +177,6 @@ function addCarets(editor: Editor, direction: VerticalDirection, border: number)
 	editor.setSelections(newSelections)
 	const scroll = { anchor: { ch: last.anchor.ch, line: last.anchor.line + direction*2 } }
 	editor.scrollIntoView({from:scroll.anchor, to:scroll.anchor})
-}
-function convertSpacesUnderScores(editor: Editor) {
-	replaceSelections(editor, (tx) => {
-		const [underI, spaceI] = [tx.indexOf("_"), tx.indexOf(" ")]
-		const replaceToUnder = (s:string) => s.replace(/ /gm, "_")
-		const replaceToSpace = (s:string) => s.replace(/_/gm, " ")
-		if (underI !== -1 || spaceI !== -1) return tx
-		if (underI === -1) return replaceToUnder(tx)
-		if (spaceI === -1) return replaceToSpace(tx)
-		if (underI > spaceI) return replaceToUnder(tx)
-		return replaceToSpace(tx)
-	})
 }
 function insertLine(editor: Editor, direction: VerticalDirection) {
 	selectionsProcessor(editor, (s) => s.sort((a, b) => a.anchor.line - b.anchor.line), (sel, index) => {
@@ -627,7 +627,13 @@ export default class KeyshotsPlugin extends Plugin {
 				id: 'transform-from-to-snake-case',
 				name: "Transform selections from / to Snakecase",
 				hotkeys: MAP.transform_from_to_snake_case,
-				editorCallback: (editor) => convertSpacesUnderScores(editor)
+				editorCallback: (editor) => convertOneToOtherChars(editor," ","_")
+			}).id,
+			this.addCommand({
+				id: 'transform-from-to-kebab-case',
+				name: "Transform selections from / to Kebabcase",
+				hotkeys: MAP.transform_from_to_snake_case,
+				editorCallback: (editor) => convertOneToOtherChars(editor," ","-")
 			}).id,
 			this.addCommand({
 				id: 'encode-or-decode-uri',
