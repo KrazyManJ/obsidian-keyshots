@@ -1,4 +1,4 @@
-import { App, Editor, EditorPosition, VaultConfig, Plugin, PluginSettingTab, Setting, Hotkey, EditorSelection, EditorRange, EditorCommandName, EditorTransaction, Notice, SliderComponent} from 'obsidian';
+import { App, Editor, EditorPosition, VaultConfig, Plugin, PluginSettingTab, Setting, Hotkey, EditorSelection, EditorRange, EditorCommandName, EditorTransaction, Notice, SliderComponent, Modifier} from 'obsidian';
 
 /*
 ========================================================================
@@ -398,65 +398,98 @@ declare interface KeyshotsMap {
 	toggle_keyshots_case_sensitivity?: Hotkey[]
 	toggle_line_numbers?: Hotkey[]
 	toggle_readable_length?: Hotkey[]
-	transform_from_to_snake_case?: Hotkey[]
+	transform_from_to_snakecase?: Hotkey[]
+	transform_from_to_kebabcase?: Hotkey[]
 	transform_selections_to_lowercase?: Hotkey[]
 	transform_selections_to_titlecase?: Hotkey[]
 	transform_selections_to_uppercase?: Hotkey[]
 	trim_selections?: Hotkey[]
 }
 
+const hotKey = (key:string, ...modifiers: Modifier[]): Hotkey[] => [{key:key, modifiers: modifiers}]
+
 const DEFAULT_MAP: KeyshotsMap = {
-	add_carets_down: [{ modifiers: ["Alt", "Mod"], key: "ArrowDown" }],
-	add_carets_up: [{ modifiers: ["Alt", "Mod"], key: "ArrowUp" }],
-	encode_or_decode_uri: [{ modifiers: ["Mod", "Alt"], key: "u" }],
-	insert_line_above: [{ modifiers: ["Shift", "Mod"], key: "Enter" }],
-	insert_line_below: [{ modifiers: ["Shift"], key: "Enter" }],
-	join_selected_lines: [{ modifiers: ["Shift", "Mod"], key: "j" }],
-	sort_selected_lines: [{ modifiers: ["Mod", "Shift"], key: "s" }],
-	split_selections_on_new_line: [{ modifiers: ["Alt"], key: "s" }],
-	toggle_inline_title: [{ modifiers: ["Mod", "Alt"], key: "T"}],
-	toggle_keyshots_case_sensitivity: [{ modifiers: ["Mod", "Alt"], key: "I"}],
-	toggle_line_numbers: [{ modifiers: ["Mod", "Alt"], key: "N"}],
-	toggle_readable_length: [{ modifiers: ["Mod", "Alt"], key: "R" }],
-	transform_from_to_snake_case: [{ modifiers: ["Alt"], key: "-" }],
-	transform_selections_to_lowercase: [{ modifiers: ["Alt"], key: "l" }],
-	transform_selections_to_titlecase: [{ modifiers: ["Alt"], key: "c" }],
-	transform_selections_to_uppercase: [{ modifiers: ["Alt"], key: "u" }],
-	trim_selections: [{ modifiers: ["Alt"], key: "T" }],
+	add_carets_down: 						hotKey("ArrowDown","Mod","Alt"),
+	add_carets_up:							hotKey("ArrowUp","Mod","Alt"),
+	encode_or_decode_uri:					hotKey("U","Mod","Alt"),
+	insert_line_below:						hotKey("Enter","Shift"),
+	insert_line_above:						hotKey("Enter","Ctrl","Shift"),
+	join_selected_lines:					hotKey("J","Mod","Shift"),
+	sort_selected_lines:					hotKey("S","Mod","Shift"),
+	shuffle_selected_lines:					hotKey("S","Mod","Shift","Alt"),
+	split_selections_by_lines: 				hotKey("L","Mod","Alt"),
+	split_selections_on_new_line:			hotKey("S","Alt"),
+	select_all_word_instances:				hotKey("L","Mod","Shift"),
+	select_multiple_word_instances:			hotKey("D","Mod"),
+	trim_selections:						hotKey("T","Alt"),
+	move_line_up:							hotKey("ArrowUp","Alt"),
+	move_line_down:							hotKey("ArrowDown","Alt"),
+	duplicate_line_up:						hotKey("ArrowUp","Shift","Alt"),
+	duplicate_line_down:					hotKey("ArrowDown","Shift","Alt"),
+	duplicate_selection_or_line:			hotKey("D","Mod","Alt"),
+	expand_line_selections:					hotKey("E","Alt"), //Conflict
+	toggle_case:							hotKey("U","Ctrl","Shift"),
+	toggle_readable_length:					hotKey("R","Mod","Alt"),
+	toggle_line_numbers:					hotKey("N","Mod","Alt"),
+	toggle_inline_title:					hotKey("T","Mod","Alt"),
+	toggle_keyshots_case_sensitivity:		hotKey("I","Mod","Alt"),
+	transform_selections_to_lowercase:  	hotKey("L","Alt"),
+	transform_selections_to_uppercase:  	hotKey("U","Alt"),
+	transform_selections_to_titlecase:  	hotKey("C","Alt"),
+	transform_from_to_snakecase:			hotKey("-","Shift","Alt"),
+	transform_from_to_kebabcase:			hotKey("-","Alt"),
 }
 
 const KEYSHOTS_MAPS: {[key: string]: KeyshotsMap} = {
 	"clear": {},
 	"keyshots": DEFAULT_MAP,
 	"vscode": {
-		add_carets_down: [{ modifiers: ["Alt", "Mod"], key: "ArrowDown" }],
-		add_carets_up: [{ modifiers: ["Alt", "Mod"], key: "ArrowUp" }],
-		duplicate_line_down: [{ modifiers: ["Alt", "Shift"], key: "ArrowDown" }],
-		duplicate_line_up: [{ modifiers: ["Alt", "Shift"], key: "ArrowUp" }],
-		insert_line_above: [{ modifiers: ["Mod"], key: "Enter"}],
-		insert_line_below: [{ modifiers: ["Mod", "Shift"], key: "Enter" }],
-		join_selected_lines: [{ modifiers: ["Shift"], key: "j" }],
-		move_line_down: [{ modifiers: ["Alt"], key: "ArrowDown" }],
-		move_line_up: [{ modifiers: ["Alt"], key: "ArrowUp" }],
-		select_all_word_instances: [{ modifiers: ["Ctrl","Shift"], key: "L"}],
-		select_multiple_word_instances: [{ modifiers: ["Mod"], key: "D" }],
+		add_carets_down: 					hotKey("ArrowDown","Mod","Alt"),
+		add_carets_up: 						hotKey("ArrowUp","Mod","Alt"),
+		insert_line_below:					hotKey("Enter","Mod"),
+		insert_line_above:					hotKey("Enter","Mod","Shift"),
+		join_selected_lines:				hotKey("J","Mod"),
+		select_all_word_instances:			hotKey("L","Mod","Shift"),
+		select_multiple_word_instances:		hotKey("D","Mod"),
+		move_line_up:						hotKey("ArrowUp","Alt"),
+		move_line_down:						hotKey("ArrowDown","Alt"),
+		duplicate_line_up:					hotKey("ArrowUp","Shift","Alt"),
+		duplicate_line_down:				hotKey("ArrowDown","Shift","Alt"),
+		duplicate_selection_or_line:		undefined,
+		expand_line_selections:				hotKey("L","Mod"),
+		toggle_case:						undefined,
 	},
 	"jetbrains": {
-		duplicate_selection_or_line: [{ modifiers: ["Mod"], key: "D" }],
-		insert_line_above: [{ modifiers: ["Mod", "Alt"], key: "Enter"}],
-		insert_line_below: [{ modifiers: ["Shift"], key: "Enter" }],
-		join_selected_lines: [{ modifiers: ["Shift", "Mod"], key: "j" }],
-		move_line_down: [{ modifiers: ["Alt", "Shift"], key: "ArrowDown" }],
-		move_line_up: [{ modifiers: ["Alt", "Shift"], key: "ArrowUp" }],
-		select_all_word_instances: [{ modifiers: ["Mod","Alt","Shift"], key: "J"}],
-		select_multiple_word_instances: [{modifiers: ["Alt"], key: "J"}],
+		insert_line_below:					hotKey("Enter","Shift"),
+		insert_line_above:					hotKey("Enter","Mod","Alt"),
+		join_selected_lines:				hotKey("J","Mod","Shift"),
+		select_all_word_instances:			hotKey("J","Mod","Shift","Alt"),
+		select_multiple_word_instances:		hotKey("J","Alt"),
+		move_line_up:						hotKey("ArrowUp","Shift","Alt"),
+		move_line_down:						hotKey("ArrowDown","Shift","Alt"),
+		duplicate_line_down:				undefined,
+		duplicate_line_up:					undefined,
+		duplicate_selection_or_line:		hotKey("D","Mod"),
+		expand_line_selections:				hotKey("W","Mod"),
+		toggle_case:						hotKey("U","Mod","Shift"),
 	},
 	"visual_studio": {
-		add_carets_down: [{ modifiers: ["Alt", "Shift"], key: "ArrowDown" }],
-		add_carets_up: [{ modifiers: ["Alt", "Shift"], key: "ArrowUp" }],
-		duplicate_selection_or_line: [{ modifiers: ["Mod"], key: "D" }],
-		move_line_down: [{ modifiers: ["Alt"], key: "ArrowDown" }],
-		move_line_up: [{ modifiers: ["Alt"], key: "ArrowUp" }],
+		add_carets_down: 					hotKey("ArrowDown","Shift","Alt"),
+		add_carets_up: 						hotKey("ArrowUp","Shift","Alt"),
+		insert_line_below:					hotKey("Enter","Shift"),
+		insert_line_above:					hotKey("Enter","Mod"),
+		select_all_word_instances:			hotKey(";","Shift","Alt"),
+		select_multiple_word_instances:		hotKey(".","Shift","Alt"),
+		move_line_up:						hotKey("ArrowUp","Alt"),
+		move_line_down:						hotKey("ArrowDown","Alt"),
+		duplicate_line_down:				undefined,
+		duplicate_line_up:					undefined,
+		duplicate_selection_or_line:		hotKey("D","Mod"),
+		expand_line_selections:				hotKey("=","Shift","Alt"),
+		transform_selections_to_lowercase: 	hotKey("U","Mod"),
+		transform_selections_to_uppercase: 	hotKey("U","Mod","Shift"),
+		toggle_case:						undefined,
+		
 	},
 }
 
@@ -626,13 +659,13 @@ export default class KeyshotsPlugin extends Plugin {
 			this.addCommand({
 				id: 'transform-from-to-snake-case',
 				name: "Transform selections from / to Snakecase",
-				hotkeys: MAP.transform_from_to_snake_case,
+				hotkeys: MAP.transform_from_to_snakecase,
 				editorCallback: (editor) => convertOneToOtherChars(editor," ","_")
 			}).id,
 			this.addCommand({
 				id: 'transform-from-to-kebab-case',
 				name: "Transform selections from / to Kebabcase",
-				hotkeys: MAP.transform_from_to_snake_case,
+				hotkeys: MAP.transform_from_to_kebabcase,
 				editorCallback: (editor) => convertOneToOtherChars(editor," ","-")
 			}).id,
 			this.addCommand({
