@@ -1,4 +1,4 @@
-import { App, Editor, EditorPosition, VaultConfig, Plugin, PluginSettingTab, Setting, Hotkey, EditorSelection, EditorRange, EditorCommandName, EditorTransaction, Notice, SliderComponent, Modifier} from 'obsidian';
+import { App, Editor, EditorPosition, VaultConfig, Plugin, PluginSettingTab, Setting, Hotkey, EditorSelection, EditorRange, Notice, SliderComponent, Modifier} from 'obsidian';
 
 /*
 ========================================================================
@@ -420,7 +420,7 @@ declare interface KeyshotsMap {
 
 const hotKey = (key:string, ...modifiers: Modifier[]): Hotkey[] => [{key:key, modifiers: modifiers}]
 
-export const DEFAULT_MAP: KeyshotsMap = {
+const DEFAULT_MAP: KeyshotsMap = {
 	add_carets_down: 						hotKey("ArrowDown","Mod","Alt"),
 	add_carets_up:							hotKey("ArrowUp","Mod","Alt"),
 	encode_or_decode_uri:					hotKey("U","Mod","Alt"),
@@ -452,7 +452,7 @@ export const DEFAULT_MAP: KeyshotsMap = {
 	transform_from_to_kebabcase:			hotKey("-","Alt"),
 }
 
-export const KEYSHOTS_MAPS: {[key: string]: KeyshotsMap} = {
+const KEYSHOTS_MAPS: {[key: string]: KeyshotsMap} = {
 	"clear": {},
 	"keyshots": DEFAULT_MAP,
 	"vscode": {
