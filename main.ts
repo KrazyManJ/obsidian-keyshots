@@ -450,6 +450,7 @@ const DEFAULT_MAP: KeyshotsMap = {
 	transform_selections_to_titlecase:  	hotKey("C","Alt"),
 	transform_from_to_snakecase:			hotKey("-","Shift","Alt"),
 	transform_from_to_kebabcase:			hotKey("-","Alt"),
+	open_keyshots_settings: 				hotKey(",","Mod","Alt")
 }
 
 const KEYSHOTS_MAPS: {[key: string]: KeyshotsMap} = {
