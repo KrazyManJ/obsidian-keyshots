@@ -266,8 +266,8 @@ const selectionValuesEqual = (editor: Editor, selections: EditorSelection[], cas
 function selectWord(editor: Editor, sel: EditorSelection): EditorSelection{
 	sel = normalizeSelection(sel)
 	const txt = editor.getLine(sel.anchor.line)
-	const postCh = (txt.substring(sel.anchor.ch).match(/^[\w]+/i) || [""])[0].length
-	const preCh = (txt.substring(0,sel.anchor.ch).match(/[\w]+$/i) || [""])[0].length
+	const postCh = (txt.substring(sel.anchor.ch).match(/^[^ \(\)\[\]\{\}\,\;]+/i) || [""])[0].length
+	const preCh = (txt.substring(0,sel.anchor.ch).match(/[^ \(\)\[\]\{\}\,\;]+$/i) || [""])[0].length
 	return {
 		anchor: {line: sel.anchor.line, ch: sel.anchor.ch-preCh},
 		head: {line: sel.anchor.line, ch: sel.anchor.ch+postCh}
