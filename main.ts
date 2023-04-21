@@ -43,9 +43,7 @@ const normalizeSelection = (sel: EditorSelection): EditorSelection => {
 }
 
 const selToPos = (sel: EditorSelection):[EditorPosition,EditorPosition] => [sel.anchor, sel.head]
-const posToSel = (anchor: EditorPosition, head: EditorPosition):EditorSelection => { return {anchor: anchor, head: head} }
 const getRangeSel = (editor: Editor, sel: EditorSelection):string => editor.getRange(...selToPos(normalizeSelection(sel)))
-const rangeToSelection = (range: EditorRange): EditorSelection => { return {anchor: range.from, head: range.to} }
 const selectionToRange = (range: EditorSelection): EditorRange => { return {from: range.anchor, to: range.head} }
 
 const expandSelection = (editor: Editor, sel: EditorSelection) : EditorSelection => {
@@ -206,7 +204,7 @@ const convertURI = (editor: Editor) => {
 	replaceSelections(editor, (s) => {
 		try {
 			const decoded = decodeURI(s)
-			if (decoded === s) throw new Error()
+			if (decoded === s) return encodeURI(s)
 			return decoded;
 		}
 		catch { return encodeURI(s) }
@@ -266,8 +264,8 @@ const selectionValuesEqual = (editor: Editor, selections: EditorSelection[], cas
 function selectWord(editor: Editor, sel: EditorSelection): EditorSelection{
 	sel = normalizeSelection(sel)
 	const txt = editor.getLine(sel.anchor.line)
-	const postCh = (txt.substring(sel.anchor.ch).match(/^[^ \(\)\[\]\{\}\,\;]+/i) || [""])[0].length
-	const preCh = (txt.substring(0,sel.anchor.ch).match(/[^ \(\)\[\]\{\}\,\;]+$/i) || [""])[0].length
+	const postCh = (txt.substring(sel.anchor.ch).match(/^[^ ()[]{},;]+/i) || [""])[0].length
+	const preCh = (txt.substring(0,sel.anchor.ch).match(/[^ ()[]{},;]+$/i) || [""])[0].length
 	return {
 		anchor: {line: sel.anchor.line, ch: sel.anchor.ch-preCh},
 		head: {line: sel.anchor.line, ch: sel.anchor.ch+postCh}
@@ -279,7 +277,7 @@ function selectWordInstances(editor: Editor, case_sensitive: boolean){
 	let range: EditorRange | undefined;
 	if (selections.filter(isCaret).length > 0) selections.filter(isCaret).forEach((sel,i) => selections[i] = selectWord(editor,sel))
 	else if (selections.filter(isSelection).length === selections.length && selectionValuesEqual(editor,selections,case_sensitive)) {
-		let {anchor: from, head: to} = normalizeSelection(lowestSelection(selections))
+		const {anchor: from, head: to} = normalizeSelection(lowestSelection(selections))
 		const tx = !case_sensitive ? editor.getRange(from,to).toLowerCase() : editor.getRange(from,to)
 		const match = (!case_sensitive ? editor.getValue().toLowerCase() : editor.getValue())
 			.substring(editor.posToOffset(to)).match(tx)
@@ -514,7 +512,7 @@ export default class KeyshotsPlugin extends Plugin {
 	async onload() {
 		await this.loadSettings()
 		this.addSettingTab(new KeyshotsSettingTab(this.app, this))
-		this.loadCommands()
+		await this.loadCommands()
 	}
 
 	async loadCommands() {
@@ -743,7 +741,7 @@ export default class KeyshotsPlugin extends Plugin {
 }
 
 class DocumentFragmentBuilder{
-	#fragment: DocumentFragment
+	readonly #fragment: DocumentFragment
 	constructor(){
 		this.#fragment = document.createDocumentFragment()
 	}
