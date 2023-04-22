@@ -63,31 +63,60 @@ class EditorPositionManipulator implements EditorPosition, Cloneable<EditorPosit
 
     ch: number
     line: number
+    private readonly editor: Editor
 
-    constructor(position: EditorPosition) {
+    constructor(position: EditorPosition, editor: Editor) {
         this.ch = position.ch
         this.line = position.line
+        this.editor = editor
     }
 
     clone(): EditorPositionManipulator {
-        return new EditorPositionManipulator({ch: this.ch, line: this.line})
+        return new EditorPositionManipulator({ch: this.ch, line: this.line}, this.editor)
     }
 
-    asEditorRange(): EditorRange { return {from:this,to:this} }
+    asEditorRange(): EditorRange {
+        return {from: this, to: this}
+    }
+
+    getLine(): string {
+        return this.editor.getLine(this.line);
+    }
+
+    setLine(text: string): this {
+        this.editor.setLine(this.line, text)
+        return this
+    }
+
+    movePos(line: number, ch: number): this {
+        this.line += line
+        this.ch += ch
+        return this
+    }
+
+    toOffset(): number {
+        return this.editor.posToOffset(this)
+    }
+
+    static documentStart(editor: Editor): EditorPositionManipulator {
+        return new EditorPositionManipulator({ch: 0, line: 0}, editor)
+    }
 }
 
 class EditorSelectionManipulator implements EditorSelection, Cloneable<EditorSelectionManipulator> {
 
     anchor: EditorPositionManipulator
     head: EditorPositionManipulator
+    private readonly editor: Editor
 
-    constructor(selection: EditorSelection) {
-        this.anchor = new EditorPositionManipulator(selection.anchor)
-        this.head = new EditorPositionManipulator(selection.head)
+    constructor(selection: EditorSelection, editor: Editor) {
+        this.anchor = new EditorPositionManipulator(selection.anchor, editor)
+        this.head = new EditorPositionManipulator(selection.head, editor)
+        this.editor = editor
     }
 
     clone(): EditorSelectionManipulator {
-        return new EditorSelectionManipulator({anchor: this.anchor.clone(), head: this.head.clone()})
+        return new EditorSelectionManipulator({anchor: this.anchor.clone(), head: this.head.clone()}, this.editor)
     }
 
     isCaret(): boolean {
@@ -95,7 +124,11 @@ class EditorSelectionManipulator implements EditorSelection, Cloneable<EditorSel
     }
 
     isNormalized(): boolean {
-        return !((this.anchor.line === this.head.line && this.anchor.ch > this.head.ch) || this.anchor.line > this.head.line)
+        return !((this.isOneLine() && this.anchor.ch > this.head.ch) || this.anchor.line > this.head.line)
+    }
+
+    isOneLine(): boolean {
+        return this.anchor.line === this.head.line
     }
 
     normalize(): this {
@@ -111,68 +144,100 @@ class EditorSelectionManipulator implements EditorSelection, Cloneable<EditorSel
         return this.clone().normalize()
     }
 
-    expand(editor: Editor): this {
-        this.anchor.ch = this.isNormalized() ? 0 : editor.getLine(this.anchor.line).length
-        this.head.ch = this.isNormalized() ? editor.getLine(this.head.line).length : 0
+    expand(): this {
+        this.anchor.ch = this.isNormalized() ? 0 : this.editor.getLine(this.anchor.line).length
+        this.head.ch = this.isNormalized() ? this.editor.getLine(this.head.line).length : 0
         return this
     }
 
-    asEditorRange(): EditorRange { return {from:this.anchor,to:this.head} }
+    asEditorRange(): EditorRange {
+        return {from: this.anchor, to: this.head}
+    }
+
+    asFromToPoints(): [EditorPosition, EditorPosition] {
+        const norm = this.asNormalized()
+        return [norm.anchor, norm.head]
+    }
 
     moveLines(anchor: number, head?: number): this {
         this.anchor.line += anchor
         this.head.line += head ?? anchor
         return this
     }
-}
 
+    moveChars(anchor: number, head?: number): this {
+        this.anchor = new EditorPositionManipulator(this.editor.offsetToPos(this.editor.posToOffset(this.anchor) + anchor), this.editor)
+        this.head = new EditorPositionManipulator(this.editor.offsetToPos(this.editor.posToOffset(this.head) + (head ?? anchor)), this.editor)
+        return this
+    }
 
-const isCaret = (sel: EditorSelection) => sel.anchor.ch === sel.head?.ch && sel.anchor.line === sel.head.line;
-const isSelection = (sel: EditorSelection) => !isCaret(sel)
+    setLines(anchor: number, head?: number): this {
+        this.anchor.line = anchor
+        this.head.line = head ?? anchor
+        return this
+    }
 
-const normalizeSelection = (sel: EditorSelection): EditorSelection => {
-    if (sel.anchor.line == sel.head.line)
-        return sel.anchor.ch > sel.head.ch ? {anchor: sel.head, head: sel.anchor} : {anchor: sel.anchor, head: sel.head}
-    return sel.anchor.line < sel.head.line ? {anchor: sel.anchor, head: sel.head} : {anchor: sel.head, head: sel.anchor}
-}
+    setChars(anchor: number, head?: number): this {
+        this.anchor.ch = anchor
+        this.head.ch = head ?? anchor
+        return this
+    }
 
-const selToPos = (sel: EditorSelection): [EditorPosition, EditorPosition] => [sel.anchor, sel.head]
-const getRangeSel = (editor: Editor, sel: EditorSelection): string => editor.getRange(...selToPos(normalizeSelection(sel)))
-const selectionToRange = (range: EditorSelection): EditorRange => {
-    return {from: range.anchor, to: range.head}
-}
+    getText(): string {
+        return this.editor.getRange(...this.asFromToPoints())
+    }
 
-const expandSelection = (editor: Editor, sel: EditorSelection): EditorSelection => {
-    sel = normalizeSelection(sel)
-    return {
-        anchor: {ch: 0, line: sel.anchor.line},
-        head: {ch: editor.getLine(sel.head.line).length, line: sel.head.line}
+    replaceText(to: string): this {
+        this.editor.replaceRange(to, ...this.asFromToPoints())
+        return this
+    }
+
+    get linesCount() {
+        const norm = this.asNormalized()
+        return norm.head.line - norm.anchor.line
+    }
+
+    static listSelections(editor: Editor) {
+        return editor.listSelections().map(s => new EditorSelectionManipulator(s, editor))
+    }
+
+    static documentStart(editor: Editor): EditorSelectionManipulator {
+        return new EditorSelectionManipulator({
+            anchor: EditorPositionManipulator.documentStart(editor),
+            head: EditorPositionManipulator.documentStart(editor)
+        }, editor)
     }
 }
-const invertSelection = (sel: EditorSelection): EditorSelection => {
-    const t = sel.anchor
-    sel.anchor = sel.head
-    sel.head = t
-    return sel
-}
+
 const flipBooleanSetting = (app: App, setting: keyof VaultConfig) => app.vault.setConfig(setting, !app.vault.getConfig(setting))
 
 const replaceSelections = (editor: Editor, transformFct: (val: string) => string) => {
-    editor.listSelections().filter(isSelection).forEach(sel => {
-        const {anchor: from, head: to} = normalizeSelection(sel)
-        editor.replaceRange(transformFct(editor.getRange(from, to)), from, to)
-    })
+    EditorSelectionManipulator.listSelections(editor).filter(s => !s.isCaret()).forEach(sel =>
+        sel.normalize().replaceText(transformFct(sel.normalize().getText()))
+    )
 }
 
 const selectionsProcessor = (
     editor: Editor,
+    arrCallback: ((arr: EditorSelectionManipulator[]) => EditorSelectionManipulator[]) | undefined,
+    fct: (sel: EditorSelectionManipulator, index: number) => EditorSelection
+) => {
+    const selections: EditorSelection[] = [];
+    (arrCallback !== undefined
+        ? arrCallback(EditorSelectionManipulator.listSelections(editor)) : EditorSelectionManipulator.listSelections(editor))
+        .forEach((sel, index) => selections.push(fct(sel, index)))
+    if (selections.length > 0) editor.setSelections(selections)
+}
+
+const selectionsUpdater = (
+    editor: Editor,
     arrCallback: ((arr: EditorSelection[]) => EditorSelection[]) | undefined,
-    fct: (sel: EditorSelection, index: number) => EditorSelection
+    fct: (sel: EditorSelectionManipulator, index: number) => EditorSelection[]
 ) => {
     const selections: EditorSelection[] = [];
     (arrCallback !== undefined
         ? arrCallback(editor.listSelections()) : editor.listSelections())
-        .forEach((sel, index) => selections.push(fct(sel, index)))
+        .forEach((sel, index) => selections.push(...fct(new EditorSelectionManipulator(sel, editor), index)))
     if (selections.length > 0) editor.setSelections(selections)
 }
 
@@ -194,89 +259,69 @@ const convertOneToOtherChars = (editor: Editor, first: string, second: string) =
     })
 }
 
+// =================================================================================================================
+// FUNCTIONS
+// =================================================================================================================
+
 function moveLine(editor: Editor, direction: VerticalDirection, border: number) {
     selectionsProcessor(editor, undefined, (sel) => {
-        const normSel = normalizeSelection(sel)
-        if (direction === 1 ? normSel.head.line === border : normSel.anchor.line === border) return sel
-        const {anchor: from, head: to} = expandSelection(editor, {
-            anchor: {line: normSel.anchor.line + (direction === -1 ? direction : 0), ch: normSel.anchor.ch},
-            head: {line: normSel.head.line + (direction === 1 ? direction : 0), ch: normSel.head.ch}
-        })
-        const tx = editor.getRange(from, to)
-        if (isCaret(sel)) editor.replaceRange(tx.split("\n").reverse().join("\n"), from, to)
+        if (direction === 1 ? sel.asNormalized().head.line === border : sel.asNormalized().anchor.line === border) return sel
+        const replaceSel = sel.asNormalized().moveLines(
+            direction === -1 ? direction : 0,
+            direction === 1 ? direction : 0
+        ).expand()
+        const tx = replaceSel.getText()
+        if (sel.isCaret()) replaceSel.replaceText(tx.split("\n").reverse().join("\n"))
         else {
             const pieces = [
                 tx.split("\n").slice(...(direction === 1 ? [-1] : [0, 1]))[0],
                 tx.split("\n").slice(...(direction === 1 ? [undefined, -1] : [1])).join("\n")
             ]
             if (direction === -1) pieces.reverse()
-            editor.replaceRange(pieces.join("\n"), from, to)
+            replaceSel.replaceText(pieces.join("\n"))
         }
-        return {
-            anchor: {line: sel.anchor.line + direction, ch: sel.anchor.ch},
-            head: {line: sel.head.line + direction, ch: sel.head.ch}
-        }
+        return sel.moveLines(direction)
     })
 }
 
 function jetBrainsDuplicate(editor: Editor) {
     selectionsProcessor(editor, undefined, (sel) => {
-        if (isCaret(sel)) {
-            const ln = sel.anchor.line
-            const tx = editor.getLine(ln)
-            editor.setLine(ln, tx + "\n" + tx)
-            return {
-                anchor: {line: sel.anchor.line + 1, ch: sel.anchor.ch},
-                head: {line: sel.anchor.line + 1, ch: sel.anchor.ch}
-            }
+        if (sel.isCaret()) {
+            const tx = sel.anchor.getLine()
+            sel.anchor.setLine(tx + "\n" + tx)
+            return sel.moveLines(1)
         } else {
-            const {anchor: from, head: to} = normalizeSelection(sel)
-            const tx = editor.getRange(from, to)
-            editor.replaceRange(tx, from, from)
-            return {anchor: to, head: editor.offsetToPos(editor.posToOffset(to) + tx.length)}
+            const tx = sel.asNormalized().getText()
+            return sel.asNormalized().replaceText(tx + tx).moveChars(tx.length)
         }
     })
 }
 
 function vscodeDuplicate(editor: Editor, direction: VerticalDirection) {
     selectionsProcessor(editor, undefined, (sel) => {
-        if (isCaret(sel)) {
-            const ln = sel.anchor.line
-            const tx = editor.getLine(ln)
-            editor.setLine(ln, tx + "\n" + tx)
-            if (direction > 0) return {
-                anchor: {line: sel.anchor.line + 1, ch: sel.anchor.ch},
-                head: {line: sel.anchor.line + 1, ch: sel.anchor.ch}
-            }
+        if (sel.isCaret()) {
+            const tx = sel.anchor.getLine()
+            sel.anchor.setLine(tx + "\n" + tx)
+            if (direction > 0) return sel.moveLines(1);
         } else {
-            const {anchor: from, head: to} = normalizeSelection(sel)
-            const {anchor: lfrom, head: lto} = expandSelection(editor, normalizeSelection(sel))
-            const tx = editor.getRange(lfrom, lto)
-            editor.replaceRange(tx + "\n" + tx, lfrom, lto)
-            if (direction > 0) {
-                return {
-                    anchor: {ch: sel.anchor.ch, line: sel.anchor.line + (to.line - from.line + 1)},
-                    head: {ch: sel.head.ch, line: sel.head.line + (to.line - from.line + 1)}
-                }
-            }
+            const replaceSel = sel.asNormalized().expand()
+            const tx = replaceSel.getText()
+            replaceSel.replaceText(tx + "\n" + tx)
+            if (direction > 0) return sel.moveLines(sel.linesCount + 1)
         }
         return sel
     })
 }
 
 function addCarets(editor: Editor, direction: VerticalDirection, border: number) {
-    const newSelections: EditorSelection[] = editor.listSelections()
-    const caretSelectsOnly = newSelections.filter(val => isCaret(val))
+    const newSelections: EditorSelectionManipulator[] = EditorSelectionManipulator.listSelections(editor)
+    const caretSelectsOnly = newSelections.filter(val => val.isCaret())
     if (caretSelectsOnly.length === 0) return;
     const last = caretSelectsOnly[direction > 0 ? caretSelectsOnly.length - 1 : 0]
     if (last.anchor.line === border) return;
-    newSelections.push({
-        anchor: {ch: last.anchor.ch, line: last.anchor.line + direction},
-        head: {ch: last.anchor.ch, line: last.anchor.line + direction}
-    })
+    newSelections.push(last.clone().moveLines(direction))
     editor.setSelections(newSelections)
-    const scroll = {anchor: {ch: last.anchor.ch, line: last.anchor.line + direction * 2}}
-    editor.scrollIntoView({from: scroll.anchor, to: scroll.anchor})
+    editor.scrollIntoView(last.anchor.movePos(direction * 2, 0).asEditorRange())
 }
 
 function insertLine(editor: Editor, direction: VerticalDirection) {
@@ -285,20 +330,17 @@ function insertLine(editor: Editor, direction: VerticalDirection) {
             const tx = [editor.getLine(ln), "\n"]
             if (direction < 0) tx.reverse()
             editor.setLine(ln, tx.join(""))
-            return {
-                anchor: {ch: 0, line: ln + (direction > 0 ? direction : 0)},
-                head: {ch: 0, line: ln + (direction > 0 ? direction : 0)},
-            }
+            return EditorSelectionManipulator.documentStart(editor).setLines(ln,direction > 0 ? direction : 0)
         }
-        if (isCaret(sel)) return a(sel.anchor.line + index)
+        if (sel.isCaret()) return a(sel.anchor.line + index)
         else {
-            const {anchor: from, head: to} = normalizeSelection(sel)
-            return a((direction > 0 ? to.line : from.line) + index)
+            const normSel = sel.asNormalized()
+            return a((direction > 0 ? normSel.anchor.line : normSel.head.line) + index)
         }
     })
 }
 
-const convertURI = (editor: Editor) => {
+function convertURI(editor: Editor) {
     replaceSelections(editor, (s) => {
         try {
             const decoded = decodeURI(s)
@@ -315,123 +357,106 @@ const titleCase = (s: string) => s.replace(/\w\S*/g, (txt) => txt.charAt(0).toUp
 function splitSelectedTextOnNewLine(editor: Editor) {
     let index = 0
     selectionsProcessor(editor, arr => arr.sort((a, b) => a.anchor.line - b.anchor.line), sel => {
-        if (isCaret(sel)) return sel
+        if (sel.isCaret()) return sel
         else {
-            const {anchor: from, head: to} = normalizeSelection({
-                anchor: {ch: sel.anchor.ch, line: sel.anchor.line + index},
-                head: {ch: sel.head.ch, line: sel.head.line + index}
-            })
-            const tx = editor.getRange(from, to)
-            editor.replaceRange("\n" + tx + "\n", from, to)
-            index += (tx.match(/\n/g) || []).length + 1
-            return {
-                anchor: {ch: 0, line: from.line + 1},
-                head: {ch: editor.getLine(to.line + 1).length, line: to.line + 1}
-            }
+            const replaceSel = sel.moveLines(index).normalize()
+            const tx = replaceSel.getText()
+            replaceSel.replaceText("\n" + tx + "\n")
+            index += (tx.split("\n") || []).length + 1
+            return sel.moveLines(1).expand()
         }
     })
 }
 
 function sortSelectedLines(editor: Editor) {
-    selectionsProcessor(editor, arr => arr.filter(isSelection), sel => {
-        const {anchor: from, head: to} = expandSelection(editor, normalizeSelection(sel))
-        editor.replaceRange(
-            editor.getRange(from, to)
-                .split("\n")
-                .sort((a, b) => a.localeCompare(b, undefined, {numeric: true, sensitivity: "base"}))
-                .join("\n")
-            , from, to)
-        return expandSelection(editor, normalizeSelection(sel))
+    selectionsProcessor(editor, arr => arr.filter(s => !s.isCaret()), sel => {
+        const replaceSel = sel.asNormalized().expand()
+        replaceSel.replaceText(replaceSel.getText()
+            .split("\n")
+            .sort((a, b) => a.localeCompare(b, undefined, {numeric: true, sensitivity: "base"}))
+            .join("\n")
+        )
+        return sel
     })
 }
 
-const lowestSelection = (selections: EditorSelection[]): EditorSelection => {
+const lowestSelection = (selections: EditorSelectionManipulator[]): EditorSelectionManipulator => {
+
     return selections.filter((sel, _i, arr) =>
-        normalizeSelection(sel).head.line === Math.max(...arr.map(s => normalizeSelection(s).head.line))
+        sel.asNormalized().head.line === Math.max(...arr.map(s => s.asNormalized().head.line))
     ).filter((sel, _i, arr) =>
-        normalizeSelection(sel).head.ch === Math.max(...arr.map(s => normalizeSelection(s).head.ch))
+        sel.asNormalized().head.ch === Math.max(...arr.map(s => s.asNormalized().head.ch))
     )[0]
 }
-const selectionValuesEqual = (editor: Editor, selections: EditorSelection[], case_sensitive: boolean): boolean => {
+const selectionValuesEqual = (editor: Editor, selections: EditorSelectionManipulator[], case_sensitive: boolean): boolean => {
     return selections.every((val, _i, arr) => {
-        const [one, two] = [arr[0], val].map(s => editor.getRange(...selToPos(normalizeSelection(s))))
+        const [one, two] = [arr[0], val].map(s => s.asNormalized().getText())
         if (!case_sensitive) return one.toLowerCase() === two.toLowerCase()
         return one === two
     })
 }
 
-function selectWord(editor: Editor, sel: EditorSelection): EditorSelection {
-    sel = normalizeSelection(sel)
-    const txt = editor.getLine(sel.anchor.line)
-    const postCh = (txt.substring(sel.anchor.ch).match(/^[^ ()[]{},;]+/i) || [""])[0].length
-    const preCh = (txt.substring(0, sel.anchor.ch).match(/[^ ()[]{},;]+$/i) || [""])[0].length
-    return {
-        anchor: {line: sel.anchor.line, ch: sel.anchor.ch - preCh},
-        head: {line: sel.anchor.line, ch: sel.anchor.ch + postCh}
-    }
+function selectWord(sel: EditorSelectionManipulator): EditorSelectionManipulator {
+    sel = sel.asNormalized().setLines(sel.anchor.line)
+    const txt = sel.anchor.getLine()
+    const postCh = (txt.substring(sel.anchor.ch).match(/^[^ ()[\]{},;]+/i) ?? [""])[0].length
+    const preCh = (txt.substring(0, sel.anchor.ch).match(/[^ ()[\]{},;]+$/i) ?? [""])[0].length
+    return sel.setChars(sel.anchor.ch).moveChars(-preCh, postCh)
 }
 
 function selectWordInstances(editor: Editor, case_sensitive: boolean) {
-    const selections: EditorSelection[] = editor.listSelections()
+    const selections: EditorSelectionManipulator[] = EditorSelectionManipulator.listSelections(editor)
     let range: EditorRange | undefined;
-    if (selections.filter(isCaret).length > 0) selections.filter(isCaret).forEach((sel, i) => selections[i] = selectWord(editor, sel))
-    else if (selections.filter(isSelection).length === selections.length && selectionValuesEqual(editor, selections, case_sensitive)) {
-        const {anchor: from, head: to} = normalizeSelection(lowestSelection(selections))
-        const tx = !case_sensitive ? editor.getRange(from, to).toLowerCase() : editor.getRange(from, to)
-        const match = (!case_sensitive ? editor.getValue().toLowerCase() : editor.getValue())
-            .substring(editor.posToOffset(to)).match(tx)
+    if (selections.filter(s => s.isCaret()).length > 0) {
+        selections.filter(s => s.isCaret()).forEach((sel, i) => selections[i] = selectWord(sel))
+    } else if (selections.filter(s => !s.isCaret()).length === selections.length && selectionValuesEqual(editor, selections, case_sensitive)) {
+        const sel = lowestSelection(selections).normalize()
+        const tx = !case_sensitive ? sel.getText().toLowerCase() : sel.getText()
+
+        const match = (!case_sensitive ? editor.getValue().toLowerCase() : editor.getValue()).substring(sel.head.toOffset()).match(tx)
         if (match !== null) {
-            const sel = {
-                anchor: editor.offsetToPos(editor.posToOffset(to) + (match.index || 0)),
-                head: editor.offsetToPos(editor.posToOffset(to) + (match.index || 0) + tx.length)
-            }
-            selections.push(sel)
-            range = selectionToRange(sel)
+            const matchSel = EditorSelectionManipulator.documentStart(editor).setChars(sel.head.toOffset())
+                .moveChars(match.index ?? 0, (match.index ?? 0) + tx.length)
+            selections.push(matchSel)
+            range = matchSel.asEditorRange()
         } else {
-            let searchText = !case_sensitive ? editor.getValue().toLowerCase() : editor.getValue()
+            let editorSearchText = !case_sensitive ? editor.getValue().toLowerCase() : editor.getValue()
             let shift = 0
-            let match = searchText.match(tx)
+            let match = editorSearchText.match(tx)
             while (match !== null) {
                 const prevTx = (!case_sensitive ? editor.getValue().toLowerCase() : editor.getValue()).substring(0, shift + (match?.index || 0))
-                const sel = {
-                    anchor: editor.offsetToPos(prevTx.length),
-                    head: editor.offsetToPos(prevTx.length + tx.length)
-                }
+                const sel = EditorSelectionManipulator.documentStart(editor).moveChars(prevTx.length, prevTx.length + tx.length)
                 if (selections.filter(s => selectionsEqual(sel, s)).length === 0) {
                     selections.push(sel)
-                    range = selectionToRange(sel)
+                    range = sel.asEditorRange()
                     break;
                 } else {
                     shift += (match?.index || 0) + tx.length
-                    searchText = searchText.substring((match?.index || 0) + tx.length)
+                    editorSearchText = editorSearchText.substring((match?.index || 0) + tx.length)
                 }
-                match = searchText.match(tx)
+                match = editorSearchText.match(tx)
             }
         }
-    }
+    } else return;
     editor.setSelections(selections);
     if (range !== undefined) editor.scrollIntoView(range);
 }
 
 function selectAllWordInstances(editor: Editor, case_sensitive: boolean) {
-    const selections: EditorSelection[] = editor.listSelections()
-    selections.filter(isCaret).forEach((sel, i) => selections[i] = selectWord(editor, sel))
-    if (selections.filter(isSelection).length === selections.length && selectionValuesEqual(editor, selections, case_sensitive)) {
-        const tx = getRangeSel(editor, selections[0])
+    const selections: EditorSelectionManipulator[] = EditorSelectionManipulator.listSelections(editor)
+    selections.filter(s => s.isCaret()).forEach((sel, i) => selections[i] = selectWord(sel))
+    if (selections.filter(s => !s.isCaret()).length === selections.length && selectionValuesEqual(editor, selections, case_sensitive)) {
+        const tx = selections[0].getText()
         Array.from(editor.getValue().matchAll(new RegExp(tx, "g" + (case_sensitive ? "" : "i"))), v => v.index || 0)
             .forEach(v => {
-                selections.push({anchor: {line: 0, ch: v}, head: {line: 0, ch: v + tx.length}})
+                selections.push(EditorSelectionManipulator.documentStart(editor).moveChars(v, v + tx.length))
             })
     } else return;
     editor.setSelections(selections);
 }
 
 function expandSelections(editor: Editor) {
-    selectionsProcessor(editor, undefined, sel =>
-        editor.posToOffset(sel.anchor) <= editor.posToOffset(sel.head)
-            ? expandSelection(editor, sel)
-            : invertSelection(expandSelection(editor, sel))
-    )
+    selectionsProcessor(editor, undefined, sel => sel.expand())
 }
 
 async function toggleCaseSensitivity(plugin: KeyshotsPlugin) {
@@ -442,29 +467,27 @@ async function toggleCaseSensitivity(plugin: KeyshotsPlugin) {
 }
 
 function splitSelectionsByLines(editor: Editor) {
-    const selections: EditorSelection[] = [];
-    editor.listSelections().forEach(sel => {
-        if (isCaret(sel) || sel.anchor.line === sel.head.line) selections.push(sel)
+    selectionsUpdater(editor, undefined, sel => {
+        const selections: EditorSelection[] = [];
+        if (sel.isCaret() || sel.isOneLine()) selections.push(sel)
         else {
-            const {anchor: from, head: to} = normalizeSelection(sel)
-            selections.push({anchor: from, head: {line: from.line, ch: editor.getLine(from.line).length}})
-            for (let i = from.line + 1; i < to.line; i++) selections.push({
-                anchor: {line: i, ch: 0},
-                head: {line: i, ch: editor.getLine(i).length}
-            })
-            selections.push({anchor: {line: to.line, ch: 0}, head: to})
+            sel.normalize()
+            selections.push(sel.clone().setLines(sel.anchor.line).setChars(sel.anchor.ch, editor.getLine(sel.anchor.line).length))
+            for (let i = sel.anchor.line + 1; i < sel.head.line; i++)
+                selections.push(sel.clone().setLines(i).setChars(0, editor.getLine(i).length))
+            selections.push(sel.clone().setLines(sel.head.line).setChars(0, sel.head.ch))
         }
+        return selections
     })
-    editor.setSelections(selections)
 }
 
 function shuffleSelectedLines(editor: Editor, rounds: number) {
-    selectionsProcessor(editor, arr => arr.filter(isSelection), sel => {
-        const {anchor: from, head: to} = expandSelection(editor, normalizeSelection(sel))
-        let text = editor.getRange(from, to)
-        for (let i = 0; i < rounds; i++) text = text.split("\n").sort(() => Math.random() - 0.5).join("\n")
-        editor.replaceRange(text, from, to)
-        return expandSelection(editor, normalizeSelection(sel))
+    selectionsProcessor(editor, arr => arr.filter(s => !s.isCaret()), sel => {
+        const replaceSel = sel.asNormalized().expand()
+        let txt = replaceSel.getText()
+        for (let i = 0; i < rounds; i++) txt = txt.split("\n").sort(() => Math.random() - 0.5).join("\n")
+        replaceSel.replaceText(txt)
+        return sel
     })
 }
 
