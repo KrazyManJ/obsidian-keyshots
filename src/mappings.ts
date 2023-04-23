@@ -37,6 +37,7 @@ export declare interface KeyshotsMap {
     multi_toggle_italic?: Hotkey[]
     multi_toggle_code?: Hotkey[]
     open_dev_tools?: Hotkey[]
+    toggle_keybinding?: Hotkey[]
 }
 
 export const DEFAULT_MAP: KeyshotsMap = {

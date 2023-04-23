@@ -205,6 +205,12 @@ export const COMMANDS = (plugin: KeyshotsPlugin, map: KeyshotsMap): Command[] =>
         editorCallback: (editor) => functions.surroundWithChars(editor, "==")
     },
     {
+        id: 'toggle-keybinding',
+        name: "Toggle Keybinding",
+        hotkeys: map.toggle_keybinding,
+        editorCallback: (editor) => functions.surroundWithChars(editor, "<kbd>","</kbd>")
+    },
+    {
         id: 'open-dev-tools',
         name: "Open Developer Tools",
         hotkeys: map.open_dev_tools,

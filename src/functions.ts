@@ -240,14 +240,14 @@ export function convertOneToOtherChars(editor: Editor, first: string, second: st
     })
 }
 
-export function surroundWithChars(editor: Editor, chars: string){
+export function surroundWithChars(editor: Editor, chars: string, endchars?: string){
     selectionsProcessor(editor,undefined,(sel) => {
-        const surroundSel = sel.clone().moveChars(-chars.length,chars.length).normalize();
-        if (surroundSel.getText().startsWith(chars) && surroundSel.getText().endsWith(chars)) {
+        const surroundSel = sel.clone().moveChars(-chars.length,(endchars ?? chars).length).normalize();
+        if (surroundSel.getText().startsWith(chars) && surroundSel.getText().endsWith(endchars ?? chars)) {
             return surroundSel.replaceText(
-                surroundSel.getText().substring(chars.length,surroundSel.getText().length-chars.length)
-            ).moveChars(0,chars.length*-2)
+                surroundSel.getText().substring(chars.length,surroundSel.getText().length-(endchars ?? chars).length)
+            ).moveChars(0,-chars.length-(endchars ?? chars).length)
         }
-        return sel.replaceText(chars+sel.getText()+chars).moveChars(chars.length)
+        return sel.replaceText(chars+sel.getText()+(endchars ?? chars)).moveChars(chars.length)
     })
 }
