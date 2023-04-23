@@ -1,6 +1,15 @@
 import EditorSelectionManipulator from "./classes/editor-selection-manipulator";
 import {App, Editor, EditorRange, EditorSelection, Notice} from "obsidian";
-import {replaceSelections, selectionsEqual, selectionsProcessor, selectionsUpdater, VerticalDirection} from "./utils";
+import {
+    lowestSelection,
+    replaceSelections,
+    selectionsEqual,
+    selectionsProcessor,
+    selectionsUpdater,
+    selectionValuesEqual,
+    selectWord,
+    VerticalDirection
+} from "./utils";
 import KeyshotsPlugin from "./main";
 
 export function moveLine(editor: Editor, direction: VerticalDirection, border: number) {
@@ -92,8 +101,6 @@ export function convertURI(editor: Editor) {
     })
 }
 
-export const titleCase = (s: string) => s.replace(/\w\S*/g, (txt) => txt.charAt(0).toUpperCase() + txt.substring(1).toLowerCase())
-
 export function splitSelectedTextOnNewLine(editor: Editor) {
     let index = 0
     selectionsProcessor(editor, arr => arr.sort((a, b) => a.anchor.line - b.anchor.line), sel => {
@@ -118,30 +125,6 @@ export function sortSelectedLines(editor: Editor) {
         )
         return sel
     })
-}
-
-const lowestSelection = (selections: EditorSelectionManipulator[]): EditorSelectionManipulator => {
-
-    return selections.filter((sel, _i, arr) =>
-        sel.asNormalized().head.line === Math.max(...arr.map(s => s.asNormalized().head.line))
-    ).filter((sel, _i, arr) =>
-        sel.asNormalized().head.ch === Math.max(...arr.map(s => s.asNormalized().head.ch))
-    )[0]
-}
-const selectionValuesEqual = (editor: Editor, selections: EditorSelectionManipulator[], case_sensitive: boolean): boolean => {
-    return selections.every((val, _i, arr) => {
-        const [one, two] = [arr[0], val].map(s => s.asNormalized().getText())
-        if (!case_sensitive) return one.toLowerCase() === two.toLowerCase()
-        return one === two
-    })
-}
-
-function selectWord(sel: EditorSelectionManipulator): EditorSelectionManipulator {
-    sel = sel.asNormalized().setLines(sel.anchor.line)
-    const txt = sel.anchor.getLine()
-    const postCh = (txt.substring(sel.anchor.ch).match(/^[^ ()[\]{},;]+/i) ?? [""])[0].length
-    const preCh = (txt.substring(0, sel.anchor.ch).match(/[^ ()[\]{},;]+$/i) ?? [""])[0].length
-    return sel.setChars(sel.anchor.ch).moveChars(-preCh, postCh)
 }
 
 export function selectWordInstances(editor: Editor, case_sensitive: boolean) {

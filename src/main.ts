@@ -1,6 +1,6 @@
 import {Plugin} from 'obsidian';
 import {DEFAULT_MAP, KEYSHOTS_MAPS} from "./mappings";
-import {convertOneToOtherChars, flipBooleanSetting, replaceSelections, VerticalDirection} from "./utils";
+import {convertOneToOtherChars, flipBooleanSetting, replaceSelections, titleCase, VerticalDirection} from "./utils";
 import {
     addCarets,
     convertURI,
@@ -15,7 +15,6 @@ import {
     sortSelectedLines,
     splitSelectedTextOnNewLine,
     splitSelectionsByLines,
-    titleCase,
     toggleCaseSensitivity,
     vscodeDuplicate
 } from "./commands";

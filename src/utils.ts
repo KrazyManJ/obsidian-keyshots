@@ -54,3 +54,27 @@ export const convertOneToOtherChars = (editor: Editor, first: string, second: st
         return replaceFromTo(tx, first, second)
     })
 }
+export const titleCase = (s: string) => s.replace(/\w\S*/g, (txt) => txt.charAt(0).toUpperCase() + txt.substring(1).toLowerCase())
+export const lowestSelection = (selections: EditorSelectionManipulator[]): EditorSelectionManipulator => {
+
+    return selections.filter((sel, _i, arr) =>
+        sel.asNormalized().head.line === Math.max(...arr.map(s => s.asNormalized().head.line))
+    ).filter((sel, _i, arr) =>
+        sel.asNormalized().head.ch === Math.max(...arr.map(s => s.asNormalized().head.ch))
+    )[0]
+}
+export const selectionValuesEqual = (editor: Editor, selections: EditorSelectionManipulator[], case_sensitive: boolean): boolean => {
+    return selections.every((val, _i, arr) => {
+        const [one, two] = [arr[0], val].map(s => s.asNormalized().getText())
+        if (!case_sensitive) return one.toLowerCase() === two.toLowerCase()
+        return one === two
+    })
+}
+
+export function selectWord(sel: EditorSelectionManipulator): EditorSelectionManipulator {
+    sel = sel.asNormalized().setLines(sel.anchor.line)
+    const txt = sel.anchor.getLine()
+    const postCh = (txt.substring(sel.anchor.ch).match(/^[^ ()[\]{},;]+/i) ?? [""])[0].length
+    const preCh = (txt.substring(0, sel.anchor.ch).match(/[^ ()[\]{},;]+$/i) ?? [""])[0].length
+    return sel.setChars(sel.anchor.ch).moveChars(-preCh, postCh)
+}
