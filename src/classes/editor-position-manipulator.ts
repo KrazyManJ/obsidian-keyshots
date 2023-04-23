@@ -1,5 +1,5 @@
 import {Editor, EditorPosition, EditorRange} from "obsidian";
-import {Cloneable} from "../Utils";
+import {Cloneable} from "../utils";
 
 export default class EditorPositionManipulator implements EditorPosition, Cloneable<EditorPositionManipulator> {
 

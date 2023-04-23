@@ -1,4 +1,4 @@
-import {hotKey} from "./Utils";
+import {hotKey} from "./utils";
 import {Hotkey} from "obsidian";
 
 declare interface KeyshotsMap {

@@ -1,6 +1,6 @@
 import {Editor, EditorPosition, EditorRange, EditorSelection} from "obsidian";
-import EditorPositionManipulator from "./EditorPositionManipulator";
-import {Cloneable} from "../Utils";
+import EditorPositionManipulator from "./editor-position-manipulator";
+import {Cloneable} from "../utils";
 
 export default class EditorSelectionManipulator implements EditorSelection, Cloneable<EditorSelectionManipulator> {
 
