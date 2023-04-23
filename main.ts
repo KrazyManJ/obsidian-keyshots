@@ -1,24 +1,21 @@
 import {
     App,
     Editor,
-    EditorPosition,
-    VaultConfig,
+    EditorRange,
+    EditorSelection,
+    Notice,
     Plugin,
     PluginSettingTab,
     Setting,
-    Hotkey,
-    EditorSelection,
-    EditorRange,
-    Notice,
     SliderComponent,
-    Modifier
+    VaultConfig
 } from 'obsidian';
+import EditorSelectionManipulator from "./src/classes/EditorSelectionManipulator";
+import {DEFAULT_MAP, KEYSHOTS_MAPS} from "./src/Mappings";
+import {VerticalDirection} from "./src/Utils";
+import {DocumentFragmentBuilder} from "./src/classes/DocumentFragmentBuilder";
 
-/*
-========================================================================
-	NON-API TYPING
-========================================================================
-*/
+
 declare module 'obsidian' {
     interface VaultConfig {
         readableLineLength: boolean
@@ -51,163 +48,8 @@ declare module 'obsidian' {
     }
 }
 
-enum VerticalDirection { UP = -1, DOWN = 1 }
 
 
-interface Cloneable<T> {
-    clone(): T
-}
-
-
-class EditorPositionManipulator implements EditorPosition, Cloneable<EditorPositionManipulator> {
-
-    ch: number
-    line: number
-    private readonly editor: Editor
-
-    constructor(position: EditorPosition, editor: Editor) {
-        this.ch = position.ch
-        this.line = position.line
-        this.editor = editor
-    }
-
-    clone(): EditorPositionManipulator {
-        return new EditorPositionManipulator({ch: this.ch, line: this.line}, this.editor)
-    }
-
-    asEditorRange(): EditorRange {
-        return {from: this, to: this}
-    }
-
-    getLine(): string {
-        return this.editor.getLine(this.line);
-    }
-
-    setLine(text: string): this {
-        this.editor.setLine(this.line, text)
-        return this
-    }
-
-    movePos(line: number, ch: number): this {
-        this.line += line
-        this.ch += ch
-        return this
-    }
-
-    toOffset(): number {
-        return this.editor.posToOffset(this)
-    }
-
-    static documentStart(editor: Editor): EditorPositionManipulator {
-        return new EditorPositionManipulator({ch: 0, line: 0}, editor)
-    }
-}
-
-class EditorSelectionManipulator implements EditorSelection, Cloneable<EditorSelectionManipulator> {
-
-    anchor: EditorPositionManipulator
-    head: EditorPositionManipulator
-    private readonly editor: Editor
-
-    constructor(selection: EditorSelection, editor: Editor) {
-        this.anchor = new EditorPositionManipulator(selection.anchor, editor)
-        this.head = new EditorPositionManipulator(selection.head, editor)
-        this.editor = editor
-    }
-
-    clone(): EditorSelectionManipulator {
-        return new EditorSelectionManipulator({anchor: this.anchor.clone(), head: this.head.clone()}, this.editor)
-    }
-
-    isCaret(): boolean {
-        return this.anchor.ch === this.head.ch && this.anchor.line === this.head.line
-    }
-
-    isNormalized(): boolean {
-        return !((this.isOneLine() && this.anchor.ch > this.head.ch) || this.anchor.line > this.head.line)
-    }
-
-    isOneLine(): boolean {
-        return this.anchor.line === this.head.line
-    }
-
-    normalize(): this {
-        if (!this.isNormalized()) {
-            const [tAnchor, tHead] = [this.anchor, this.head]
-            this.anchor = tHead
-            this.head = tAnchor
-        }
-        return this
-    }
-
-    asNormalized(): EditorSelectionManipulator {
-        return this.clone().normalize()
-    }
-
-    expand(): this {
-        this.anchor.ch = this.isNormalized() ? 0 : this.editor.getLine(this.anchor.line).length
-        this.head.ch = this.isNormalized() ? this.editor.getLine(this.head.line).length : 0
-        return this
-    }
-
-    asEditorRange(): EditorRange {
-        return {from: this.anchor, to: this.head}
-    }
-
-    asFromToPoints(): [EditorPosition, EditorPosition] {
-        const norm = this.asNormalized()
-        return [norm.anchor, norm.head]
-    }
-
-    moveLines(anchor: number, head?: number): this {
-        this.anchor.line += anchor
-        this.head.line += head ?? anchor
-        return this
-    }
-
-    moveChars(anchor: number, head?: number): this {
-        this.anchor = new EditorPositionManipulator(this.editor.offsetToPos(this.editor.posToOffset(this.anchor) + anchor), this.editor)
-        this.head = new EditorPositionManipulator(this.editor.offsetToPos(this.editor.posToOffset(this.head) + (head ?? anchor)), this.editor)
-        return this
-    }
-
-    setLines(anchor: number, head?: number): this {
-        this.anchor.line = anchor
-        this.head.line = head ?? anchor
-        return this
-    }
-
-    setChars(anchor: number, head?: number): this {
-        this.anchor.ch = anchor
-        this.head.ch = head ?? anchor
-        return this
-    }
-
-    getText(): string {
-        return this.editor.getRange(...this.asFromToPoints())
-    }
-
-    replaceText(to: string): this {
-        this.editor.replaceRange(to, ...this.asFromToPoints())
-        return this
-    }
-
-    get linesCount() {
-        const norm = this.asNormalized()
-        return norm.head.line - norm.anchor.line
-    }
-
-    static listSelections(editor: Editor) {
-        return editor.listSelections().map(s => new EditorSelectionManipulator(s, editor))
-    }
-
-    static documentStart(editor: Editor): EditorSelectionManipulator {
-        return new EditorSelectionManipulator({
-            anchor: EditorPositionManipulator.documentStart(editor),
-            head: EditorPositionManipulator.documentStart(editor)
-        }, editor)
-    }
-}
 
 const flipBooleanSetting = (app: App, setting: keyof VaultConfig) => app.vault.setConfig(setting, !app.vault.getConfig(setting))
 
@@ -330,7 +172,7 @@ function insertLine(editor: Editor, direction: VerticalDirection) {
             const tx = [editor.getLine(ln), "\n"]
             if (direction < 0) tx.reverse()
             editor.setLine(ln, tx.join(""))
-            return EditorSelectionManipulator.documentStart(editor).setLines(ln,direction > 0 ? direction : 0)
+            return EditorSelectionManipulator.documentStart(editor).setLines(ln, direction > 0 ? direction : 0)
         }
         if (sel.isCaret()) return a(sel.anchor.line + index)
         else {
@@ -496,12 +338,7 @@ function openKeyshotsSettings(app: App) {
     app.setting.openTabById("keyshots")
 }
 
-interface KeyshotsSettings {
-    ide_mappings: string;
-    keyshot_mappings: boolean;
-    case_sensitive: boolean;
-    shuffle_rounds_amount: number
-}
+
 
 const DEFAULT_SETTINGS: KeyshotsSettings = {
     ide_mappings: "clear",
@@ -510,126 +347,13 @@ const DEFAULT_SETTINGS: KeyshotsSettings = {
     shuffle_rounds_amount: 10
 }
 
-declare interface KeyshotsMap {
-    add_carets_down?: Hotkey[]
-    add_carets_up?: Hotkey[]
-    duplicate_line_down?: Hotkey[]
-    duplicate_line_up?: Hotkey[]
-    duplicate_selection_or_line?: Hotkey[]
-    encode_or_decode_uri?: Hotkey[]
-    expand_line_selections?: Hotkey[]
-    insert_line_above?: Hotkey[]
-    insert_line_below?: Hotkey[]
-    join_selected_lines?: Hotkey[]
-    move_line_down?: Hotkey[]
-    move_line_up?: Hotkey[]
-    open_keyshots_settings?: Hotkey[]
-    select_all_word_instances?: Hotkey[]
-    select_multiple_word_instances?: Hotkey[]
-    shuffle_selected_lines?: Hotkey[]
-    sort_selected_lines?: Hotkey[]
-    split_selections_by_lines?: Hotkey[]
-    split_selections_on_new_line?: Hotkey[]
-    toggle_case?: Hotkey[];
-    toggle_inline_title?: Hotkey[]
-    toggle_keyshots_case_sensitivity?: Hotkey[]
-    toggle_line_numbers?: Hotkey[]
-    toggle_readable_length?: Hotkey[]
-    transform_from_to_snakecase?: Hotkey[]
-    transform_from_to_kebabcase?: Hotkey[]
-    transform_selections_to_lowercase?: Hotkey[]
-    transform_selections_to_titlecase?: Hotkey[]
-    transform_selections_to_uppercase?: Hotkey[]
-    trim_selections?: Hotkey[]
+declare interface KeyshotsSettings {
+    ide_mappings: string;
+    keyshot_mappings: boolean;
+    case_sensitive: boolean;
+    shuffle_rounds_amount: number
 }
 
-const hotKey = (key: string, ...modifiers: Modifier[]): Hotkey[] => [{key: key, modifiers: modifiers}]
-
-const DEFAULT_MAP: KeyshotsMap = {
-    add_carets_down: hotKey("ArrowDown", "Mod", "Alt"),
-    add_carets_up: hotKey("ArrowUp", "Mod", "Alt"),
-    encode_or_decode_uri: hotKey("U", "Mod", "Alt"),
-    insert_line_below: hotKey("Enter", "Shift"),
-    insert_line_above: hotKey("Enter", "Ctrl", "Shift"),
-    join_selected_lines: hotKey("J", "Mod", "Shift"),
-    sort_selected_lines: hotKey("S", "Mod", "Shift"),
-    shuffle_selected_lines: hotKey("S", "Mod", "Shift", "Alt"),
-    split_selections_by_lines: hotKey("L", "Mod", "Alt"),
-    split_selections_on_new_line: hotKey("S", "Alt"),
-    select_all_word_instances: hotKey("L", "Mod", "Shift"),
-    select_multiple_word_instances: hotKey("D", "Mod"),
-    trim_selections: hotKey("T", "Alt"),
-    move_line_up: hotKey("ArrowUp", "Alt"),
-    move_line_down: hotKey("ArrowDown", "Alt"),
-    duplicate_line_up: hotKey("ArrowUp", "Shift", "Alt"),
-    duplicate_line_down: hotKey("ArrowDown", "Shift", "Alt"),
-    duplicate_selection_or_line: hotKey("D", "Mod", "Alt"),
-    expand_line_selections: hotKey("E", "Alt"),
-    toggle_case: hotKey("U", "Ctrl", "Shift"),
-    toggle_readable_length: hotKey("R", "Mod", "Alt"),
-    toggle_line_numbers: hotKey("N", "Mod", "Alt"),
-    toggle_inline_title: hotKey("T", "Mod", "Alt"),
-    toggle_keyshots_case_sensitivity: hotKey("I", "Mod", "Alt"),
-    transform_selections_to_lowercase: hotKey("L", "Alt"),
-    transform_selections_to_uppercase: hotKey("U", "Alt"),
-    transform_selections_to_titlecase: hotKey("C", "Alt"),
-    transform_from_to_snakecase: hotKey("-", "Shift", "Alt"),
-    transform_from_to_kebabcase: hotKey("-", "Alt"),
-    open_keyshots_settings: hotKey(",", "Mod", "Alt")
-}
-
-const KEYSHOTS_MAPS: { [key: string]: KeyshotsMap } = {
-    "clear": {},
-    "keyshots": DEFAULT_MAP,
-    "vscode": {
-        add_carets_down: hotKey("ArrowDown", "Mod", "Alt"),
-        add_carets_up: hotKey("ArrowUp", "Mod", "Alt"),
-        insert_line_below: hotKey("Enter", "Mod"),
-        insert_line_above: hotKey("Enter", "Mod", "Shift"),
-        join_selected_lines: hotKey("J", "Mod"),
-        select_all_word_instances: hotKey("L", "Mod", "Shift"),
-        select_multiple_word_instances: hotKey("D", "Mod"),
-        move_line_up: hotKey("ArrowUp", "Alt"),
-        move_line_down: hotKey("ArrowDown", "Alt"),
-        duplicate_line_up: hotKey("ArrowUp", "Shift", "Alt"),
-        duplicate_line_down: hotKey("ArrowDown", "Shift", "Alt"),
-        duplicate_selection_or_line: undefined,
-        expand_line_selections: hotKey("L", "Mod"),
-        toggle_case: undefined,
-    },
-    "jetbrains": {
-        insert_line_below: hotKey("Enter", "Shift"),
-        insert_line_above: hotKey("Enter", "Mod", "Alt"),
-        join_selected_lines: hotKey("J", "Mod", "Shift"),
-        select_all_word_instances: hotKey("J", "Mod", "Shift", "Alt"),
-        select_multiple_word_instances: hotKey("J", "Alt"),
-        move_line_up: hotKey("ArrowUp", "Shift", "Alt"),
-        move_line_down: hotKey("ArrowDown", "Shift", "Alt"),
-        duplicate_line_down: undefined,
-        duplicate_line_up: undefined,
-        duplicate_selection_or_line: hotKey("D", "Mod"),
-        expand_line_selections: hotKey("W", "Mod"),
-        toggle_case: hotKey("U", "Mod", "Shift"),
-    },
-    "visual_studio": {
-        add_carets_down: hotKey("ArrowDown", "Shift", "Alt"),
-        add_carets_up: hotKey("ArrowUp", "Shift", "Alt"),
-        insert_line_below: hotKey("Enter", "Shift"),
-        insert_line_above: hotKey("Enter", "Mod"),
-        select_all_word_instances: hotKey(";", "Shift", "Alt"),
-        select_multiple_word_instances: hotKey(".", "Shift", "Alt"),
-        move_line_up: hotKey("ArrowUp", "Alt"),
-        move_line_down: hotKey("ArrowDown", "Alt"),
-        duplicate_line_down: undefined,
-        duplicate_line_up: undefined,
-        duplicate_selection_or_line: hotKey("D", "Mod"),
-        expand_line_selections: hotKey("=", "Shift", "Alt"),
-        transform_selections_to_lowercase: hotKey("U", "Mod"),
-        transform_selections_to_uppercase: hotKey("U", "Mod", "Shift"),
-        toggle_case: undefined,
-
-    },
-}
 
 export default class KeyshotsPlugin extends Plugin {
 
@@ -645,7 +369,7 @@ export default class KeyshotsPlugin extends Plugin {
     async loadCommands() {
         if (this.command_ids !== undefined) this.command_ids.forEach(cmd => this.app.commands.removeCommand(cmd))
         const IDS: string[] = []
-        const MAP: KeyshotsMap = ["clear", "keyshots"].contains(this.settings.ide_mappings)
+        const MAP = ["clear", "keyshots"].contains(this.settings.ide_mappings)
             ? KEYSHOTS_MAPS[this.settings.ide_mappings]
             : {...(this.settings.keyshot_mappings ? DEFAULT_MAP : {}), ...KEYSHOTS_MAPS[this.settings.ide_mappings]}
         IDS.push(
@@ -864,28 +588,6 @@ export default class KeyshotsPlugin extends Plugin {
 
     async saveSettings() {
         await this.saveData(this.settings);
-    }
-}
-
-class DocumentFragmentBuilder {
-    readonly #fragment: DocumentFragment
-
-    constructor() {
-        this.#fragment = document.createDocumentFragment()
-    }
-
-    appendText(text: string) {
-        this.#fragment.append(text)
-        return this
-    }
-
-    createElem(tag: keyof HTMLElementTagNameMap, o?: DomElementInfo | string) {
-        this.#fragment.createEl(tag, o)
-        return this
-    }
-
-    toFragment(): DocumentFragment {
-        return this.#fragment
     }
 }
 
