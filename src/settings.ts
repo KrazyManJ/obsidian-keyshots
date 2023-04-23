@@ -16,6 +16,8 @@ export declare interface KeyshotsSettings {
     shuffle_rounds_amount: number
 }
 
+
+
 export class KeyshotsSettingTab extends PluginSettingTab {
     plugin: KeyshotsPlugin;
 

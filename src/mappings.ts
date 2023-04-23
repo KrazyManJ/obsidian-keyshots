@@ -1,7 +1,8 @@
 import {hotKey} from "./utils";
 import {Hotkey} from "obsidian";
+import KeyshotsPlugin from "./main";
 
-declare interface KeyshotsMap {
+export declare interface KeyshotsMap {
     add_carets_down?: Hotkey[]
     add_carets_up?: Hotkey[]
     duplicate_line_down?: Hotkey[]
@@ -115,6 +116,11 @@ export const KEYSHOTS_MAPS: { [key: string]: KeyshotsMap } = {
         transform_selections_to_lowercase: hotKey("U", "Mod"),
         transform_selections_to_uppercase: hotKey("U", "Mod", "Shift"),
         toggle_case: undefined,
-
     },
+}
+
+export const mapBySettings = (plugin: KeyshotsPlugin): KeyshotsMap => {
+    return ["clear", "keyshots"].contains(plugin.settings.ide_mappings)
+        ? KEYSHOTS_MAPS[plugin.settings.ide_mappings]
+        : {...(plugin.settings.keyshot_mappings ? DEFAULT_MAP : {}), ...KEYSHOTS_MAPS[plugin.settings.ide_mappings]}
 }
