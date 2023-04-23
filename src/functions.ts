@@ -239,3 +239,15 @@ export function convertOneToOtherChars(editor: Editor, first: string, second: st
         return replaceFromTo(tx, first, second)
     })
 }
+
+export function surroundWithChars(editor: Editor, chars: string){
+    selectionsProcessor(editor,undefined,(sel) => {
+        const surroundSel = sel.clone().moveChars(-chars.length,chars.length).normalize();
+        if (surroundSel.getText().startsWith(chars) && surroundSel.getText().endsWith(chars)) {
+            return surroundSel.replaceText(
+                surroundSel.getText().substring(chars.length,surroundSel.getText().length-chars.length)
+            ).moveChars(0,chars.length*-2)
+        }
+        return sel.replaceText(chars+sel.getText()+chars).moveChars(chars.length)
+    })
+}

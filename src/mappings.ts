@@ -33,6 +33,10 @@ export declare interface KeyshotsMap {
     transform_selections_to_titlecase?: Hotkey[]
     transform_selections_to_uppercase?: Hotkey[]
     trim_selections?: Hotkey[]
+    multi_toggle_bold?: Hotkey[]
+    multi_toggle_italic?: Hotkey[]
+    multi_toggle_code?: Hotkey[]
+    open_dev_tools?: Hotkey[]
 }
 
 export const DEFAULT_MAP: KeyshotsMap = {
@@ -65,7 +69,10 @@ export const DEFAULT_MAP: KeyshotsMap = {
     transform_selections_to_titlecase: hotKey("C", "Alt"),
     transform_from_to_snakecase: hotKey("-", "Shift", "Alt"),
     transform_from_to_kebabcase: hotKey("-", "Alt"),
-    open_keyshots_settings: hotKey(",", "Mod", "Alt")
+    open_keyshots_settings: hotKey(",", "Mod", "Alt"),
+    multi_toggle_bold: hotKey("B","Mod", "Shift"),
+    multi_toggle_italic: hotKey("I","Mod", "Shift"),
+    open_dev_tools: hotKey("F12")
 }
 export const KEYSHOTS_MAPS: { [key: string]: KeyshotsMap } = {
     "clear": {},

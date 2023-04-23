@@ -185,5 +185,29 @@ export const COMMANDS = (plugin: KeyshotsPlugin, map: KeyshotsMap): Command[] =>
         name: "Shuffle selected lines",
         hotkeys: map.shuffle_selected_lines,
         editorCallback: (editor) => functions.shuffleSelectedLines(editor, plugin.settings.shuffle_rounds_amount)
+    },
+    {
+        id: 'multi-toggle-bold',
+        name: "Multi Toggle Bold",
+        hotkeys: map.multi_toggle_bold,
+        editorCallback: (editor) => functions.surroundWithChars(editor, "**")
+    },
+    {
+        id: 'multi-toggle-italic',
+        name: "Multi Toggle Italic",
+        hotkeys: map.multi_toggle_italic,
+        editorCallback: (editor) => functions.surroundWithChars(editor, "*")
+    },
+    {
+        id: 'multi-toggle-code',
+        name: "Multi Toggle Code",
+        hotkeys: map.multi_toggle_code,
+        editorCallback: (editor) => functions.surroundWithChars(editor, "==")
+    },
+    {
+        id: 'open-dev-tools',
+        name: "Open Developer Tools",
+        hotkeys: map.open_dev_tools,
+        callback: () => electron.remote.getCurrentWindow().webContents.openDevTools()
     }
 ] 
