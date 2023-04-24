@@ -242,7 +242,7 @@ export function convertOneToOtherChars(editor: Editor, first: string, second: st
 
 export function surroundWithChars(editor: Editor, chars: string, endchars?: string){
     selectionsProcessor(editor,undefined,(sel) => {
-        const surroundSel = sel.clone().moveChars(-chars.length,(endchars ?? chars).length).normalize();
+        const surroundSel = sel.clone().normalize().moveChars(-chars.length,(endchars ?? chars).length);
         if (surroundSel.getText().startsWith(chars) && surroundSel.getText().endsWith(endchars ?? chars)) {
             return surroundSel.replaceText(
                 surroundSel.getText().substring(chars.length,surroundSel.getText().length-(endchars ?? chars).length)

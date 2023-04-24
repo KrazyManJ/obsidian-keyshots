@@ -17,7 +17,7 @@ export default class KeyshotsPlugin extends Plugin {
 
     async loadCommands() {
         if (this.command_ids !== undefined) this.command_ids.forEach(cmd => this.app.commands.removeCommand(cmd))
-        this.command_ids = new Set(...COMMANDS(this,mapBySettings(this)).map(cmd => this.addCommand(cmd).id));
+        this.command_ids = new Set(COMMANDS(this,mapBySettings(this)).map(cmd => this.addCommand(cmd).id));
     }
 
     async loadSettings() {
