@@ -6,17 +6,21 @@ import {COMMANDS} from "./commands";
 
 export default class KeyshotsPlugin extends Plugin {
 
-    command_ids: Set<string>
+    private command_ids: Set<string>
     settings: KeyshotsSettings
 
     async onload() {
         await this.loadSettings()
         this.addSettingTab(new KeyshotsSettingTab(this.app, this))
-        await this.loadCommands()
+        this.loadCommands()
     }
 
-    async loadCommands() {
-        if (this.command_ids !== undefined) this.command_ids.forEach(cmd => this.app.commands.removeCommand(cmd))
+    loadCommands() {
+
+        if (this.command_ids !== undefined) {
+            this.command_ids.forEach(cmd => this.app.commands.removeCommand(cmd))
+            this._events.splice(1)
+        }
         this.command_ids = new Set(COMMANDS(this,mapBySettings(this)).map(cmd => this.addCommand(cmd).id));
     }
 

@@ -78,7 +78,7 @@ export function insertLine(editor: Editor, direction: VerticalDirection) {
             const tx = [editor.getLine(ln), "\n"]
             if (direction < 0) tx.reverse()
             editor.setLine(ln, tx.join(""))
-            return EditorSelectionManipulator.documentStart(editor).setLines(ln, direction > 0 ? direction : 0)
+            return EditorSelectionManipulator.documentStart(editor).setLines( ln+(direction > 0 ? direction : 0))
         }
         if (sel.isCaret()) return a(sel.anchor.line + index)
         else {

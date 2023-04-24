@@ -15,7 +15,7 @@ declare module 'obsidian' {
     }
 
     interface CommandManager {
-        removeCommand(id: string): void;
+        removeCommand(...id: string[]): void;
     }
 
     interface SettingManager {
@@ -30,6 +30,11 @@ declare module 'obsidian' {
         commands: CommandManager
         setting: SettingManager
         vault: Vault
+    }
+
+
+    interface Plugin {
+        _events: (() => void)[]
     }
 }
 

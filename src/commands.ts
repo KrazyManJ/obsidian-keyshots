@@ -39,54 +39,63 @@ export const COMMANDS = (plugin: KeyshotsPlugin, map: KeyshotsMap): Command[] =>
     {
         id: 'move-line-up',
         name: 'Move line up',
+        repeatable: true,
         hotkeys: map.move_line_up,
         editorCallback: (editor) => functions.moveLine(editor, VerticalDirection.UP, 0)
     },
     {
         id: 'move-line-down',
         name: 'Move line down',
+        repeatable: true,
         hotkeys: map.move_line_down,
         editorCallback: (editor) => functions.moveLine(editor, VerticalDirection.DOWN, editor.lineCount() - 1)
     },
     {
         id: 'add-carets-up',
         name: 'Add caret cursor up',
+        repeatable: true,
         hotkeys: map.add_carets_up,
         editorCallback: (editor) => functions.addCarets(editor, VerticalDirection.UP, 0)
     },
     {
         id: 'add-carets-down',
         name: 'Add caret cursor down',
+        repeatable: true,
         hotkeys: map.add_carets_down,
         editorCallback: (editor) => functions.addCarets(editor, VerticalDirection.DOWN, editor.lineCount())
     },
     {
         id: 'duplicate-line-up',
         name: 'Duplicate line up (Visual Studio Code)',
+        repeatable: true,
         hotkeys: map.duplicate_line_up,
         editorCallback: (editor) => functions.vscodeDuplicate(editor, VerticalDirection.UP)
     },
     {
         id: 'duplicate-line-down',
         name: 'Duplicate line down (Visual Studio Code)',
+        repeatable: true,
         hotkeys: map.duplicate_line_down,
         editorCallback: (editor) => functions.vscodeDuplicate(editor, VerticalDirection.DOWN)
     },
     {
         id: 'duplicate-selection-or-line',
         name: 'Duplicate selection or line (JetBrains IDEs)',
+        repeatable: true,
         hotkeys: map.duplicate_selection_or_line,
         editorCallback: (editor) => functions.jetBrainsDuplicate(editor)
     },
     {
         id: 'insert-line-above',
         name: "Insert line above",
+        repeatable: true,
         hotkeys: map.insert_line_above,
         editorCallback: (editor) => functions.insertLine(editor, VerticalDirection.UP)
     },
     {
         id: 'insert-line-below',
         name: "Insert line below",
+        repeatable: true,
         hotkeys: map.insert_line_below,
         editorCallback: (editor) => functions.insertLine(editor, VerticalDirection.DOWN)
     },
@@ -216,4 +225,4 @@ export const COMMANDS = (plugin: KeyshotsPlugin, map: KeyshotsMap): Command[] =>
         hotkeys: map.open_dev_tools,
         callback: () => electron.remote.getCurrentWindow().webContents.openDevTools()
     }
-] 
+]

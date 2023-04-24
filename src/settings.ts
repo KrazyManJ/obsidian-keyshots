@@ -51,7 +51,7 @@ export class KeyshotsSettingTab extends PluginSettingTab {
                 .setValue(this.plugin.settings.ide_mappings)
                 .onChange(async (value) => {
                     this.plugin.settings.ide_mappings = value
-                    await this.plugin.loadCommands()
+                    this.plugin.loadCommands()
                     await this.plugin.saveSettings()
                 })
             )
@@ -67,7 +67,7 @@ export class KeyshotsSettingTab extends PluginSettingTab {
                 .setValue(this.plugin.settings.keyshot_mappings)
                 .onChange(async (value) => {
                     this.plugin.settings.keyshot_mappings = value
-                    await this.plugin.loadCommands()
+                    this.plugin.loadCommands()
                     await this.plugin.saveSettings()
                 })
             )
@@ -76,7 +76,7 @@ export class KeyshotsSettingTab extends PluginSettingTab {
             .setName("Case sensitivity")
             .setDesc(new DocumentFragmentBuilder()
                 .appendText("Determines if Keyshots commands should be case sensitive. For toggling while editing text just simply use ")
-                .createElem("kbd", {text: " Ctrl + Alt + I "})
+                .createElem("kbd", {text: " Ctrl + Alt + I"})
                 .appendText(" hotkey if you are using default Keyshots binding!")
                 .toFragment()
             )
