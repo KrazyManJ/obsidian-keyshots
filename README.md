@@ -60,7 +60,7 @@ Adds actions like move line up or down...
 
 ![](assets/transform_to_from_snakecase.gif)
 
-...**And more commands comming soon**!
+...**and much more shortcuts to explore!**  *(And more commands comming soon)* 
 
 ## ⌨️ IDE Mappings
 

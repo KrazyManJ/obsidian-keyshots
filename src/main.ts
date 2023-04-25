@@ -16,7 +16,6 @@ export default class KeyshotsPlugin extends Plugin {
     }
 
     loadCommands() {
-
         if (this.command_ids !== undefined) {
             this.command_ids.forEach(cmd => this.app.commands.removeCommand(cmd))
             this._events.splice(1)
