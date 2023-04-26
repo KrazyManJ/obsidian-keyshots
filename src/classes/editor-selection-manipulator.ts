@@ -1,8 +1,8 @@
 import {Editor, EditorPosition, EditorRange, EditorSelection} from "obsidian";
 import EditorPositionManipulator from "./editor-position-manipulator";
-import {Cloneable} from "../utils";
+import {JavaLikeObject} from "../utils";
 
-export default class EditorSelectionManipulator implements EditorSelection, Cloneable<EditorSelectionManipulator> {
+export default class EditorSelectionManipulator implements EditorSelection, JavaLikeObject<EditorSelectionManipulator> {
 
     anchor: EditorPositionManipulator
     head: EditorPositionManipulator
@@ -16,6 +16,10 @@ export default class EditorSelectionManipulator implements EditorSelection, Clon
 
     clone(): EditorSelectionManipulator {
         return new EditorSelectionManipulator({anchor: this.anchor.clone(), head: this.head.clone()}, this.editor)
+    }
+
+    equals(sel: EditorSelection){
+        return this.anchor.equals(sel.anchor) && this.head.equals(sel.head)
     }
 
     isCaret(): boolean {

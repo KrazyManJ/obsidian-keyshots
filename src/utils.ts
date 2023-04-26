@@ -3,8 +3,10 @@ import EditorSelectionManipulator from "./classes/editor-selection-manipulator";
 
 export const hotKey = (key: string, ...modifiers: Modifier[]): Hotkey[] => [{key: key, modifiers: modifiers}]
 
-export interface Cloneable<T> {
+export interface JavaLikeObject<T> {
     clone(): T
+
+    equals(obj: T): boolean
 }
 
 export enum VerticalDirection { UP = -1, DOWN = 1 }
@@ -30,12 +32,6 @@ export const selectionsUpdater = (
         ? arrCallback(editor.listSelections()) : editor.listSelections())
         .forEach((sel, index) => selections.push(...fct(new EditorSelectionManipulator(sel, editor), index)))
     if (selections.length > 0) editor.setSelections(selections)
-}
-export const selectionsEqual = (one: EditorSelection, two: EditorSelection) => {
-    return one.anchor.ch === two.anchor.ch
-        && one.anchor.line === two.anchor.line
-        && one.head.line === two.head.line
-        && one.head.ch === two.head.ch
 }
 export const titleCase = (s: string) => s.replace(/\w\S*/g, (txt) => txt.charAt(0).toUpperCase() + txt.substring(1).toLowerCase())
 export const lowestSelection = (selections: EditorSelectionManipulator[]): EditorSelectionManipulator => {

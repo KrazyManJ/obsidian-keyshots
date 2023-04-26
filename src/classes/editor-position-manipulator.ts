@@ -1,7 +1,7 @@
 import {Editor, EditorPosition, EditorRange} from "obsidian";
-import {Cloneable} from "../utils";
+import {JavaLikeObject} from "../utils";
 
-export default class EditorPositionManipulator implements EditorPosition, Cloneable<EditorPositionManipulator> {
+export default class EditorPositionManipulator implements EditorPosition, JavaLikeObject<EditorPositionManipulator> {
 
     ch: number
     line: number
@@ -15,6 +15,10 @@ export default class EditorPositionManipulator implements EditorPosition, Clonea
 
     clone(): EditorPositionManipulator {
         return new EditorPositionManipulator({ch: this.ch, line: this.line}, this.editor)
+    }
+
+    equals(pos: EditorPosition) {
+        return this.line === pos.line && this.ch === pos.ch
     }
 
     asEditorRange(): EditorRange {

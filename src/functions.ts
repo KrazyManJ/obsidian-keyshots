@@ -2,7 +2,6 @@ import EditorSelectionManipulator from "./classes/editor-selection-manipulator";
 import {App, Editor, EditorRange, EditorSelection, Notice, VaultConfig} from "obsidian";
 import {
     lowestSelection,
-    selectionsEqual,
     selectionsProcessor,
     selectionsUpdater,
     selectionValuesEqual,
@@ -158,7 +157,7 @@ export function selectWordInstances(editor: Editor, case_sensitive: boolean) {
             while (match !== null) {
                 const prevTx = (!case_sensitive ? editor.getValue().toLowerCase() : editor.getValue()).substring(0, shift + (match?.index || 0))
                 const sel = EditorSelectionManipulator.documentStart(editor).moveChars(prevTx.length, prevTx.length + tx.length)
-                if (selections.filter(s => selectionsEqual(sel, s)).length === 0) {
+                if (selections.filter(s => s.equals(sel)).length === 0) {
                     selections.push(sel)
                     range = sel.asEditorRange()
                     break;
