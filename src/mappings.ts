@@ -36,6 +36,9 @@ export declare interface KeyshotsMap {
     multi_toggle_bold?: Hotkey[]
     multi_toggle_italic?: Hotkey[]
     multi_toggle_code?: Hotkey[]
+    multi_toggle_highlight?: Hotkey[]
+    multi_toggle_comment?: Hotkey[]
+    multi_toggle_strikethrough?: Hotkey[]
     open_dev_tools?: Hotkey[]
     toggle_keybinding?: Hotkey[]
 }

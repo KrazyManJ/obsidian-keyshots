@@ -211,7 +211,25 @@ export const COMMANDS = (plugin: KeyshotsPlugin, map: KeyshotsMap): Command[] =>
         id: 'multi-toggle-code',
         name: "Multi Toggle Code",
         hotkeys: map.multi_toggle_code,
+        editorCallback: (editor) => functions.surroundWithChars(editor, "``")
+    },
+    {
+        id: 'multi-toggle-highlight',
+        name: "Multi Toggle Highlight",
+        hotkeys: map.multi_toggle_highlight,
         editorCallback: (editor) => functions.surroundWithChars(editor, "==")
+    },
+    {
+        id: 'multi-toggle-comment',
+        name: "Multi Toggle Comment",
+        hotkeys: map.multi_toggle_comment,
+        editorCallback: (editor) => functions.surroundWithChars(editor, "%%")
+    },
+    {
+        id: 'multi-toggle-strikethrough',
+        name: "Multi Toggle Strikethrough",
+        hotkeys: map.multi_toggle_strikethrough,
+        editorCallback: (editor) => functions.surroundWithChars(editor, "~~")
     },
     {
         id: 'toggle-keybinding',
