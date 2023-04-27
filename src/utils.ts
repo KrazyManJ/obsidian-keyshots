@@ -1,7 +1,5 @@
-import {Editor, EditorSelection, Hotkey, Modifier} from "obsidian";
+import {Editor, EditorSelection} from "obsidian";
 import EditorSelectionManipulator from "./classes/editor-selection-manipulator";
-
-export const hotKey = (key: string, ...modifiers: Modifier[]): Hotkey[] => [{key: key, modifiers: modifiers}]
 
 export interface JavaLikeObject<T> {
     clone(): T
