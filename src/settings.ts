@@ -2,20 +2,22 @@ import {App, PluginSettingTab, Setting, SliderComponent} from "obsidian";
 import {DocumentFragmentBuilder} from "./classes/document-fragment-builder";
 import KeyshotsPlugin from "./main";
 
-export const DEFAULT_SETTINGS: KeyshotsSettings = {
-    ide_mappings: "clear",
-    keyshot_mappings: true,
-    case_sensitive: true,
-    shuffle_rounds_amount: 10
-}
 
 export declare interface KeyshotsSettings {
     ide_mappings: string;
     keyshot_mappings: boolean;
     case_sensitive: boolean;
-    shuffle_rounds_amount: number
+    shuffle_rounds_amount: number;
+    carets_via_double_ctrl: boolean;
 }
 
+export const DEFAULT_SETTINGS: KeyshotsSettings = {
+    ide_mappings: "clear",
+    keyshot_mappings: true,
+    case_sensitive: true,
+    shuffle_rounds_amount: 10,
+    carets_via_double_ctrl: false
+}
 
 
 export class KeyshotsSettingTab extends PluginSettingTab {
@@ -113,6 +115,33 @@ export class KeyshotsSettingTab extends PluginSettingTab {
                 .onClick(async () => {
                     this.plugin.settings.shuffle_rounds_amount = DEFAULT_SETTINGS.shuffle_rounds_amount
                     slider.setValue(DEFAULT_SETTINGS.shuffle_rounds_amount)
+                    await this.plugin.saveSettings()
+                })
+            )
+        containerEl.createEl('h2', {text: "🔧 JetBrains Features"})
+        new Setting(containerEl)
+            .setName(new DocumentFragmentBuilder()
+                .appendText("Double ")
+                .createElem("kbd", {text: "Ctrl"})
+                .appendText(" caret adding shortcut")
+                .toFragment()
+            )
+            .setDesc(new DocumentFragmentBuilder()
+                .appendText("Everytime when you press ")
+                .createElem("kbd", {text: "Ctrl"})
+                .appendText(" twice and second one you'll hold, then when you press ")
+                .createElem("kbd", {text: "↓"})
+                .appendText(" or ")
+                .createElem("kbd", {text: "↑"})
+                .appendText(" keys, Obsidian will add carets like will normaly do with \"")
+                .createElem("b", {text: "Add carets up/down"})
+                .appendText("\" command.")
+                .toFragment()
+            )
+            .addToggle(cb => cb
+                .setValue(this.plugin.settings.carets_via_double_ctrl)
+                .onChange(async (value) => {
+                    this.plugin.settings.carets_via_double_ctrl = value
                     await this.plugin.saveSettings()
                 })
             )

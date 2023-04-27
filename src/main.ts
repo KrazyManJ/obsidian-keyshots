@@ -1,4 +1,4 @@
-import {Editor, MarkdownView, Plugin} from 'obsidian';
+import {MarkdownView, Plugin} from 'obsidian';
 import {mapBySettings} from "./mappings";
 import {DEFAULT_SETTINGS, KeyshotsSettings, KeyshotsSettingTab} from "./settings";
 import {COMMANDS} from "./commands";
@@ -22,7 +22,11 @@ export default class KeyshotsPlugin extends Plugin {
         let lastTimePressed: Date | undefined = undefined
         let ctrlActive = false;
         this.registerDomEvent(this.app.workspace.containerEl,"keydown",(ev) => {
-            if (!["Control","ArrowUp","ArrowDown"].includes(ev.key)) return
+            if (!this.settings.carets_via_double_ctrl) return;
+            if (!["Control","ArrowUp","ArrowDown"].includes(ev.key)) {
+                lastTimePressed = undefined
+                return
+            }
             const view = this.app.workspace.getActiveViewOfType(MarkdownView)
             if (view === null) return
             const editor = view.editor
@@ -39,9 +43,12 @@ export default class KeyshotsPlugin extends Plugin {
                     ev.key === "ArrowUp" ? 0 : editor?.lineCount()
                 )
                 ev.preventDefault()
+                return
             }
+            lastTimePressed = undefined
         })
         this.registerDomEvent(this.app.workspace.containerEl, "keyup", (ev) => {
+            if (!this.settings.carets_via_double_ctrl) return;
             if (!["Control"].includes(ev.key)) return;
             if (this.app.workspace.getActiveViewOfType(MarkdownView) === null) return;
             ctrlActive = false;
@@ -51,6 +58,7 @@ export default class KeyshotsPlugin extends Plugin {
 
     loadCommands() {
         if (this.command_ids !== undefined) {
+            if (!this.settings.carets_via_double_ctrl) return;
             this.command_ids.forEach(cmd => this.app.commands.removeCommand(cmd))
             this._events.splice(1)
         }
