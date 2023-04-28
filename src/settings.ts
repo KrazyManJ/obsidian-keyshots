@@ -4,11 +4,12 @@ import KeyshotsPlugin from "./main";
 
 
 export declare interface KeyshotsSettings {
-    ide_mappings: string;
-    keyshot_mappings: boolean;
-    case_sensitive: boolean;
-    shuffle_rounds_amount: number;
-    carets_via_double_ctrl: boolean;
+    ide_mappings: string
+    keyshot_mappings: boolean
+    case_sensitive: boolean
+    shuffle_rounds_amount: number
+    carets_via_double_ctrl: boolean
+    quick_switch_via_double_shift: boolean
 }
 
 export const DEFAULT_SETTINGS: KeyshotsSettings = {
@@ -16,7 +17,8 @@ export const DEFAULT_SETTINGS: KeyshotsSettings = {
     keyshot_mappings: true,
     case_sensitive: true,
     shuffle_rounds_amount: 10,
-    carets_via_double_ctrl: false
+    carets_via_double_ctrl: false,
+    quick_switch_via_double_shift: false
 }
 
 
@@ -143,6 +145,28 @@ export class KeyshotsSettingTab extends PluginSettingTab {
                 .onChange(async (value) => {
                     this.plugin.settings.carets_via_double_ctrl = value
                     await this.plugin.saveSettings()
+                    this.plugin.loadDoubleKeyCommands()
+                })
+            )
+        new Setting(containerEl)
+            .setName(new DocumentFragmentBuilder()
+                .appendText("Opening Quick-Switcher via double ")
+                .createElem("kbd", {text: "Shift"})
+                .appendText(" shortcut")
+                .toFragment()
+            )
+            .setDesc(new DocumentFragmentBuilder()
+                .appendText("If you have Quick Switcher plugin enabled, hitting ")
+                .createElem("kbd", {text: "Shift"})
+                .appendText(" twice will open quick switcher window.")
+                .toFragment()
+            )
+            .addToggle(cb => cb
+                .setValue(this.plugin.settings.quick_switch_via_double_shift)
+                .onChange(async (value) => {
+                    this.plugin.settings.quick_switch_via_double_shift = value
+                    await this.plugin.saveSettings()
+                    this.plugin.loadDoubleKeyCommands()
                 })
             )
     }

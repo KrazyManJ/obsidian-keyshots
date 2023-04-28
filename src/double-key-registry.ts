@@ -1,0 +1,82 @@
+import KeyshotsPlugin from "./main";
+
+
+export interface DoubleKeyCommand {
+    id: string
+    key: string
+    maxDelay: number
+
+    /**
+     * Called when last key of `hotkeys` array is pressed
+     */
+    lastPressedCallback?: () => void
+    /**
+     * Called when another key is pressed while holding last key of `hotkeys` array
+     */
+    anotherKeyPressedCallback?: (ev: KeyboardEvent) => void
+}
+
+declare interface KeyRecord {
+    key: string,
+    timeStamp: number
+}
+
+export default class DoubleKeyRegistry {
+
+    private readonly cmds: Record<string,DoubleKeyCommand> = {}
+
+    private cancelAction = false
+
+    private lastPressed?: KeyRecord = undefined
+    private activeCmdId?: string = undefined
+
+
+    constructor(plugin: KeyshotsPlugin) {
+        const elem = plugin.app.workspace.containerEl
+        plugin.registerDomEvent(elem,"keydown",(ev) => {
+            if (Object.keys(this.cmds).length === 0) return;
+            if (this.cancelAction) this.cancelAction = false
+            const currCmd = this.activeCmdId ? this.cmds[this.activeCmdId] : undefined
+            if (this.lastPressed && !currCmd && this.lastPressed.key === ev.key) {
+                this.activeCmdId = Object.keys(this.cmds).filter(cmd => this.cmds[cmd].key === ev.key)[0]
+                const currCmd = this.cmds[this.activeCmdId]
+                if (Math.abs(ev.timeStamp - this.lastPressed.timeStamp) > currCmd.maxDelay) {
+                    this.activeCmdId = undefined
+                    return
+                }
+                if (currCmd.lastPressedCallback) currCmd.lastPressedCallback()
+                if (!currCmd.anotherKeyPressedCallback) this.cancelCurrentCommand(true)
+            }
+            else if (currCmd && ev.key !== currCmd.key && currCmd.anotherKeyPressedCallback) currCmd.anotherKeyPressedCallback(ev)
+            else if (this.lastPressed && this.lastPressed.key !== ev.key) this.cancelCurrentCommand()
+        })
+        plugin.registerDomEvent(elem,"keyup",(ev) => {
+            if (Object.keys(this.cmds).length === 0) return;
+            if (this.cancelAction) return
+            const currCmd = this.activeCmdId ? this.cmds[this.activeCmdId] : undefined
+            if (!currCmd && Object.values(this.cmds).map(c => c.key).includes(ev.key))
+                this.lastPressed = {key: ev.key, timeStamp: ev.timeStamp}
+            else if (currCmd && currCmd.key === ev.key) this.cancelCurrentCommand()
+        })
+        plugin.registerDomEvent(elem,"mousedown",() => {
+            if (Object.keys(this.cmds).length === 0) return;
+            this.cancelCurrentCommand(true)
+        })
+    }
+
+    private cancelCurrentCommand(ingoreNextKeyUp = false){
+        this.cancelAction = ingoreNextKeyUp
+        this.activeCmdId = undefined
+        this.lastPressed = undefined
+    }
+
+    registerCommand(cmd: DoubleKeyCommand){
+        this.cmds[cmd.id] = cmd
+        this.cancelCurrentCommand()
+    }
+
+    unregisterAllCommands() {
+        this.cancelCurrentCommand(true)
+        Object.keys(this.cmds).forEach((i) => delete this.cmds[i])
+    }
+}

@@ -1,68 +1,38 @@
-import {MarkdownView, Plugin} from 'obsidian';
+import {Plugin} from 'obsidian';
 import {mapBySettings} from "./mappings";
 import {DEFAULT_SETTINGS, KeyshotsSettings, KeyshotsSettingTab} from "./settings";
-import {COMMANDS} from "./commands";
-import * as functions from "./functions"
-import {VerticalDirection} from "./utils";
+import {COMMANDS, DOUBLE_KEY_COMMANDS} from "./commands";
+import DoubleKeyRegistry from "./double-key-registry";
 
 
 export default class KeyshotsPlugin extends Plugin {
 
-    private command_ids: Set<string>
     settings: KeyshotsSettings
+    private commandIds: Set<string>
+    private doubleKeyRegistry: DoubleKeyRegistry
 
     async onload() {
         await this.loadSettings()
         this.addSettingTab(new KeyshotsSettingTab(this.app, this))
         this.loadCommands()
-        this.registerDoubleModCaret()
-    }
-
-    private registerDoubleModCaret(){
-        let lastTimePressed: Date | undefined = undefined
-        let ctrlActive = false;
-        this.registerDomEvent(this.app.workspace.containerEl,"keydown",(ev) => {
-            if (!this.settings.carets_via_double_ctrl) return;
-            if (!["Control","ArrowUp","ArrowDown"].includes(ev.key)) {
-                lastTimePressed = undefined
-                return
-            }
-            const view = this.app.workspace.getActiveViewOfType(MarkdownView)
-            if (view === null) return
-            const editor = view.editor
-            if (ev.key === "Control"){
-
-                if (lastTimePressed !== undefined && Math.abs(new Date().getTime() - lastTimePressed.getTime()) < 2000) ctrlActive = true
-                else lastTimePressed = new Date()
-                return
-            }
-            if (ctrlActive){
-                functions.addCarets(
-                    editor,
-                    ev.key === "ArrowUp" ? VerticalDirection.UP : VerticalDirection.DOWN,
-                    ev.key === "ArrowUp" ? 0 : editor?.lineCount()
-                )
-                ev.preventDefault()
-                return
-            }
-            lastTimePressed = undefined
-        })
-        this.registerDomEvent(this.app.workspace.containerEl, "keyup", (ev) => {
-            if (!this.settings.carets_via_double_ctrl) return;
-            if (!["Control"].includes(ev.key)) return;
-            if (this.app.workspace.getActiveViewOfType(MarkdownView) === null) return;
-            ctrlActive = false;
-        })
-        this.registerEvent(app.workspace.on("active-leaf-change",() => ctrlActive = false))
+        this.doubleKeyRegistry = new DoubleKeyRegistry(this)
+        this.loadDoubleKeyCommands()
     }
 
     loadCommands() {
-        if (this.command_ids !== undefined) {
+        if (this.commandIds !== undefined) {
             if (!this.settings.carets_via_double_ctrl) return;
-            this.command_ids.forEach(cmd => this.app.commands.removeCommand(cmd))
+            this.commandIds.forEach(cmd => this.app.commands.removeCommand(cmd))
             this._events.splice(1)
         }
-        this.command_ids = new Set(COMMANDS(this,mapBySettings(this)).map(cmd => this.addCommand(cmd).id));
+        this.commandIds = new Set(COMMANDS(this, mapBySettings(this)).map(cmd => this.addCommand(cmd).id));
+    }
+
+    loadDoubleKeyCommands() {
+        this.doubleKeyRegistry.unregisterAllCommands()
+        DOUBLE_KEY_COMMANDS(this)
+            .filter(cmd => cmd.conditional(this))
+            .forEach(cmd => this.doubleKeyRegistry.registerCommand(cmd.object))
     }
 
     async loadSettings() {

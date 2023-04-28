@@ -16,6 +16,7 @@ declare module 'obsidian' {
 
     interface CommandManager {
         removeCommand(...id: string[]): void;
+        executeCommandById(id: string): boolean;
     }
 
     interface SettingManager {
@@ -26,10 +27,19 @@ declare module 'obsidian' {
         openTabById(id: string): void
     }
 
+    interface InternalPlugin extends Plugin {
+        enabled: boolean
+    }
+
+    interface PluginManager {
+        plugins: Record<string,InternalPlugin>
+    }
+
     interface App {
         commands: CommandManager
         setting: SettingManager
         vault: Vault
+        internalPlugins: PluginManager
     }
 
 

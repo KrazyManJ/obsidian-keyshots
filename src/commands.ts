@@ -1,8 +1,9 @@
-import {Command} from "obsidian";
+import {Command, MarkdownView} from "obsidian";
 import * as functions from "./functions";
 import {titleCase, VerticalDirection} from "./utils";
 import {KeyshotsMap} from "./mappings"
 import KeyshotsPlugin from "./main";
+import {DoubleKeyCommand} from "./double-key-registry";
 
 
 export const COMMANDS = (plugin: KeyshotsPlugin, map: KeyshotsMap): Command[] => [
@@ -242,5 +243,43 @@ export const COMMANDS = (plugin: KeyshotsPlugin, map: KeyshotsMap): Command[] =>
         name: "Open Developer Tools",
         hotkeys: map.open_dev_tools,
         callback: () => electron.remote.getCurrentWindow().webContents.openDevTools()
+    }
+]
+
+declare interface PluginConditionalObject<T> {
+    conditional: (plugin: KeyshotsPlugin) => boolean,
+    object: T
+}
+
+
+export const DOUBLE_KEY_COMMANDS = (plugin: KeyshotsPlugin): PluginConditionalObject<DoubleKeyCommand>[] => [
+    {
+        conditional: (plugin) => plugin.settings.carets_via_double_ctrl,
+        object: {
+            id: "add-caret",
+            key: "Control",
+            maxDelay: 1000,
+            anotherKeyPressedCallback: (ev) => {
+                ev.preventDefault()
+                const view = plugin.app.workspace.getActiveViewOfType(MarkdownView)
+                if (!view) return;
+                functions.addCarets(
+                    view.editor,
+                    ev.key === "ArrowUp" ? VerticalDirection.UP : VerticalDirection.DOWN,
+                    ev.key === "ArrowUp" ? 0 : view.editor.lineCount()
+                )
+            }
+        }
+    },
+    {
+        conditional: (plugin) => plugin.settings.quick_switch_via_double_shift,
+        object:{
+            id: "quick-open",
+            key: "Shift",
+            maxDelay: 1000,
+            lastPressedCallback: () => {
+                if (app.internalPlugins.plugins["switcher"]) app.commands.executeCommandById("switcher:open")
+            }
+        }
     }
 ]
