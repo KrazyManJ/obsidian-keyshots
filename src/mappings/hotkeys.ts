@@ -1,5 +1,5 @@
 import {Hotkey, Modifier} from "obsidian";
-import KeyshotsPlugin from "./main";
+import KeyshotsPlugin from "../main";
 
 const HotKey = (key: string, ...modifiers: Modifier[]): Hotkey[] => [{key: key, modifiers: modifiers}]
 
@@ -136,3 +136,4 @@ export const mapBySettings = (plugin: KeyshotsPlugin): KeyshotsMap => {
         ? KEYSHOTS_MAPS[plugin.settings.ide_mappings]
         : {...(plugin.settings.keyshot_mappings ? DEFAULT_MAP : {}), ...KEYSHOTS_MAPS[plugin.settings.ide_mappings]}
 }
+

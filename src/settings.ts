@@ -1,6 +1,7 @@
 import {App, PluginSettingTab, Setting, SliderComponent} from "obsidian";
 import {DocumentFragmentBuilder} from "./classes/document-fragment-builder";
 import KeyshotsPlugin from "./main";
+import {IDE_LABELS} from "./mappings/ide-info";
 
 
 export declare interface KeyshotsSettings {
@@ -45,13 +46,10 @@ export class KeyshotsSettingTab extends PluginSettingTab {
                 .toFragment()
             )
             .addDropdown(cb => cb
-                .addOptions({
-                    "clear": "Clear (everything blank; default)",
-                    "vscode": "Visual Studio Code",
-                    "jetbrains": "JetBrains IDEs (IntelliJ IDEA, Pycharm, ... )",
-                    "visual_studio": "Microsoft Visual Studio",
-                    "keyshots": "Keyshots default hotkeys mappings"
-                })
+                .addOptions(Object.entries(IDE_LABELS).reduce((acc: Record<string, string>, [key, ideInfo]) => {
+                    acc[key] = ideInfo.name;
+                    return acc;
+                }, {}))
                 .setValue(this.plugin.settings.ide_mappings)
                 .onChange(async (value) => {
                     this.plugin.settings.ide_mappings = value

@@ -1,5 +1,5 @@
 import {Plugin} from 'obsidian';
-import {mapBySettings} from "./mappings";
+import {mapBySettings} from "./mappings/hotkeys";
 import {DEFAULT_SETTINGS, KeyshotsSettings, KeyshotsSettingTab} from "./settings";
 import {COMMANDS, DOUBLE_KEY_COMMANDS} from "./commands";
 import DoubleKeyRegistry from "./double-key-registry";

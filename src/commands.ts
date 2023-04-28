@@ -1,9 +1,10 @@
 import {Command, MarkdownView} from "obsidian";
 import * as functions from "./functions";
 import {titleCase, VerticalDirection} from "./utils";
-import {KeyshotsMap} from "./mappings"
+import {KeyshotsMap} from "./mappings/hotkeys"
 import KeyshotsPlugin from "./main";
 import {DoubleKeyCommand} from "./double-key-registry";
+import LanguagePickerModal from "./language-picker";
 
 
 export const COMMANDS = (plugin: KeyshotsPlugin, map: KeyshotsMap): Command[] => [
@@ -243,6 +244,11 @@ export const COMMANDS = (plugin: KeyshotsPlugin, map: KeyshotsMap): Command[] =>
         name: "Open Developer Tools",
         hotkeys: map.open_dev_tools,
         callback: () => electron.remote.getCurrentWindow().webContents.openDevTools()
+    },
+    {
+        id: 'change-keyshots-preset',
+        name: "Change Keyshots Preset",
+        callback: () => new LanguagePickerModal(plugin).open()
     }
 ]
 
