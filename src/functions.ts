@@ -61,14 +61,25 @@ export function vscodeDuplicate(editor: Editor, direction: VerticalDirection) {
 }
 
 export function addCarets(editor: Editor, direction: VerticalDirection, border: number) {
-    const newSelections: EditorSelectionManipulator[] = EditorSelectionManipulator.listSelections(editor)
-    const caretSelectsOnly = newSelections.filter(val => val.isCaret())
-    if (caretSelectsOnly.length === 0) return;
-    const last = caretSelectsOnly[direction > 0 ? caretSelectsOnly.length - 1 : 0]
-    if (last.anchor.line === border) return;
-    newSelections.push(last.clone().moveLines(direction))
-    editor.setSelections(newSelections)
-    editor.scrollIntoView(last.anchor.movePos(direction * 2, 0).asEditorRange())
+    const selections: EditorSelectionManipulator[] = EditorSelectionManipulator.listSelections(editor)
+        .sort((a, b) => a.anchor.toOffset() - b.anchor.toOffset())
+    if (selections.filter(s => !s.isCaret()).length > 0) return
+    const main = selections.filter(s => s.anchor.line === editor.getCursor().line && s.anchor.ch === editor.getCursor().ch)[0]
+    let mainIndex = selections.indexOf(main)
+    const newSel = selections[direction > 0 ? selections.length - 1 : 0].clone()
+    if (newSel.anchor.line === border) return
+    newSel.moveLines(direction).setChars(Math.min(editor.getLine(newSel.anchor.line).length, main.anchor.ch))
+    if (direction === VerticalDirection.DOWN && mainIndex !== 0) selections.shift()
+    else if (direction === VerticalDirection.UP && mainIndex !== selections.length - 1) selections.pop()
+    else if (direction === VerticalDirection.DOWN) selections.push(newSel)
+    else {
+        selections.unshift(newSel)
+        mainIndex++;
+    }
+    selections.splice(mainIndex, 1)
+    selections.unshift(main)
+    editor.setSelections(selections)
+    editor.scrollIntoView(newSel.anchor.clone().movePos(direction*2,0).asEditorRange())
 }
 
 export function insertLine(editor: Editor, direction: VerticalDirection) {
@@ -77,7 +88,7 @@ export function insertLine(editor: Editor, direction: VerticalDirection) {
             const tx = [editor.getLine(ln), "\n"]
             if (direction < 0) tx.reverse()
             editor.setLine(ln, tx.join(""))
-            return EditorSelectionManipulator.documentStart(editor).setLines( ln+(direction > 0 ? direction : 0))
+            return EditorSelectionManipulator.documentStart(editor).setLines(ln + (direction > 0 ? direction : 0))
         }
         if (sel.isCaret()) return a(sel.anchor.line + index)
         else {
@@ -87,7 +98,7 @@ export function insertLine(editor: Editor, direction: VerticalDirection) {
     })
 }
 
-export function flipBooleanSetting(app: App, setting: keyof VaultConfig){
+export function flipBooleanSetting(app: App, setting: keyof VaultConfig) {
     app.vault.setConfig(setting, !app.vault.getConfig(setting))
 }
 
@@ -239,14 +250,14 @@ export function convertOneToOtherChars(editor: Editor, first: string, second: st
     })
 }
 
-export function surroundWithChars(editor: Editor, chars: string, endchars?: string){
-    selectionsProcessor(editor,undefined,(sel) => {
-        const surroundSel = sel.clone().normalize().moveChars(-chars.length,(endchars ?? chars).length);
+export function surroundWithChars(editor: Editor, chars: string, endchars?: string) {
+    selectionsProcessor(editor, undefined, (sel) => {
+        const surroundSel = sel.clone().normalize().moveChars(-chars.length, (endchars ?? chars).length);
         if (surroundSel.getText().startsWith(chars) && surroundSel.getText().endsWith(endchars ?? chars)) {
             return surroundSel.replaceText(
-                surroundSel.getText().substring(chars.length,surroundSel.getText().length-(endchars ?? chars).length)
-            ).moveChars(0,-chars.length-(endchars ?? chars).length)
+                surroundSel.getText().substring(chars.length, surroundSel.getText().length - (endchars ?? chars).length)
+            ).moveChars(0, -chars.length - (endchars ?? chars).length)
         }
-        return sel.replaceText(chars+sel.getText()+(endchars ?? chars)).moveChars(chars.length)
+        return sel.replaceText(chars + sel.getText() + (endchars ?? chars)).moveChars(chars.length)
     })
 }
