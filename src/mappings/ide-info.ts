@@ -31,6 +31,6 @@ export const IDE_LABELS: Record<string,IDEInfo> = {
     "keyshots": {
         name: "Keyshots Default Mappings",
         description: "HotKeys designed by creator of Keyshots that are 100% conflict free",
-        svg_icon_content: svgs.EMPTY_SVG
+        svg_icon_content: svgs.KEYSHOTS_SVG
     }
 }

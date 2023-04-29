@@ -4,7 +4,7 @@ import {titleCase, VerticalDirection} from "./utils";
 import {KeyshotsMap} from "./mappings/hotkeys"
 import KeyshotsPlugin from "./main";
 import {DoubleKeyCommand} from "./double-key-registry";
-import LanguagePickerModal from "./language-picker";
+import IDEPresetPickerModal from "./ide-preset-picker";
 
 
 export const COMMANDS = (plugin: KeyshotsPlugin, map: KeyshotsMap): Command[] => [
@@ -248,7 +248,7 @@ export const COMMANDS = (plugin: KeyshotsPlugin, map: KeyshotsMap): Command[] =>
     {
         id: 'change-keyshots-preset',
         name: "Change Keyshots Preset",
-        callback: () => new LanguagePickerModal(plugin).open()
+        callback: () => new IDEPresetPickerModal(plugin).open()
     }
 ]
 

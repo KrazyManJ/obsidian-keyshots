@@ -1,8 +1,4 @@
-<h1 align=center>Keyshots</h1>
-
-<p align=center><i>Turn your Obsidian into compact text editor!</i></p>
-
----
+<img src="assets/readme_banner.svg" alt="xd" width="1000">
 
 Keyshots is an [Obsidian](https://obsidian.md) plugin that adds classic hotkey/shortcuts commands from popular IDEs like Visual Studio Code or JetBrains Family. 
 
@@ -10,55 +6,55 @@ Apart from that, i want to add as much my custom and usefull commands as possibl
 
 Adds actions like move line up or down...
 
-![](assets/line_move.gif)
+![](assets/gifs/line_move.gif)
 
 ...add caret cursor up or down...
 
-![](assets/add_caret.gif)
+![](assets/gifs/add_caret.gif)
 
 ...insert lines above or below...
 
-![](assets/insert_line.gif)
+![](assets/gifs/insert_line.gif)
 
 ...duplicate line up or down...
 
-![](assets/vscode_duplicate_line.gif)
+![](assets/gifs/vscode_duplicate_line.gif)
 
 ...duplicate text or selection...
 
-![](assets/jetbrains_duplicate.gif)
+![](assets/gifs/jetbrains_duplicate.gif)
 
 ...toggle readable line length inside editor...
 
-![](assets/toggle_readable_line_length.gif)
+![](assets/gifs/toggle_readable_line_length.gif)
 
 ...toggle line numbers inside editor...
 
-![](assets/toggle_line_numbers.gif)
+![](assets/gifs/toggle_line_numbers.gif)
 
 ...encode or decode URI text...
 
-![](assets/uri_encode_decode.gif)
+![](assets/gifs/uri_encode_decode.gif)
 
 ...transform selected texts to lowercase, uppercase or titlecase...
 
-![](assets/transform_text.gif)
+![](assets/gifs/transform_text.gif)
 
 ...join selected lines to one line...
 
-![](assets/join_lines.gif)
+![](assets/gifs/join_lines.gif)
 
 ...split selections on new line and trim selection...
 
-![](assets/split_sel_on_line_and_trim.gif)
+![](assets/gifs/split_sel_on_line_and_trim.gif)
 
 ...sort selected lines with alphanumeric comparison...
 
-![](assets/sort_selected_lines.gif)
+![](assets/gifs/sort_selected_lines.gif)
 
 ...transform selections to or from snakecase...
 
-![](assets/transform_to_from_snakecase.gif)
+![](assets/gifs/transform_to_from_snakecase.gif)
 
 ...**and much more shortcuts to explore!**  *(And more commands comming soon)* 
 

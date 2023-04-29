@@ -2,7 +2,7 @@ import {Notice, SuggestModal} from "obsidian";
 import {IDE_LABELS, IDEInfo} from "./mappings/ide-info";
 import KeyshotsPlugin from "./main";
 
-export default class LanguagePickerModal extends SuggestModal<IDEInfo>{
+export default class IDEPresetPickerModal extends SuggestModal<IDEInfo>{
 
     private readonly plugin: KeyshotsPlugin
 
@@ -15,11 +15,11 @@ export default class LanguagePickerModal extends SuggestModal<IDEInfo>{
         return Object.values(IDE_LABELS).filter(v => v.name.toLowerCase().includes(query.toLowerCase()));
     }
 
-    onChooseSuggestion(item: IDEInfo, evt: MouseEvent | KeyboardEvent) {
+    async onChooseSuggestion(item: IDEInfo, evt: MouseEvent | KeyboardEvent) {
         this.plugin.settings.ide_mappings = Object.keys(IDE_LABELS).filter(f => IDE_LABELS[f] === item)[0]
         this.plugin.loadCommands()
         new Notice(`✅ Preset successfully changed to "${item.name}"!`)
-        this.plugin.saveSettings()
+        await this.plugin.saveSettings()
     }
 
     renderSuggestion(value: IDEInfo, el: HTMLElement) {
