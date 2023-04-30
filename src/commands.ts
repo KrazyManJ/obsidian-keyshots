@@ -2,7 +2,7 @@ import {Command, MarkdownView} from "obsidian";
 import * as functions from "./functions";
 import {titleCase, VerticalDirection} from "./utils";
 import {KeyshotsMap} from "./mappings/hotkeys"
-import KeyshotsPlugin from "./main";
+import KeyshotsPlugin from "./plugin";
 import {DoubleKeyCommand} from "./double-key-registry";
 import IDEPresetPickerModal from "./components/ide-preset-picker";
 

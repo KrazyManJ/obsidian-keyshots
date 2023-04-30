@@ -1,5 +1,5 @@
 import {App, PluginSettingTab, Setting, SliderComponent} from "obsidian";
-import KeyshotsPlugin from "../main";
+import KeyshotsPlugin from "../plugin";
 import {DocumentFragmentBuilder} from "../classes/document-fragment-builder";
 import {IDE_LABELS} from "../mappings/ide-info";
 import {DEFAULT_SETTINGS} from "../settings";

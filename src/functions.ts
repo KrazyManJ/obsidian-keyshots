@@ -8,7 +8,7 @@ import {
     selectWord,
     VerticalDirection
 } from "./utils";
-import KeyshotsPlugin from "./main";
+import KeyshotsPlugin from "./plugin";
 
 export function moveLine(editor: Editor, direction: VerticalDirection, border: number) {
     selectionsProcessor(editor, undefined, (sel) => {

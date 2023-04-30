@@ -1,5 +1,5 @@
 import {Hotkey, Modifier} from "obsidian";
-import KeyshotsPlugin from "../main";
+import KeyshotsPlugin from "../plugin";
 
 const HotKey = (key: string, ...modifiers: Modifier[]): Hotkey[] => [{key: key, modifiers: modifiers}]
 

@@ -1,4 +1,4 @@
-import KeyshotsPlugin from "./main";
+import KeyshotsPlugin from "./plugin";
 
 
 export interface DoubleKeyCommand {
@@ -23,6 +23,8 @@ declare interface KeyRecord {
 
 export default class DoubleKeyRegistry {
 
+    private plugin: KeyshotsPlugin
+
     private readonly cmds: Record<string,DoubleKeyCommand> = {}
 
     private cancelAction = false
@@ -32,8 +34,9 @@ export default class DoubleKeyRegistry {
 
 
     constructor(plugin: KeyshotsPlugin) {
+        this.plugin = plugin
         const elem = window
-        plugin.registerDomEvent(elem,"keydown",(ev) => {
+        this.plugin.registerDomEvent(elem,"keydown",(ev) => {
             if (Object.keys(this.cmds).length === 0) return;
             if (this.cancelAction) this.cancelAction = false
             const currCmd = this.activeCmdId ? this.cmds[this.activeCmdId] : undefined
@@ -50,7 +53,7 @@ export default class DoubleKeyRegistry {
             else if (currCmd && ev.key !== currCmd.key && currCmd.anotherKeyPressedCallback) currCmd.anotherKeyPressedCallback(ev)
             else if (this.lastPressed && this.lastPressed.key !== ev.key) this.cancelCurrentCommand()
         })
-        plugin.registerDomEvent(elem,"keyup",(ev) => {
+        this.plugin.registerDomEvent(elem,"keyup",(ev) => {
             if (Object.keys(this.cmds).length === 0) return;
             if (this.cancelAction) return
             const currCmd = this.activeCmdId ? this.cmds[this.activeCmdId] : undefined
@@ -58,7 +61,7 @@ export default class DoubleKeyRegistry {
                 this.lastPressed = {key: ev.key, timeStamp: ev.timeStamp}
             else if (currCmd && currCmd.key === ev.key) this.cancelCurrentCommand()
         })
-        plugin.registerDomEvent(elem,"mousedown",() => {
+        this.plugin.registerDomEvent(elem,"mousedown",() => {
             if (Object.keys(this.cmds).length === 0) return;
             this.cancelCurrentCommand(true)
         })
