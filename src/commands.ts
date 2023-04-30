@@ -4,7 +4,7 @@ import {titleCase, VerticalDirection} from "./utils";
 import {KeyshotsMap} from "./mappings/hotkeys"
 import KeyshotsPlugin from "./main";
 import {DoubleKeyCommand} from "./double-key-registry";
-import IDEPresetPickerModal from "./ide-preset-picker";
+import IDEPresetPickerModal from "./components/ide-preset-picker";
 
 
 export const COMMANDS = (plugin: KeyshotsPlugin, map: KeyshotsMap): Command[] => [
@@ -235,7 +235,7 @@ export const COMMANDS = (plugin: KeyshotsPlugin, map: KeyshotsMap): Command[] =>
     },
     {
         id: 'toggle-keybinding',
-        name: "Toggle Keybinding",
+        name: "Toggle Keybinding tag (<kbd>)",
         hotkeys: map.toggle_keybinding,
         editorCallback: (editor) => functions.surroundWithChars(editor, "<kbd>","</kbd>")
     },
@@ -266,6 +266,7 @@ export const DOUBLE_KEY_COMMANDS = (plugin: KeyshotsPlugin): PluginConditionalOb
             key: "Control",
             maxDelay: 1000,
             anotherKeyPressedCallback: (ev) => {
+                if (!["ArrowUp","ArrowDown"].includes(ev.key)) return
                 ev.preventDefault()
                 const view = plugin.app.workspace.getActiveViewOfType(MarkdownView)
                 if (!view) return;

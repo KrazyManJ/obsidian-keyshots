@@ -79,7 +79,7 @@ export function addCarets(editor: Editor, direction: VerticalDirection, border: 
     selections.splice(mainIndex, 1)
     selections.unshift(main)
     editor.setSelections(selections)
-    editor.scrollIntoView(newSel.anchor.clone().movePos(direction*2,0).asEditorRange())
+    editor.scrollIntoView(newSel.anchor.clone().movePos(direction * 2, 0).asEditorRange())
 }
 
 export function insertLine(editor: Editor, direction: VerticalDirection) {

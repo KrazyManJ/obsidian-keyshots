@@ -1,6 +1,6 @@
 import {Notice, SuggestModal} from "obsidian";
-import {IDE_LABELS, IDEInfo} from "./mappings/ide-info";
-import KeyshotsPlugin from "./main";
+import {IDE_LABELS, IDEInfo} from "../mappings/ide-info";
+import KeyshotsPlugin from "../main";
 
 export default class IDEPresetPickerModal extends SuggestModal<IDEInfo>{
 
@@ -9,6 +9,7 @@ export default class IDEPresetPickerModal extends SuggestModal<IDEInfo>{
     constructor(plugin: KeyshotsPlugin) {
         super(plugin.app);
         this.plugin = plugin
+        this.setPlaceholder("Choose one of these presets to use...")
     }
 
     getSuggestions(query: string): IDEInfo[] | Promise<IDEInfo[]> {

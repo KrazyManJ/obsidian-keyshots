@@ -7,7 +7,7 @@ export interface DoubleKeyCommand {
     maxDelay: number
 
     /**
-     * Called when last key of `hotkeys` array is pressed
+     * Called when last key is pressed
      */
     lastPressedCallback?: () => void
     /**
@@ -32,7 +32,7 @@ export default class DoubleKeyRegistry {
 
 
     constructor(plugin: KeyshotsPlugin) {
-        const elem = plugin.app.workspace.containerEl
+        const elem = window
         plugin.registerDomEvent(elem,"keydown",(ev) => {
             if (Object.keys(this.cmds).length === 0) return;
             if (this.cancelAction) this.cancelAction = false

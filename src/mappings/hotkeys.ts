@@ -42,6 +42,7 @@ export declare interface KeyshotsMap {
     multi_toggle_strikethrough?: Hotkey[]
     open_dev_tools?: Hotkey[]
     toggle_keybinding?: Hotkey[]
+    insert_codeblock?: Hotkey[]
 }
 
 export const DEFAULT_MAP: KeyshotsMap = {
@@ -77,6 +78,7 @@ export const DEFAULT_MAP: KeyshotsMap = {
     open_keyshots_settings: HotKey(",", "Mod", "Alt"),
     multi_toggle_bold: HotKey("B","Mod", "Shift"),
     multi_toggle_italic: HotKey("I","Mod", "Shift"),
+    multi_toggle_comment: HotKey("/", "Mod", "Shift"),
     open_dev_tools: HotKey("F12")
 }
 export const KEYSHOTS_MAPS: { [key: string]: KeyshotsMap } = {
