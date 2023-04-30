@@ -2,7 +2,7 @@ import {Notice, SuggestModal} from "obsidian";
 import {IDE_LABELS, IDEInfo} from "../mappings/ide-info";
 import KeyshotsPlugin from "../plugin";
 
-export default class IDEPresetPickerModal extends SuggestModal<IDEInfo>{
+export default class IDEPresetModal extends SuggestModal<IDEInfo>{
 
     private readonly plugin: KeyshotsPlugin
 

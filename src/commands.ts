@@ -4,7 +4,8 @@ import {titleCase, VerticalDirection} from "./utils";
 import {KeyshotsMap} from "./mappings/hotkeys"
 import KeyshotsPlugin from "./plugin";
 import {DoubleKeyCommand} from "./double-key-registry";
-import IDEPresetPickerModal from "./components/ide-preset-picker";
+import IDEPresetModal from "./components/ide-preset-modal";
+import CodeBlockModal from "./components/code-block-modal";
 
 
 export const COMMANDS = (plugin: KeyshotsPlugin, map: KeyshotsMap): Command[] => [
@@ -240,6 +241,15 @@ export const COMMANDS = (plugin: KeyshotsPlugin, map: KeyshotsMap): Command[] =>
         editorCallback: (editor) => functions.surroundWithChars(editor, "<kbd>","</kbd>")
     },
     {
+        id: 'insert-code-block',
+        name: "Insert Code Block",
+        hotkeys: map.insert_codeblock,
+        editorCallback: (editor) => new CodeBlockModal(
+            plugin,(item) => functions.insertCodeBlock(editor,item)
+        ).open()
+
+    },
+    {
         id: 'open-dev-tools',
         name: "Open Developer Tools",
         hotkeys: map.open_dev_tools,
@@ -248,7 +258,8 @@ export const COMMANDS = (plugin: KeyshotsPlugin, map: KeyshotsMap): Command[] =>
     {
         id: 'change-keyshots-preset',
         name: "Change Keyshots Preset",
-        callback: () => new IDEPresetPickerModal(plugin).open()
+        hotkeys: map.change_hotkeys_presets,
+        callback: () => new IDEPresetModal(plugin).open()
     }
 ]
 

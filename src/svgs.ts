@@ -129,8 +129,8 @@ export const VS_SVG = `
 </svg> 
 `
 
-export const KEYSHOTS_SVG = `
-<svg width="32" height="32" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+export const KEYSHOTS_SVG = (size: number) => `
+<svg width="${size}" height="${size}" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
 <g clip-path="url(#clip0_2_2)">
 <rect width="100" height="100" rx="8.23529" fill="url(#paint0_linear_2_2)"/>
 <g filter="url(#filter0_d_2_2)">

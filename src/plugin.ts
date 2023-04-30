@@ -3,7 +3,7 @@ import {mapBySettings} from "./mappings/hotkeys";
 import {DEFAULT_SETTINGS, KeyshotsSettings} from "./settings";
 import {COMMANDS, DOUBLE_KEY_COMMANDS} from "./commands";
 import DoubleKeyRegistry from "./double-key-registry";
-import {KeyshotsSettingTab} from "./components/setting-tab";
+import {KeyshotsSettingTab} from "./components/settings-tab";
 
 
 export default class KeyshotsPlugin extends Plugin {

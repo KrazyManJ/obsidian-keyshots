@@ -3,6 +3,7 @@ import KeyshotsPlugin from "../plugin";
 import {DocumentFragmentBuilder} from "../classes/document-fragment-builder";
 import {IDE_LABELS} from "../mappings/ide-info";
 import {DEFAULT_SETTINGS} from "../settings";
+import {KEYSHOTS_SVG} from "../svgs";
 
 export class KeyshotsSettingTab extends PluginSettingTab {
     plugin: KeyshotsPlugin;
@@ -15,7 +16,9 @@ export class KeyshotsSettingTab extends PluginSettingTab {
     display() {
         const {containerEl} = this;
         containerEl.empty()
-        containerEl.createEl('h1', {text: "Keyshots Settings"})
+        const title = containerEl.createEl('h1', {text: "Keyshots Settings"})
+        title.innerHTML = KEYSHOTS_SVG(48)+title.innerHTML
+        title.setCssProps({"display": "flex","align-items": "center", "gap":"10px"})
         containerEl.createEl('h2', {text: "⌨️ Default keys"})
         new Setting(containerEl)
             .setName("IDE Keys Mapping")

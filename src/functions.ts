@@ -9,6 +9,7 @@ import {
     VerticalDirection
 } from "./utils";
 import KeyshotsPlugin from "./plugin";
+import {PrismLanguage} from "./mappings/prism-langs";
 
 export function moveLine(editor: Editor, direction: VerticalDirection, border: number) {
     selectionsProcessor(editor, undefined, (sel) => {
@@ -260,4 +261,14 @@ export function surroundWithChars(editor: Editor, chars: string, endchars?: stri
         }
         return sel.replaceText(chars + sel.getText() + (endchars ?? chars)).moveChars(chars.length)
     })
+}
+
+export function insertCodeBlock(editor: Editor, lang: PrismLanguage) {
+    selectionsProcessor(editor, undefined, (sel) =>
+        sel.normalize()
+            .replaceText(`\n\`\`\`${lang.id}\n${sel.getText()}\n\`\`\`\n`)
+            .moveLines(2)
+            .setChars(0)
+            .expand()
+    )
 }

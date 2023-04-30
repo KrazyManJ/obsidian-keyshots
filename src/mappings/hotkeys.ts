@@ -43,6 +43,7 @@ export declare interface KeyshotsMap {
     open_dev_tools?: Hotkey[]
     toggle_keybinding?: Hotkey[]
     insert_codeblock?: Hotkey[]
+    change_hotkeys_presets?: Hotkey[]
 }
 
 export const DEFAULT_MAP: KeyshotsMap = {
