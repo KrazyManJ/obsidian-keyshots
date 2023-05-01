@@ -34,6 +34,10 @@ export default class EditorSelectionManipulator implements EditorSelection, Java
         return this.anchor.line === this.head.line
     }
 
+    isOnSameLine(sel: EditorSelectionManipulator): boolean {
+        return this.asNormalized().head.line === sel.asNormalized().anchor.line
+    }
+
     normalize(): this {
         if (!this.isNormalized()) {
             const [tAnchor, tHead] = [this.anchor, this.head]
@@ -97,7 +101,7 @@ export default class EditorSelectionManipulator implements EditorSelection, Java
 
     get linesCount() {
         const norm = this.asNormalized()
-        return norm.head.line - norm.anchor.line
+        return norm.head.line - norm.anchor.line + 1
     }
 
     static listSelections(editor: Editor) {

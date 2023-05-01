@@ -9,7 +9,7 @@ export default class CodeBlockModal extends FuzzySuggestModal<PrismLanguage> {
     constructor(plugin: KeyshotsPlugin, onSelectCallback: (item: PrismLanguage) => void) {
         super(plugin.app);
         this.limit = 1000;
-        this.setPlaceholder("Choose language that this code block will be written in...")
+        this.setPlaceholder("Choose a language that this code block will be written in...")
         this.onSelectCallback = onSelectCallback
     }
 

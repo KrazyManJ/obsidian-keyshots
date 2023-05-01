@@ -252,23 +252,45 @@ export function convertOneToOtherChars(editor: Editor, first: string, second: st
 }
 
 export function surroundWithChars(editor: Editor, chars: string, endchars?: string) {
+    let selBefore: EditorSelectionManipulator | undefined = undefined
+    let lastRemoved = false;
+    let shift = 0;
     selectionsProcessor(editor, undefined, (sel) => {
+        if (lastRemoved) {
+            if (selBefore && selBefore.isOneLine() && selBefore.isOnSameLine(sel)) shift -= chars.length+(endchars ?? chars).length
+            else if (selBefore && selBefore.isOnSameLine(sel)) shift = -1*(endchars ?? chars).length
+            else shift = 0
+            sel.moveChars(shift)
+        }
         const surroundSel = sel.clone().normalize().moveChars(-chars.length, (endchars ?? chars).length);
         if (surroundSel.getText().startsWith(chars) && surroundSel.getText().endsWith(endchars ?? chars)) {
-            return surroundSel.replaceText(
+            lastRemoved = true
+            selBefore = surroundSel.replaceText(
                 surroundSel.getText().substring(chars.length, surroundSel.getText().length - (endchars ?? chars).length)
-            ).moveChars(0, -chars.length - (endchars ?? chars).length)
+            ).moveChars(0, -chars.length - (endchars ?? chars).length+(sel.isOneLine() ? 0 : (endchars ?? chars).length))
         }
-        return sel.replaceText(chars + sel.getText() + (endchars ?? chars)).moveChars(chars.length)
+        else {
+            lastRemoved = false
+            if (selBefore && selBefore.isOneLine() && selBefore.isOnSameLine(sel)) shift += chars.length+(endchars ?? chars).length
+            else if (selBefore && selBefore.isOnSameLine(sel)) shift = (endchars ?? chars).length
+            else shift = 0
+            sel.moveChars(shift)
+            selBefore = sel.replaceText(chars + sel.getText() + (endchars ?? chars))
+                .moveChars(chars.length,chars.length-(sel.isOneLine() ? 0 : (endchars ?? chars).length))
+        }
+        return selBefore
     })
 }
 
 export function insertCodeBlock(editor: Editor, lang: PrismLanguage) {
-    selectionsProcessor(editor, undefined, (sel) =>
-        sel.normalize()
+    let moveLine = 0;
+    selectionsProcessor(editor, undefined, (sel) => {
+        sel.moveLines(moveLine)
+        moveLine += sel.linesCount+1
+        return sel.normalize()
             .replaceText(`\n\`\`\`${lang.id}\n${sel.getText()}\n\`\`\`\n`)
             .moveLines(2)
             .setChars(0)
             .expand()
-    )
+    })
 }

@@ -9,18 +9,11 @@ import CodeBlockModal from "./components/code-block-modal";
 
 
 export const COMMANDS = (plugin: KeyshotsPlugin, map: KeyshotsMap): Command[] => [
-    {
-        id: 'toggle-keyshots-case-sensitivity',
-        name: "Toggle Keyshots case sensitivity",
-        hotkeys: map.toggle_keyshots_case_sensitivity,
-        callback: () => functions.toggleCaseSensitivity(plugin)
-    },
-    {
-        id: 'open-keyshots-settings',
-        name: "Open Keyshots settings",
-        hotkeys: map.open_keyshots_settings,
-        callback: () => functions.openKeyshotsSettings(app)
-    },
+    /*
+    * =======================================================================================
+    * OBSIDIAN SETTINGS
+    * =======================================================================================
+    */
     {
         id: 'toggle-readable-length',
         name: "Toggle readable line length (setting)",
@@ -39,6 +32,34 @@ export const COMMANDS = (plugin: KeyshotsPlugin, map: KeyshotsMap): Command[] =>
         hotkeys: map.toggle_inline_title,
         callback: () => functions.flipBooleanSetting(plugin.app, 'showInlineTitle')
     },
+    /*
+    * =======================================================================================
+    * KEYSHOTS SETTINGS
+    * =======================================================================================
+    */
+    {
+        id: 'change-keyshots-preset',
+        name: "Change Keyshots Preset",
+        hotkeys: map.change_hotkeys_presets,
+        callback: () => new IDEPresetModal(plugin).open()
+    },
+    {
+        id: 'toggle-keyshots-case-sensitivity',
+        name: "Toggle Keyshots case sensitivity",
+        hotkeys: map.toggle_keyshots_case_sensitivity,
+        callback: () => functions.toggleCaseSensitivity(plugin)
+    },
+    {
+        id: 'open-keyshots-settings',
+        name: "Open Keyshots settings",
+        hotkeys: map.open_keyshots_settings,
+        callback: () => functions.openKeyshotsSettings(app)
+    },
+    /*
+    * =======================================================================================
+    * EDITOR LINE ACTIONS
+    * =======================================================================================
+    */
     {
         id: 'move-line-up',
         name: 'Move line up',
@@ -52,20 +73,6 @@ export const COMMANDS = (plugin: KeyshotsPlugin, map: KeyshotsMap): Command[] =>
         repeatable: true,
         hotkeys: map.move_line_down,
         editorCallback: (editor) => functions.moveLine(editor, VerticalDirection.DOWN, editor.lineCount() - 1)
-    },
-    {
-        id: 'add-carets-up',
-        name: 'Add caret cursor up',
-        repeatable: true,
-        hotkeys: map.add_carets_up,
-        editorCallback: (editor) => functions.addCarets(editor, VerticalDirection.UP, 0)
-    },
-    {
-        id: 'add-carets-down',
-        name: 'Add caret cursor down',
-        repeatable: true,
-        hotkeys: map.add_carets_down,
-        editorCallback: (editor) => functions.addCarets(editor, VerticalDirection.DOWN, editor.lineCount())
     },
     {
         id: 'duplicate-line-up',
@@ -115,6 +122,43 @@ export const COMMANDS = (plugin: KeyshotsPlugin, map: KeyshotsMap): Command[] =>
         editorCallback: (editor) => functions.splitSelectedTextOnNewLine(editor)
     },
     {
+        id: 'expand-line-selections',
+        name: "Expand line selections",
+        hotkeys: map.expand_line_selections,
+        editorCallback: (editor) => functions.expandSelections(editor)
+    },
+    {
+        id: 'sort-selected-lines',
+        name: "Sort selected lines",
+        hotkeys: map.sort_selected_lines,
+        editorCallback: (editor) => functions.sortSelectedLines(editor)
+    },
+    {
+        id: 'shuffle-selected-lines',
+        name: "Shuffle selected lines",
+        hotkeys: map.shuffle_selected_lines,
+        editorCallback: (editor) => functions.shuffleSelectedLines(editor, plugin.settings.shuffle_rounds_amount)
+    },
+    /*
+    * =======================================================================================
+    * SELECTIONS ADDING/REMOVING
+    * =======================================================================================
+    */
+    {
+        id: 'add-carets-up',
+        name: 'Add caret cursor up',
+        repeatable: true,
+        hotkeys: map.add_carets_up,
+        editorCallback: (editor) => functions.addCarets(editor, VerticalDirection.UP, 0)
+    },
+    {
+        id: 'add-carets-down',
+        name: 'Add caret cursor down',
+        repeatable: true,
+        hotkeys: map.add_carets_down,
+        editorCallback: (editor) => functions.addCarets(editor, VerticalDirection.DOWN, editor.lineCount())
+    },
+    {
         id: 'select-multiple-word-instances',
         name: "Select multiple word instances",
         hotkeys: map.select_multiple_word_instances,
@@ -127,17 +171,16 @@ export const COMMANDS = (plugin: KeyshotsPlugin, map: KeyshotsMap): Command[] =>
         editorCallback: (editor) => functions.selectAllWordInstances(editor, plugin.settings.case_sensitive)
     },
     {
-        id: 'expand-line-selections',
-        name: "Expand line selections",
-        hotkeys: map.expand_line_selections,
-        editorCallback: (editor) => functions.expandSelections(editor)
-    },
-    {
         id: 'split-selections-by-lines',
         name: "Split selections by lines",
         hotkeys: map.split_selections_by_lines,
         editorCallback: (editor) => functions.splitSelectionsByLines(editor)
     },
+    /*
+    * =======================================================================================
+    * TRANSFORM SELECTIONS
+    * =======================================================================================
+    */
     {
         id: 'trim-selections',
         name: "Trim selections",
@@ -186,18 +229,11 @@ export const COMMANDS = (plugin: KeyshotsPlugin, map: KeyshotsMap): Command[] =>
         hotkeys: map.toggle_case,
         editorCallback: (editor) => functions.replaceSelections(editor, (str) => str === str.toLowerCase() ? str.toUpperCase() : str.toLowerCase())
     },
-    {
-        id: 'sort-selected-lines',
-        name: "Sort selected lines",
-        hotkeys: map.sort_selected_lines,
-        editorCallback: (editor) => functions.sortSelectedLines(editor)
-    },
-    {
-        id: 'shuffle-selected-lines',
-        name: "Shuffle selected lines",
-        hotkeys: map.shuffle_selected_lines,
-        editorCallback: (editor) => functions.shuffleSelectedLines(editor, plugin.settings.shuffle_rounds_amount)
-    },
+    /*
+    * =======================================================================================
+    * MULTI TOGGLERS/INSERTERS
+    * =======================================================================================
+    */
     {
         id: 'multi-toggle-bold',
         name: "Multi Toggle Bold",
@@ -247,19 +283,17 @@ export const COMMANDS = (plugin: KeyshotsPlugin, map: KeyshotsMap): Command[] =>
         editorCallback: (editor) => new CodeBlockModal(
             plugin,(item) => functions.insertCodeBlock(editor,item)
         ).open()
-
     },
+    /*
+    * =======================================================================================
+    * OTHERS
+    * =======================================================================================
+    */
     {
         id: 'open-dev-tools',
         name: "Open Developer Tools",
         hotkeys: map.open_dev_tools,
         callback: () => electron.remote.getCurrentWindow().webContents.openDevTools()
-    },
-    {
-        id: 'change-keyshots-preset',
-        name: "Change Keyshots Preset",
-        hotkeys: map.change_hotkeys_presets,
-        callback: () => new IDEPresetModal(plugin).open()
     }
 ]
 
