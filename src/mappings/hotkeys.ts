@@ -42,7 +42,9 @@ export declare interface KeyshotsMap {
     multi_toggle_strikethrough?: Hotkey[]
     open_dev_tools?: Hotkey[]
     toggle_keybinding?: Hotkey[]
+    toggle_underline?: Hotkey[]
     insert_codeblock?: Hotkey[]
+    better_insert_callout?: Hotkey[]
     change_hotkeys_presets?: Hotkey[]
 }
 

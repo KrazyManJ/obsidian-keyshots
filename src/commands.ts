@@ -1,4 +1,4 @@
-import {Command, MarkdownView} from "obsidian";
+import {Command, MarkdownView, Notice} from "obsidian";
 import * as functions from "./functions";
 import {titleCase, VerticalDirection} from "./utils";
 import {KeyshotsMap} from "./mappings/hotkeys"
@@ -271,6 +271,12 @@ export const COMMANDS = (plugin: KeyshotsPlugin, map: KeyshotsMap): Command[] =>
         editorCallback: (editor) => functions.surroundWithChars(editor, "~~")
     },
     {
+        id: 'toggle-underline',
+        name: "Toggle Underline",
+        hotkeys: map.toggle_underline,
+        editorCallback: (editor) => functions.surroundWithChars(editor, "<u>", "</u>")
+    },
+    {
         id: 'toggle-keybinding',
         name: "Toggle Keybinding tag (<kbd>)",
         hotkeys: map.toggle_keybinding,
@@ -331,6 +337,7 @@ export const DOUBLE_KEY_COMMANDS = (plugin: KeyshotsPlugin): PluginConditionalOb
             maxDelay: 1000,
             lastPressedCallback: () => {
                 if (app.internalPlugins.plugins["switcher"]) app.commands.executeCommandById("switcher:open")
+                else new Notice("Quick Switcher plugin is not enabled!")
             }
         }
     }
