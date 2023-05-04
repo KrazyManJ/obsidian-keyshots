@@ -3,6 +3,7 @@ import KeyshotsPlugin from "./plugin";
 
 export interface DoubleKeyCommand {
     id: string
+    name: string
     key: string
     maxDelay: number
 
@@ -23,7 +24,8 @@ declare interface KeyRecord {
 
 export default class DoubleKeyRegistry {
 
-    private plugin: KeyshotsPlugin
+    private readonly plugin: KeyshotsPlugin
+    private readonly statusBarItem: HTMLElement
 
     private readonly cmds: Record<string,DoubleKeyCommand> = {}
 
@@ -32,9 +34,19 @@ export default class DoubleKeyRegistry {
     private lastPressed?: KeyRecord = undefined
     private activeCmdId?: string = undefined
 
+    private setStatusBarState(commandName?: string){
+        this.statusBarItem.setText(commandName ? "🟩" : "🟥")
+        this.statusBarItem.setAttr("aria-label", "Keyshots: " +(commandName
+            ? `command "${commandName}" is active`
+            : `no double-key command active`
+        ))
+    }
 
     constructor(plugin: KeyshotsPlugin) {
         this.plugin = plugin
+        this.statusBarItem = this.plugin.addStatusBarItem()
+        this.statusBarItem.setAttr("aria-label-position","top")
+        this.setStatusBarState()
         const elem = window
         this.plugin.registerDomEvent(elem,"keydown",(ev) => {
             if (Object.keys(this.cmds).length === 0) return;
@@ -47,6 +59,7 @@ export default class DoubleKeyRegistry {
                     this.activeCmdId = undefined
                     return
                 }
+                this.setStatusBarState(currCmd.name)
                 if (currCmd.lastPressedCallback) currCmd.lastPressedCallback()
                 if (!currCmd.anotherKeyPressedCallback) this.cancelCurrentCommand(true)
             }
@@ -68,6 +81,7 @@ export default class DoubleKeyRegistry {
     }
 
     private cancelCurrentCommand(ingoreNextKeyUp = false){
+        this.setStatusBarState()
         this.cancelAction = ingoreNextKeyUp
         this.activeCmdId = undefined
         this.lastPressed = undefined

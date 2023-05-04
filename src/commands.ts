@@ -316,6 +316,7 @@ export const DOUBLE_KEY_COMMANDS = (plugin: KeyshotsPlugin): PluginConditionalOb
         conditional: (plugin) => plugin.settings.carets_via_double_ctrl,
         object: {
             id: "add-caret",
+            name: "Add caret cursors",
             key: "Control",
             maxDelay: 1000,
             anotherKeyPressedCallback: (ev) => {
@@ -335,6 +336,7 @@ export const DOUBLE_KEY_COMMANDS = (plugin: KeyshotsPlugin): PluginConditionalOb
         conditional: (plugin) => plugin.settings.quick_switch_via_double_shift,
         object:{
             id: "quick-open",
+            name: "Open Quick-Switcher",
             key: "Shift",
             maxDelay: 1000,
             lastPressedCallback: () => {
