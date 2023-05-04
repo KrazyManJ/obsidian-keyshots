@@ -1,5 +1,5 @@
 import {Editor, EditorPosition, EditorRange} from "obsidian";
-import {JavaLikeObject} from "../utils";
+import {JavaLikeObject} from "./java-like-object";
 
 export default class EditorPositionManipulator implements EditorPosition, JavaLikeObject<EditorPositionManipulator> {
 

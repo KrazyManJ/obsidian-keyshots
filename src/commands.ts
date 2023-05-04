@@ -1,11 +1,11 @@
 import {Command, MarkdownView, Notice} from "obsidian";
 import * as functions from "./functions";
-import {titleCase, VerticalDirection} from "./utils";
 import {KeyshotsMap} from "./mappings/hotkeys"
 import KeyshotsPlugin from "./plugin";
 import {DoubleKeyCommand} from "./double-key-registry";
 import IDEPresetModal from "./components/ide-preset-modal";
 import CodeBlockModal from "./components/code-block-modal";
+import {VerticalDirection} from "./classes/vertical-direction";
 
 
 export const COMMANDS = (plugin: KeyshotsPlugin, map: KeyshotsMap): Command[] => [
@@ -221,7 +221,9 @@ export const COMMANDS = (plugin: KeyshotsPlugin, map: KeyshotsMap): Command[] =>
         id: 'transform-selections-to-titlecase',
         name: "Transform selections to Titlecase (Capitalize)",
         hotkeys: map.transform_selections_to_titlecase,
-        editorCallback: (editor) => functions.replaceSelections(editor, (s) => titleCase(s))
+        editorCallback: (editor) => functions.replaceSelections(editor, (s) =>
+            s.replace(/\w\S*/g, (txt) => txt.charAt(0).toUpperCase() + txt.substring(1).toLowerCase())
+        )
     },
     {
         id: 'toggle-case',

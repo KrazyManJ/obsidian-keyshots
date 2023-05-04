@@ -1,15 +1,9 @@
 import EditorSelectionManipulator from "./classes/editor-selection-manipulator";
 import {App, Editor, EditorRange, EditorSelection, Notice, VaultConfig} from "obsidian";
-import {
-    lowestSelection,
-    selectionsProcessor,
-    selectionsUpdater,
-    selectionValuesEqual,
-    selectWord,
-    VerticalDirection
-} from "./utils";
 import KeyshotsPlugin from "./plugin";
 import {PrismLanguage} from "./mappings/prism-langs";
+import {lowestSelection, selectionsProcessor, selectionsUpdater, selectionValuesEqual} from "./selections-processor";
+import {VerticalDirection} from "./classes/vertical-direction";
 
 export function moveLine(editor: Editor, direction: VerticalDirection, border: number) {
     selectionsProcessor(editor, undefined, (sel) => {
@@ -151,7 +145,7 @@ export function selectWordInstances(editor: Editor, case_sensitive: boolean) {
     const selections: EditorSelectionManipulator[] = EditorSelectionManipulator.listSelections(editor)
     let range: EditorRange | undefined;
     if (selections.filter(s => s.isCaret()).length > 0) {
-        selections.filter(s => s.isCaret()).forEach((sel, i) => selections[i] = selectWord(sel))
+        selections.filter(s => s.isCaret()).forEach((sel, i) => selections[i] = sel.selectWord())
     } else if (selections.filter(s => !s.isCaret()).length === selections.length && selectionValuesEqual(editor, selections, case_sensitive)) {
         const sel = lowestSelection(selections).normalize()
         const tx = !case_sensitive ? sel.getText().toLowerCase() : sel.getText()
@@ -187,7 +181,7 @@ export function selectWordInstances(editor: Editor, case_sensitive: boolean) {
 
 export function selectAllWordInstances(editor: Editor, case_sensitive: boolean) {
     const selections: EditorSelectionManipulator[] = EditorSelectionManipulator.listSelections(editor)
-    selections.filter(s => s.isCaret()).forEach((sel, i) => selections[i] = selectWord(sel))
+    selections.filter(s => s.isCaret()).forEach((sel, i) => selections[i] = sel.selectWord())
     if (selections.filter(s => !s.isCaret()).length === selections.length && selectionValuesEqual(editor, selections, case_sensitive)) {
         const tx = selections[0].getText()
         Array.from(editor.getValue().matchAll(new RegExp(tx, "g" + (case_sensitive ? "" : "i"))), v => v.index || 0)
@@ -252,33 +246,14 @@ export function convertOneToOtherChars(editor: Editor, first: string, second: st
 }
 
 export function surroundWithChars(editor: Editor, chars: string, endchars?: string) {
-    let selBefore: EditorSelectionManipulator | undefined = undefined
-    let lastRemoved = false;
-    let shift = 0;
     selectionsProcessor(editor, undefined, (sel) => {
-        if (lastRemoved) {
-            if (selBefore && selBefore.isOneLine() && selBefore.isOnSameLine(sel)) shift -= chars.length+(endchars ?? chars).length
-            else if (selBefore && selBefore.isOnSameLine(sel)) shift = -1*(endchars ?? chars).length
-            else shift = 0
-            sel.moveChars(shift)
-        }
         const surroundSel = sel.clone().normalize().moveChars(-chars.length, (endchars ?? chars).length);
         if (surroundSel.getText().startsWith(chars) && surroundSel.getText().endsWith(endchars ?? chars)) {
-            lastRemoved = true
-            selBefore = surroundSel.replaceText(
+            return surroundSel.replaceText(
                 surroundSel.getText().substring(chars.length, surroundSel.getText().length - (endchars ?? chars).length)
-            ).moveChars(0, -chars.length - (endchars ?? chars).length+(sel.isOneLine() ? 0 : (endchars ?? chars).length))
+            ).moveChars(0, -chars.length - (endchars ?? chars).length)
         }
-        else {
-            lastRemoved = false
-            if (selBefore && selBefore.isOneLine() && selBefore.isOnSameLine(sel)) shift += chars.length+(endchars ?? chars).length
-            else if (selBefore && selBefore.isOnSameLine(sel)) shift = (endchars ?? chars).length
-            else shift = 0
-            sel.moveChars(shift)
-            selBefore = sel.replaceText(chars + sel.getText() + (endchars ?? chars))
-                .moveChars(chars.length,chars.length-(sel.isOneLine() ? 0 : (endchars ?? chars).length))
-        }
-        return selBefore
+        return sel.replaceText(chars + sel.getText() + (endchars ?? chars)).moveChars(chars.length)
     })
 }
 

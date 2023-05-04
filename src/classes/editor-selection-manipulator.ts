@@ -1,12 +1,13 @@
 import {Editor, EditorPosition, EditorRange, EditorSelection} from "obsidian";
 import EditorPositionManipulator from "./editor-position-manipulator";
-import {JavaLikeObject} from "../utils";
+import {JavaLikeObject} from "./java-like-object";
 
 export default class EditorSelectionManipulator implements EditorSelection, JavaLikeObject<EditorSelectionManipulator> {
 
     anchor: EditorPositionManipulator
     head: EditorPositionManipulator
     private readonly editor: Editor
+    private sizeChange = 0
 
     constructor(selection: EditorSelection, editor: Editor) {
         this.anchor = new EditorPositionManipulator(selection.anchor, editor)
@@ -66,6 +67,10 @@ export default class EditorSelectionManipulator implements EditorSelection, Java
         return [norm.anchor, norm.head]
     }
 
+    toEditorSelection(): EditorSelection {
+        return {anchor: this.anchor, head: this.head}
+    }
+
     moveLines(anchor: number, head?: number): this {
         this.anchor.line += anchor
         this.head.line += head ?? anchor
@@ -95,13 +100,28 @@ export default class EditorSelectionManipulator implements EditorSelection, Java
     }
 
     replaceText(to: string): this {
+        this.sizeChange = to.length-this.getText().length
         this.editor.replaceRange(to, ...this.asFromToPoints())
+        return this
+    }
+
+    selectWord(): this {
+        if (this.isCaret()) {
+            const txt = this.anchor.getLine()
+            const postCh = (txt.substring(this.anchor.ch).match(/^[^ ()[\]{},;]+/i) ?? [""])[0].length
+            const preCh = (txt.substring(0, this.anchor.ch).match(/[^ ()[\]{},;]+$/i) ?? [""])[0].length
+            this.moveChars(-preCh, postCh)
+        }
         return this
     }
 
     get linesCount() {
         const norm = this.asNormalized()
         return norm.head.line - norm.anchor.line + 1
+    }
+
+    get replaceSizeChange(){
+        return this.sizeChange
     }
 
     static listSelections(editor: Editor) {
