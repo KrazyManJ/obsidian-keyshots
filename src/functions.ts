@@ -74,7 +74,9 @@ export function addCarets(editor: Editor, direction: VerticalDirection, border: 
     selections.splice(mainIndex, 1)
     selections.unshift(main)
     editor.setSelections(selections)
-    editor.scrollIntoView(newSel.anchor.clone().movePos(direction * 2, 0).asEditorRange())
+    editor.scrollIntoView(newSel.anchor.clone().setPos(
+        Math.min(editor.lineCount()-1,newSel.anchor.line+direction * 2), newSel.anchor.ch
+    ).asEditorRange())
 }
 
 export function insertLine(editor: Editor, direction: VerticalDirection) {
@@ -280,7 +282,14 @@ export function addCaretsViaDoubleKey(plugin: KeyshotsPlugin, ev: KeyboardEvent)
     )
 }
 
-export function runCommandById(plugin: KeyshotsPlugin, id: string, notAvailableCallback: () => void) {
-    if (plugin.app.internalPlugins.plugins[id.split(":")[0]]) plugin.app.commands.executeCommandById(id)
+export function runCommandById(keyshotsPlugin: KeyshotsPlugin, id: string, notAvailableCallback: () => void) {
+    const plugin = keyshotsPlugin.app.internalPlugins.plugins[id.split(":")[0]]
+    if (plugin && plugin.enabled) keyshotsPlugin.app.commands.executeCommandById(id)
     else notAvailableCallback()
+}
+
+export function insertOrdinalNumbering(editor: Editor) {
+    SelectionsProcessing.selectionsProcessor(editor, undefined, (sel,index) => {
+        return sel.replaceText((index+1).toString(),true)
+    })
 }

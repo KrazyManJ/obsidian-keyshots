@@ -1,12 +1,13 @@
 <a href="https://github.com/KrazyManJ/obsidian-keyshots">
-<img src="assets/readme_banner.svg" alt="xd" width="100%">
+    <img src="assets/readme_banner.svg" alt="xd" width="100%">
 </a>
 
-Keyshots is an [Obsidian](https://obsidian.md) plugin that adds classic hotkey/shortcuts commands from popular IDEs like Visual Studio Code or JetBrains Family. 
+Keyshots is an [Obsidian](https://obsidian.md) plugin that adds classic hotkey/shortcuts commands from popular IDEs like
+Visual Studio Code or JetBrains Family.
 
 Apart from that, i want to add as much my custom and usefull commands as possible!
 
-Adds actions like move line up or down...
+Keyshots adds actions like move line up or down...
 
 ![](assets/gifs/line_move.gif)
 
@@ -58,43 +59,71 @@ Adds actions like move line up or down...
 
 ![](assets/gifs/transform_to_from_snakecase.gif)
 
-...**and much more shortcuts to explore!**  *(And more commands comming soon)* 
+...**and much more commands to explore!**  *(And more are comming soon)*
 
 ## ⌨️ IDE Mappings
 
-Here is a full list of all mappings that are available. If any of hotkey for IDE action is missing, Keyshots mappings hotkey is used instead.
+Here is a full list of all mappings that are available. If any of hotkey for IDE action is missing, Keyshots mappings
+hotkey is used instead.
 
-| Command Name                             | Visual Studio Code              | JetBrains IDEs                    | Microsoft Visual Studio     | Keyshots Mappings                 |
-| ---------------------------------------- | ------------------------------- | --------------------------------- | --------------------------- | --------------------------------- |
-| Add carets down                          | <kbd>Ctrl + Alt + ↓</kbd>       |                                   | <kbd>Shift + Alt + ↓</kbd>  | <kbd>Ctrl + Alt + ↓</kbd>         |
-| Add carets up                            | <kbd>Ctrl + Alt + ↑</kbd>       |                                   | <kbd>Shift + Alt + ↑</kbd>  | <kbd>Ctrl + Alt + ↑</kbd>         |
-| Encode/Decode URI                        |                                 |                                   |                             | <kbd>Ctrl + Alt + U</kbd>         |
-| Insert line below                        | <kbd>Ctrl + Enter</kbd>         | <kbd>Shift + Enter</kbd>          | <kbd>Shift + Enter</kbd>    | <kbd>Shift + Enter</kbd>          |
-| Insert line above                        | <kbd>Ctrl + Shift + Enter</kbd> | <kbd>Ctrl + Alt + Enter</kbd>     | <kbd>Ctrl + Enter</kbd>     | <kbd>Ctrl + Shift + Enter</kbd>   |
-| Join selected lines                      | <kbd>Shift + J</kbd>            | <kbd>Ctrl + Shift + J</kbd>       |                             | <kbd>Ctrl + Shift + J</kbd>       |
-| Sort selected lines                      |                                 |                                   |                             | <kbd>Ctrl + Shift + S</kbd>       |
-| Shuffle selected lines                   |                                 |                                   |                             | <kbd>Ctrl + Shift + Alt + S</kbd> |
-| Split selections by lines                |                                 |                                   |                             | <kbd>Ctrl + Alt + L</kbd>         |
-| Split selections on new line             |                                 |                                   |                             | <kbd>Alt + S</kbd>                |
-| Select all word instances                | <kbd>Ctrl + Shift + L</kbd>     | <kbd>Ctrl + Shift + Alt + J</kbd> | <kbd>Shift + Alt + \`</kbd> | <kbd>Ctrl + Shift + L</kbd>       |
-| Select multiple word instances           | <kbd>Ctrl + D</kbd>             | <kbd>Alt + J</kbd>                | <kbd>Shift + Alt + .</kbd>  | <kbd>Ctrl + D</kbd>               |
-| Trim selections                          |                                 |                                   |                             | <kbd>Alt + T</kbd>                |
-| Move line up                             | <kbd>Alt + ↑</kbd>              | <kbd>Shift + Alt + ↑</kbd>        | <kbd>Alt + ↑</kbd>          | <kbd>Alt + ↑</kbd>                |
-| Move line down                           | <kbd>Alt + ↓</kbd>              | <kbd>Shift + Alt + ↓</kbd>        | <kbd>Alt + ↓</kbd>          | <kbd>Alt + ↓</kbd>                |
-| Duplicate line up                        | <kbd>Shift + Alt + ↑</kbd>      |                                   |                             | <kbd>Shift + Alt + ↑</kbd>        |
-| Duplicate line down                      | <kbd>Shift + Alt + ↓</kbd>      |                                   |                             | <kbd>Shift + Alt + ↓</kbd>        |
-| Duplicate line or selection              |                                 | <kbd>Ctrl + D</kbd>               | <kbd>Ctrl + D</kbd>         | <kbd>Ctrl + Alt + D</kbd>         |
-| Expand Line selections                   | <kbd>Ctrl + L</kbd>             | <kbd>Ctrl + W</kbd>               | <kbd>Shift + Alt + =</kbd>  | <kbd>Alt + E</kbd>                | 
-| Toggle case                              |                                 | <kbd>Ctrl + Shift + U</kbd>       |                             | <kbd>Ctrl + Shift + U</kbd>       |
-| Toggle readable line length              |                                 |                                   |                             | <kbd>Ctrl + Alt + R</kbd>         |
-| Toggle line numbers                      |                                 |                                   |                             | <kbd>Ctrl + Alt + N</kbd>         |
-| Toggle inline title                      |                                 |                                   |                             | <kbd>Ctrl + Alt + T</kbd>         |
-| Toggle Keyshots case sensitivity         |                                 |                                   |                             | <kbd>Ctrl + Alt + I</kbd>         |
-| Transform selections to Lowercase        |                                 |                                   | <kbd>Ctrl + U</kbd>         | <kbd>Alt + L</kbd>                |
-| Transform selections to Uppercase        |                                 |                                   | <kbd>Ctrl + Shift + U</kbd> | <kbd>Alt + U</kbd>                |
-| Transform selections to Titlecase        |                                 |                                   |                             | <kbd>Alt + C</kbd>                |
-| Transform selections from / to Snakecase |                                 |                                   |                             | <kbd>Shift + Alt + -</kbd>        |
-| Transform selections from / to Kebabcase |                                 |                                   |                             | <kbd>Alt + -</kbd>                |
+| Command Name                                   | Keyshots Mappings                 | Visual Studio Code              | JetBrains IDEs                    | Microsoft Visual Studio     |
+|------------------------------------------------|-----------------------------------|---------------------------------|-----------------------------------|-----------------------------|
+| Add caret cursor down                          | <kbd>Ctrl + Alt + ↓</kbd>         | <kbd>Ctrl + Alt + ↓</kbd>       |                                   | <kbd>Shift + Alt + ↓</kbd>  |
+| Add caret cursor up                            | <kbd>Ctrl + Alt + ↑</kbd>         | <kbd>Ctrl + Alt + ↑</kbd>       |                                   | <kbd>Shift + Alt + ↑</kbd>  |
+| Duplicate line down                            | <kbd>Shift + Alt + ↓</kbd>        | <kbd>Shift + Alt + ↓</kbd>      |                                   |                             |
+| Duplicate line or selection                    | <kbd>Ctrl + Alt + D</kbd>         |                                 | <kbd>Ctrl + D</kbd>               | <kbd>Ctrl + D</kbd>         |
+| Duplicate line up                              | <kbd>Shift + Alt + ↑</kbd>        | <kbd>Shift + Alt + ↑</kbd>      |                                   |                             |
+| Expand Line selections                         | <kbd>Alt + E</kbd>                | <kbd>Ctrl + L</kbd>             | <kbd>Ctrl + W</kbd>               | <kbd>Shift + Alt + =</kbd>  |
+| Change Keyshots preset                         | <kbd>Ctrl + Shift + P</kbd>       |                                 |                                   |                             |
+| Insert code block                              | <kbd>Ctrl + Shift + \`</kbd>      |                                 |                                   |                             |
+| Insert line above                              | <kbd>Ctrl + Shift + Enter</kbd>   | <kbd>Ctrl + Shift + Enter</kbd> | <kbd>Ctrl + Alt + Enter</kbd>     | <kbd>Ctrl + Enter</kbd>     |
+| Insert line below                              | <kbd>Shift + Enter</kbd>          | <kbd>Ctrl + Enter</kbd>         | <kbd>Shift + Enter</kbd>          | <kbd>Shift + Enter</kbd>    |
+| Insert ordinal numbering                       | <kbd>Shift + Alt + N</kbd>        |                                 |                                   |                             |
+| Join selected lines                            | <kbd>Ctrl + Shift + J</kbd>       | <kbd>Shift + J</kbd>            | <kbd>Ctrl + Shift + J</kbd>       |                             |
+| Move line down                                 | <kbd>Alt + ↓</kbd>                | <kbd>Alt + ↓</kbd>              | <kbd>Shift + Alt + ↓</kbd>        | <kbd>Alt + ↓</kbd>          |
+| Move line up                                   | <kbd>Alt + ↑</kbd>                | <kbd>Alt + ↑</kbd>              | <kbd>Shift + Alt + ↑</kbd>        | <kbd>Alt + ↑</kbd>          |
+| Multi-toggle bold                              | <kbd>Ctrl + Shift + B</kbd>       |                                 |                                   |                             |
+| Multi-toggle code                              | <kbd>Ctrl + Shift + C</kbd>       |                                 |                                   |                             |
+| Multi-toggle comment                           | <kbd>Ctrl + Shift + /</kbd>       |                                 |                                   |                             |
+| Multi-toggle highlight                         | <kbd>Ctrl + Shift + H</kbd>       |                                 |                                   |                             |
+| Multi-toggle italic                            | <kbd>Ctrl + Shift + I</kbd>       |                                 |                                   |                             |
+| Multi-toggle strikethrough                     | <kbd>Ctrl + Shift + M</kbd>       |                                 |                                   |                             |
+| Open developer tools                           | <kbd>F12</kbd>                    |                                 |                                   |                             |
+| Open Keyshots settings tab                     | <kbd>Ctrl + Alt + ,</kbd>         |                                 |                                   |                             |
+| Select all word instances                      | <kbd>Ctrl + Shift + L</kbd>       | <kbd>Ctrl + Shift + L</kbd>     | <kbd>Ctrl + Shift + Alt + J</kbd> | <kbd>Shift + Alt + \`</kbd> |
+| Select multiple word instances                 | <kbd>Ctrl + D</kbd>               | <kbd>Ctrl + D</kbd>             | <kbd>Alt + J</kbd>                | <kbd>Shift + Alt + .</kbd>  |
+| Shuffle selected lines                         | <kbd>Ctrl + Shift + Alt + S</kbd> |                                 |                                   |                             |
+| Sort selected lines                            | <kbd>Ctrl + Shift + S</kbd>       |                                 |                                   |                             |
+| Split selections by lines                      | <kbd>Ctrl + Alt + L</kbd>         |                                 |                                   |                             |
+| Split selections on new line                   | <kbd>Alt + S</kbd>                |                                 |                                   |                             |
+| Switch 'inline title' setting                  | <kbd>Ctrl + Alt + T</kbd>         |                                 |                                   |                             |
+| Switch 'line numbers' setting                  | <kbd>Ctrl + Alt + N</kbd>         |                                 |                                   |                             |
+| Switch 'readable line length' setting          | <kbd>Ctrl + Alt + R</kbd>         |                                 |                                   |                             |
+| Switch Keyshots case sensitivity               | <kbd>Ctrl + Alt + I</kbd>         |                                 |                                   |                             |
+| Toggle case (JetBrains)                        | <kbd>Ctrl + Shift + U</kbd>       |                                 | <kbd>Ctrl + Shift + U</kbd>       |                             |
+| Toggle keyboard input (\<kbd\>)                | <kbd>Ctrl + Shift + K</kbd>       |                                 |                                   |                             |
+| Toggle selections kebabcase                    | <kbd>Alt + -</kbd>                |                                 |                                   |                             |
+| Toggle selections snakecase                    | <kbd>Shift + Alt + -</kbd>        |                                 |                                   |                             |
+| Toggle selections URI encoded/decoded string   | <kbd>Ctrl + Alt + U</kbd>         |                                 |                                   |                             |
+| Toggle underline                               | <kbd>Alt + N</kbd>                |                                 |                                   |                             |
+| Transform selections to lowercase              | <kbd>Alt + L</kbd>                |                                 |                                   | <kbd>Ctrl + U</kbd>         |
+| Transform selections to titlecase (capitalize) | <kbd>Alt + C</kbd>                |                                 |                                   |                             |
+| Transform selections to uppercase              | <kbd>Alt + U</kbd>                |                                 |                                   | <kbd>Ctrl + Shift + U</kbd> |
+| Trim selections                                | <kbd>Alt + T</kbd>                |                                 |                                   |                             |
+
+## ✌️⌨️ Double-Key commands
+
+Double key commands are feature used in JetBrains IDEs, that are 
+doing certain actions after specific key is pressed twice.
+
+Now Keyshots has two double-key commands:
+
+- <kbd>Ctrl</kbd> - Pressing and holding last key and then press <kbd>↑</kbd> or <kbd>↓</kbd> will
+add caret cursor just like `Add caret cursor up` or `Add caret cursor down` do
+- <kbd>Shift</kbd> - If you have internal plugin `Quick Switcher` enabled, then this shortcut will
+open quick switcher window just like <kbd>Ctrl + O</kbd> does
+
+If you do not like them, then you can disable them in settings.
 
 ## 🎛️ Settings
 
@@ -108,6 +137,9 @@ You can choose from these IDEs presets:
 - Microsoft Visual Studio
 - Keyshots default hotkeys mappings
 
+You can change it also via modal window inside obsidian that you can
+open with command "Change Keyshots preset" with <kbd>Ctrl + Shift + P</kbd> shortcut.
+
 ## ⚠️ Possible conflicts:
 
 Some IDE commands have hotkey, that is already set to another Obsidian action and that results into conflict.
@@ -115,7 +147,7 @@ Some IDE commands have hotkey, that is already set to another Obsidian action an
 Here is list of all possible conflicts:
 
 | Hotkey                        | Visual Studio Code     | JetBrains IDEs         | Microsoft Visual Studio | Obsidian Action                     |
-| ----------------------------- | ---------------------- | ---------------------- | ----------------------- | ----------------------------------- |
+|-------------------------------|------------------------|------------------------|-------------------------|-------------------------------------|
 | <kbd>Ctrl + L</kbd>           | Expand line selections |                        |                         | Toggle checkbox status              |
 | <kbd>Ctrl + Enter</kbd>       | Insert line below      |                        | Insert line above       | Open link under cursor in new tab   |
 | <kbd>Ctrl + W</kbd>           |                        | Expand line selections |                         | Close current tab                   |
@@ -123,6 +155,9 @@ Here is list of all possible conflicts:
 
 ### My conflicts handling
 
-For default Keyshots mappings I will take care of all conflicts with Obsidian hotkeys. However mind that I can take care of obsidian hotkeys only meaning that plugins hotkeys are irrelevant and impossible to handle due to unlimited plugin amount. 
+For default Keyshots mappings I will take care of all conflicts with Obsidian hotkeys. However mind that I can take care
+of obsidian hotkeys only meaning that plugins hotkeys are irrelevant and impossible to handle due to unlimited plugin
+amount.
 
-Also obsidian team recommends to don't set default hotkeys for commands and that is why Keyshots installs with "clear" preset!
+Also, obsidian team recommends to don't set default hotkeys for commands and that is why Keyshots installs with "clear"
+preset!

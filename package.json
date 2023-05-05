@@ -1,6 +1,6 @@
 {
 	"name": "obsidian-keyshots",
-	"version": "1.5.0",
+	"version": "2.0.0",
 	"description": "",
 	"main": "main.js",
 	"scripts": {
@@ -9,7 +9,7 @@
 		"version": "node version-bump.mjs && git add manifest.json versions.json"
 	},
 	"keywords": [],
-	"author": "",
+	"author": "KrazyManJ",
 	"license": "MIT",
 	"devDependencies": {
 		"@types/node": "^16.11.6",

@@ -15,21 +15,21 @@ export const COMMANDS = (plugin: KeyshotsPlugin, map: KeyshotsMap): Command[] =>
     * =======================================================================================
     */
     {
-        id: 'toggle-readable-length',
-        name: "Toggle readable line length (setting)",
-        hotkeys: map.toggle_readable_length,
+        id: 'switch-readable-length-setting',
+        name: "Switch 'readable line length' setting",
+        hotkeys: map.switch_readable_length_setting,
         callback: () => functions.flipBooleanSetting(plugin.app, 'readableLineLength')
     },
     {
-        id: 'toggle-line-numbers',
-        name: "Toggle line numbers (setting)",
-        hotkeys: map.toggle_line_numbers,
+        id: 'switch-line-numbers-setting',
+        name: "Switch 'line numbers' setting",
+        hotkeys: map.switch_line_numbers_setting,
         callback: () => functions.flipBooleanSetting(plugin.app, 'showLineNumber')
     },
     {
-        id: 'toggle-inline-title',
-        name: "Toggle inline title (setting)",
-        hotkeys: map.toggle_inline_title,
+        id: 'switch-inline-title-setting',
+        name: "Switch 'inline title' setting",
+        hotkeys: map.switch_inline_title_setting,
         callback: () => functions.flipBooleanSetting(plugin.app, 'showInlineTitle')
     },
     /*
@@ -39,20 +39,20 @@ export const COMMANDS = (plugin: KeyshotsPlugin, map: KeyshotsMap): Command[] =>
     */
     {
         id: 'change-keyshots-preset',
-        name: "Change Keyshots Preset",
-        hotkeys: map.change_hotkeys_presets,
+        name: "Change Keyshots preset",
+        hotkeys: map.change_keyshots_preset,
         callback: () => new IDEPresetModal(plugin).open()
     },
     {
-        id: 'toggle-keyshots-case-sensitivity',
-        name: "Toggle Keyshots case sensitivity",
-        hotkeys: map.toggle_keyshots_case_sensitivity,
+        id: 'switch-keyshots-case-sensitivity',
+        name: "Switch Keyshots case sensitivity",
+        hotkeys: map.switch_keyshots_case_sensitivity,
         callback: () => functions.toggleCaseSensitivity(plugin)
     },
     {
-        id: 'open-keyshots-settings',
-        name: "Open Keyshots settings",
-        hotkeys: map.open_keyshots_settings,
+        id: 'open-keyshots-settings-tab',
+        name: "Open Keyshots settings tab",
+        hotkeys: map.open_keyshots_settings_tab,
         callback: () => functions.openKeyshotsSettings(app)
     },
     /*
@@ -145,17 +145,17 @@ export const COMMANDS = (plugin: KeyshotsPlugin, map: KeyshotsMap): Command[] =>
     * =======================================================================================
     */
     {
-        id: 'add-carets-up',
+        id: 'add-caret-up',
         name: 'Add caret cursor up',
         repeatable: true,
-        hotkeys: map.add_carets_up,
+        hotkeys: map.add_caret_up,
         editorCallback: (editor) => functions.addCarets(editor, VerticalDirection.UP, 0)
     },
     {
-        id: 'add-carets-down',
+        id: 'add-caret-down',
         name: 'Add caret cursor down',
         repeatable: true,
-        hotkeys: map.add_carets_down,
+        hotkeys: map.add_caret_down,
         editorCallback: (editor) => functions.addCarets(editor, VerticalDirection.DOWN, editor.lineCount())
     },
     {
@@ -188,47 +188,47 @@ export const COMMANDS = (plugin: KeyshotsPlugin, map: KeyshotsMap): Command[] =>
         editorCallback: (editor) => functions.replaceSelections(editor, (s) => s.trim())
     },
     {
-        id: 'transform-from-to-snake-case',
-        name: "Transform selections from / to Snakecase",
-        hotkeys: map.transform_from_to_snakecase,
+        id: 'toggle-snake-case',
+        name: "Toggle selections snakecase",
+        hotkeys: map.toggle_snakecase,
         editorCallback: (editor) => functions.convertOneToOtherChars(editor, " ", "_")
     },
     {
-        id: 'transform-from-to-kebab-case',
-        name: "Transform selections from / to Kebabcase",
-        hotkeys: map.transform_from_to_kebabcase,
+        id: 'toggle-kebab-case',
+        name: "Toggle selections kebabcase",
+        hotkeys: map.toggle_kebabcase,
         editorCallback: (editor) => functions.convertOneToOtherChars(editor, " ", "-")
     },
     {
-        id: 'encode-or-decode-uri',
-        name: "Encode / Decode URI selections",
-        hotkeys: map.encode_or_decode_uri,
+        id: 'toggle-uri-encoded-or-decoded',
+        name: "Toggle selections URI encoded/decoded string",
+        hotkeys: map.toggle_uri_encoded_or_decoded,
         editorCallback: (editor) => functions.convertURI(editor)
     },
     {
         id: 'transform-selections-to-lowercase',
-        name: "Transform selections to Lowercase",
+        name: "Transform selections to lowercase",
         hotkeys: map.transform_selections_to_lowercase,
         editorCallback: (editor) => functions.replaceSelections(editor, (s) => s.toLowerCase())
     },
     {
         id: 'transform-selections-to-uppercase',
-        name: "Transform selections to Uppercase",
+        name: "Transform selections to uppercase",
         hotkeys: map.transform_selections_to_uppercase,
         editorCallback: (editor) => functions.replaceSelections(editor, (s) => s.toUpperCase())
     },
     {
         id: 'transform-selections-to-titlecase',
-        name: "Transform selections to Titlecase (Capitalize)",
+        name: "Transform selections to titlecase (capitalize)",
         hotkeys: map.transform_selections_to_titlecase,
         editorCallback: (editor) => functions.replaceSelections(editor, (s) =>
             s.replace(/\w\S*/g, (txt) => txt.charAt(0).toUpperCase() + txt.substring(1).toLowerCase())
         )
     },
     {
-        id: 'toggle-case',
+        id: 'toggle-case-jetbrains',
         name: "Toggle case (JetBrains)",
-        hotkeys: map.toggle_case,
+        hotkeys: map.toggle_case_jetbrains,
         editorCallback: (editor) => functions.replaceSelections(editor, (str) => str === str.toLowerCase() ? str.toUpperCase() : str.toLowerCase())
     },
     /*
@@ -238,59 +238,65 @@ export const COMMANDS = (plugin: KeyshotsPlugin, map: KeyshotsMap): Command[] =>
     */
     {
         id: 'multi-toggle-bold',
-        name: "Multi Toggle Bold",
+        name: "Multi-toggle bold",
         hotkeys: map.multi_toggle_bold,
         editorCallback: (editor) => functions.surroundWithChars(editor, "**")
     },
     {
         id: 'multi-toggle-italic',
-        name: "Multi Toggle Italic",
+        name: "Multi-toggle italic",
         hotkeys: map.multi_toggle_italic,
         editorCallback: (editor) => functions.surroundWithChars(editor, "*")
     },
     {
         id: 'multi-toggle-code',
-        name: "Multi Toggle Code",
+        name: "Multi-toggle code",
         hotkeys: map.multi_toggle_code,
         editorCallback: (editor) => functions.surroundWithChars(editor, "``")
     },
     {
         id: 'multi-toggle-highlight',
-        name: "Multi Toggle Highlight",
+        name: "Multi-toggle highlight",
         hotkeys: map.multi_toggle_highlight,
         editorCallback: (editor) => functions.surroundWithChars(editor, "==")
     },
     {
         id: 'multi-toggle-comment',
-        name: "Multi Toggle Comment",
+        name: "Multi-toggle comment",
         hotkeys: map.multi_toggle_comment,
         editorCallback: (editor) => functions.surroundWithChars(editor, "%%")
     },
     {
         id: 'multi-toggle-strikethrough',
-        name: "Multi Toggle Strikethrough",
+        name: "Multi-toggle strikethrough",
         hotkeys: map.multi_toggle_strikethrough,
         editorCallback: (editor) => functions.surroundWithChars(editor, "~~")
     },
     {
         id: 'toggle-underline',
-        name: "Toggle Underline",
+        name: "Toggle underline",
         hotkeys: map.toggle_underline,
         editorCallback: (editor) => functions.surroundWithChars(editor, "<u>", "</u>")
     },
     {
-        id: 'toggle-keybinding',
-        name: "Toggle Keybinding tag (<kbd>)",
-        hotkeys: map.toggle_keybinding,
+        id: 'toggle-keyboard-input',
+        name: "Toggle keyboard input (<kbd>)",
+        hotkeys: map.toggle_keyboard_input,
         editorCallback: (editor) => functions.surroundWithChars(editor, "<kbd>", "</kbd>")
     },
     {
         id: 'insert-code-block',
-        name: "Insert Code Block",
-        hotkeys: map.insert_codeblock,
+        name: "Insert code block",
+        hotkeys: map.insert_code_block,
         editorCallback: (editor) => new CodeBlockModal(
             plugin, (item) => functions.insertCodeBlock(editor, item)
         ).open()
+    },
+    {
+        id: 'insert-ordinal-numbering',
+        name: "Insert ordinal numbering",
+        hotkeys: map.insert_ordinal_numbering,
+        editorCallback: (editor) => functions.insertOrdinalNumbering(editor)
     },
     /*
     * =======================================================================================
@@ -299,10 +305,10 @@ export const COMMANDS = (plugin: KeyshotsPlugin, map: KeyshotsMap): Command[] =>
     */
     {
         id: 'open-dev-tools',
-        name: "Open Developer Tools",
+        name: "Open developer tools",
         hotkeys: map.open_dev_tools,
         callback: () => electron.remote.getCurrentWindow().webContents.openDevTools()
-    }
+    },
 ]
 
 declare interface PluginConditionalObject<T> {
