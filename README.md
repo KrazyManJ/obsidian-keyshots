@@ -1,7 +1,7 @@
 <a href="https://github.com/KrazyManJ/obsidian-keyshots">
     <picture>
-        <source media="(prefers-color-scheme: dark)" srcset="./assets/readme_banner_dark.svg">
-        <img width="100%" alt="" src="./assets/readme_banner_light.svg">
+        <source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/KrazyManJ/obsidian-keyshots/master/assets/readme_banner_dark.svg">
+        <img width="100%" alt="" src="https://raw.githubusercontent.com/KrazyManJ/obsidian-keyshots/master/assets/readme_banner_light.svg">
     </picture>
 </a>
 
