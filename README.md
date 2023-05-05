@@ -1,6 +1,11 @@
 <a href="https://github.com/KrazyManJ/obsidian-keyshots">
-    <img src="assets/readme_banner.svg" alt="xd" width="100%">
+    <picture>
+        <source media="(prefers-color-scheme: dark)" srcset="assets/readme_banner_dark.svg">
+        <img width="100%" alt="" src="assets/readme_banner_light.svg">
+    </picture>
 </a>
+
+
 
 Keyshots is an [Obsidian](https://obsidian.md) plugin that adds classic hotkey/shortcuts commands from popular IDEs like
 Visual Studio Code or JetBrains Family.
