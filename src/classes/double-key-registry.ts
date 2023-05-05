@@ -1,4 +1,4 @@
-import KeyshotsPlugin from "./plugin";
+import KeyshotsPlugin from "../plugin";
 
 
 export interface DoubleKeyCommand {
@@ -35,7 +35,7 @@ export default class DoubleKeyRegistry {
     private activeCmdId?: string = undefined
 
     private setStatusBarState(commandName?: string){
-        this.statusBarItem.setText(commandName ? "🟩" : "🟥")
+        this.statusBarItem.setText(commandName ? "🟩" : "🟨")
         this.statusBarItem.setAttr("aria-label", "Keyshots: " +(commandName
             ? `command "${commandName}" is active`
             : `no double-key command active`

@@ -1,12 +1,12 @@
 import EditorSelectionManipulator from "./classes/editor-selection-manipulator";
-import {App, Editor, EditorRange, EditorSelection, Notice, VaultConfig} from "obsidian";
+import {App, Editor, EditorRange, MarkdownView, Notice, VaultConfig} from "obsidian";
 import KeyshotsPlugin from "./plugin";
 import {PrismLanguage} from "./mappings/prism-langs";
-import {lowestSelection, selectionsProcessor, selectionsUpdater, selectionValuesEqual} from "./selections-processor";
+import SelectionsProcessing from "./classes/selections-processing"
 import {VerticalDirection} from "./classes/vertical-direction";
 
 export function moveLine(editor: Editor, direction: VerticalDirection, border: number) {
-    selectionsProcessor(editor, undefined, (sel) => {
+    SelectionsProcessing.selectionsProcessor(editor, undefined, (sel) => {
         if (direction === 1 ? sel.asNormalized().head.line === border : sel.asNormalized().anchor.line === border) return sel
         const replaceSel = sel.asNormalized().moveLines(
             direction === -1 ? direction : 0,
@@ -27,7 +27,7 @@ export function moveLine(editor: Editor, direction: VerticalDirection, border: n
 }
 
 export function jetBrainsDuplicate(editor: Editor) {
-    selectionsProcessor(editor, undefined, (sel) => {
+    SelectionsProcessing.selectionsProcessor(editor, undefined, (sel) => {
         if (sel.isCaret()) {
             const tx = sel.anchor.getLine()
             sel.anchor.setLine(tx + "\n" + tx)
@@ -40,7 +40,7 @@ export function jetBrainsDuplicate(editor: Editor) {
 }
 
 export function vscodeDuplicate(editor: Editor, direction: VerticalDirection) {
-    selectionsProcessor(editor, undefined, (sel) => {
+    SelectionsProcessing.selectionsProcessor(editor, undefined, (sel) => {
         if (sel.isCaret()) {
             const tx = sel.anchor.getLine()
             sel.anchor.setLine(tx + "\n" + tx)
@@ -78,7 +78,7 @@ export function addCarets(editor: Editor, direction: VerticalDirection, border: 
 }
 
 export function insertLine(editor: Editor, direction: VerticalDirection) {
-    selectionsProcessor(editor, (s) => s.sort((a, b) => a.anchor.line - b.anchor.line), (sel, index) => {
+    SelectionsProcessing.selectionsProcessor(editor, (s) => s.sort((a, b) => a.anchor.line - b.anchor.line), (sel, index) => {
         const a = (ln: number) => {
             const tx = [editor.getLine(ln), "\n"]
             if (direction < 0) tx.reverse()
@@ -98,13 +98,11 @@ export function flipBooleanSetting(app: App, setting: keyof VaultConfig) {
 }
 
 export function replaceSelections(editor: Editor, transformFct: (val: string) => string) {
-    EditorSelectionManipulator.listSelections(editor).filter(s => !s.isCaret()).forEach(sel =>
-        sel.normalize().replaceText(transformFct(sel.normalize().getText()))
-    )
+    SelectionsProcessing.selectionsReplacer(editor, transformFct)
 }
 
 export function convertURI(editor: Editor) {
-    replaceSelections(editor, (s) => {
+    SelectionsProcessing.selectionsReplacer(editor, (s) => {
         try {
             const decoded = decodeURI(s)
             if (decoded === s) return encodeURI(s)
@@ -117,7 +115,7 @@ export function convertURI(editor: Editor) {
 
 export function splitSelectedTextOnNewLine(editor: Editor) {
     let index = 0
-    selectionsProcessor(editor, arr => arr.sort((a, b) => a.anchor.line - b.anchor.line), sel => {
+    SelectionsProcessing.selectionsProcessor(editor, arr => arr.sort((a, b) => a.anchor.line - b.anchor.line), sel => {
         if (sel.isCaret()) return sel
         else {
             const replaceSel = sel.moveLines(index).normalize()
@@ -130,7 +128,7 @@ export function splitSelectedTextOnNewLine(editor: Editor) {
 }
 
 export function sortSelectedLines(editor: Editor) {
-    selectionsProcessor(editor, arr => arr.filter(s => !s.isCaret()), sel => {
+    SelectionsProcessing.selectionsProcessor(editor, arr => arr.filter(s => !s.isCaret()), sel => {
         const replaceSel = sel.asNormalized().expand()
         replaceSel.replaceText(replaceSel.getText()
             .split("\n")
@@ -146,8 +144,8 @@ export function selectWordInstances(editor: Editor, case_sensitive: boolean) {
     let range: EditorRange | undefined;
     if (selections.filter(s => s.isCaret()).length > 0) {
         selections.filter(s => s.isCaret()).forEach((sel, i) => selections[i] = sel.selectWord())
-    } else if (selections.filter(s => !s.isCaret()).length === selections.length && selectionValuesEqual(editor, selections, case_sensitive)) {
-        const sel = lowestSelection(selections).normalize()
+    } else if (selections.filter(s => !s.isCaret()).length === selections.length && SelectionsProcessing.selectionValuesEqual(selections, case_sensitive)) {
+        const sel = SelectionsProcessing.lowestSelection(selections).normalize()
         const tx = !case_sensitive ? sel.getText().toLowerCase() : sel.getText()
 
         const match = (!case_sensitive ? editor.getValue().toLowerCase() : editor.getValue()).substring(sel.head.toOffset()).match(tx)
@@ -182,7 +180,7 @@ export function selectWordInstances(editor: Editor, case_sensitive: boolean) {
 export function selectAllWordInstances(editor: Editor, case_sensitive: boolean) {
     const selections: EditorSelectionManipulator[] = EditorSelectionManipulator.listSelections(editor)
     selections.filter(s => s.isCaret()).forEach((sel, i) => selections[i] = sel.selectWord())
-    if (selections.filter(s => !s.isCaret()).length === selections.length && selectionValuesEqual(editor, selections, case_sensitive)) {
+    if (selections.filter(s => !s.isCaret()).length === selections.length && SelectionsProcessing.selectionValuesEqual(selections, case_sensitive)) {
         const tx = selections[0].getText()
         Array.from(editor.getValue().matchAll(new RegExp(tx, "g" + (case_sensitive ? "" : "i"))), v => v.index || 0)
             .forEach(v => {
@@ -193,7 +191,7 @@ export function selectAllWordInstances(editor: Editor, case_sensitive: boolean) 
 }
 
 export function expandSelections(editor: Editor) {
-    selectionsProcessor(editor, undefined, sel => sel.expand())
+    SelectionsProcessing.selectionsProcessor(editor, undefined, sel => sel.expand())
 }
 
 export async function toggleCaseSensitivity(plugin: KeyshotsPlugin) {
@@ -204,8 +202,8 @@ export async function toggleCaseSensitivity(plugin: KeyshotsPlugin) {
 }
 
 export function splitSelectionsByLines(editor: Editor) {
-    selectionsUpdater(editor, undefined, sel => {
-        const selections: EditorSelection[] = [];
+    SelectionsProcessing.selectionsUpdater(editor, undefined, sel => {
+        const selections: EditorSelectionManipulator[] = [];
         if (sel.isCaret() || sel.isOneLine()) selections.push(sel)
         else {
             sel.normalize()
@@ -219,7 +217,7 @@ export function splitSelectionsByLines(editor: Editor) {
 }
 
 export function shuffleSelectedLines(editor: Editor, rounds: number) {
-    selectionsProcessor(editor, arr => arr.filter(s => !s.isCaret()), sel => {
+    SelectionsProcessing.selectionsProcessor(editor, arr => arr.filter(s => !s.isCaret()), sel => {
         const replaceSel = sel.asNormalized().expand()
         let txt = replaceSel.getText()
         for (let i = 0; i < rounds; i++) txt = txt.split("\n").sort(() => Math.random() - 0.5).join("\n")
@@ -246,26 +244,43 @@ export function convertOneToOtherChars(editor: Editor, first: string, second: st
 }
 
 export function surroundWithChars(editor: Editor, chars: string, endchars?: string) {
-    selectionsProcessor(editor, undefined, (sel) => {
+    SelectionsProcessing.selectionsProcessor(editor, undefined, (sel) => {
         const surroundSel = sel.clone().normalize().moveChars(-chars.length, (endchars ?? chars).length);
         if (surroundSel.getText().startsWith(chars) && surroundSel.getText().endsWith(endchars ?? chars)) {
             return surroundSel.replaceText(
                 surroundSel.getText().substring(chars.length, surroundSel.getText().length - (endchars ?? chars).length)
             ).moveChars(0, -chars.length - (endchars ?? chars).length)
         }
-        return sel.replaceText(chars + sel.getText() + (endchars ?? chars)).moveChars(chars.length)
+        return sel.replaceText(chars + sel.getText() + (endchars ?? chars)).moveChars(chars.length, sel.isOneLine() ? chars.length : 0)
     })
 }
 
 export function insertCodeBlock(editor: Editor, lang: PrismLanguage) {
     let moveLine = 0;
-    selectionsProcessor(editor, undefined, (sel) => {
+    SelectionsProcessing.selectionsProcessor(editor, undefined, (sel) => {
         sel.moveLines(moveLine)
-        moveLine += sel.linesCount+1
+        moveLine += sel.linesCount + 1
         return sel.normalize()
             .replaceText(`\n\`\`\`${lang.id}\n${sel.getText()}\n\`\`\`\n`)
             .moveLines(2)
             .setChars(0)
             .expand()
     })
+}
+
+export function addCaretsViaDoubleKey(plugin: KeyshotsPlugin, ev: KeyboardEvent) {
+    if (!["ArrowUp", "ArrowDown"].includes(ev.key)) return
+    ev.preventDefault()
+    const view = plugin.app.workspace.getActiveViewOfType(MarkdownView)
+    if (!view) return;
+    addCarets(
+        view.editor,
+        ev.key === "ArrowUp" ? VerticalDirection.UP : VerticalDirection.DOWN,
+        ev.key === "ArrowUp" ? 0 : view.editor.lineCount()
+    )
+}
+
+export function runCommandById(plugin: KeyshotsPlugin, id: string, notAvailableCallback: () => void) {
+    if (plugin.app.internalPlugins.plugins[id.split(":")[0]]) plugin.app.commands.executeCommandById(id)
+    else notAvailableCallback()
 }

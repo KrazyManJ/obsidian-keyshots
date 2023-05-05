@@ -1,8 +1,8 @@
-import {Command, MarkdownView, Notice} from "obsidian";
+import {Command, Notice} from "obsidian";
 import * as functions from "./functions";
 import {KeyshotsMap} from "./mappings/hotkeys"
 import KeyshotsPlugin from "./plugin";
-import {DoubleKeyCommand} from "./double-key-registry";
+import {DoubleKeyCommand} from "./classes/double-key-registry";
 import IDEPresetModal from "./components/ide-preset-modal";
 import CodeBlockModal from "./components/code-block-modal";
 import {VerticalDirection} from "./classes/vertical-direction";
@@ -282,14 +282,14 @@ export const COMMANDS = (plugin: KeyshotsPlugin, map: KeyshotsMap): Command[] =>
         id: 'toggle-keybinding',
         name: "Toggle Keybinding tag (<kbd>)",
         hotkeys: map.toggle_keybinding,
-        editorCallback: (editor) => functions.surroundWithChars(editor, "<kbd>","</kbd>")
+        editorCallback: (editor) => functions.surroundWithChars(editor, "<kbd>", "</kbd>")
     },
     {
         id: 'insert-code-block',
         name: "Insert Code Block",
         hotkeys: map.insert_codeblock,
         editorCallback: (editor) => new CodeBlockModal(
-            plugin,(item) => functions.insertCodeBlock(editor,item)
+            plugin, (item) => functions.insertCodeBlock(editor, item)
         ).open()
     },
     /*
@@ -319,30 +319,19 @@ export const DOUBLE_KEY_COMMANDS = (plugin: KeyshotsPlugin): PluginConditionalOb
             name: "Add caret cursors",
             key: "Control",
             maxDelay: 1000,
-            anotherKeyPressedCallback: (ev) => {
-                if (!["ArrowUp","ArrowDown"].includes(ev.key)) return
-                ev.preventDefault()
-                const view = plugin.app.workspace.getActiveViewOfType(MarkdownView)
-                if (!view) return;
-                functions.addCarets(
-                    view.editor,
-                    ev.key === "ArrowUp" ? VerticalDirection.UP : VerticalDirection.DOWN,
-                    ev.key === "ArrowUp" ? 0 : view.editor.lineCount()
-                )
-            }
+            anotherKeyPressedCallback: (ev) => functions.addCaretsViaDoubleKey(plugin,ev)
         }
     },
     {
         conditional: (plugin) => plugin.settings.quick_switch_via_double_shift,
-        object:{
+        object: {
             id: "quick-open",
             name: "Open Quick-Switcher",
             key: "Shift",
             maxDelay: 1000,
-            lastPressedCallback: () => {
-                if (app.internalPlugins.plugins["switcher"]) app.commands.executeCommandById("switcher:open")
-                else new Notice("Quick Switcher plugin is not enabled!")
-            }
+            lastPressedCallback: () => functions.runCommandById(plugin,"switcher:open",
+                () => new Notice("Quick Switcher plugin is not enabled!")
+            )
         }
     }
 ]

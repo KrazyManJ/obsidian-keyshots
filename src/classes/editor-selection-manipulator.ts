@@ -99,9 +99,10 @@ export default class EditorSelectionManipulator implements EditorSelection, Java
         return this.editor.getRange(...this.asFromToPoints())
     }
 
-    replaceText(to: string): this {
+    replaceText(to: string, resize = false): this {
         this.sizeChange = to.length-this.getText().length
         this.editor.replaceRange(to, ...this.asFromToPoints())
+        if (resize) this.moveChars(0,this.sizeChange)
         return this
     }
 

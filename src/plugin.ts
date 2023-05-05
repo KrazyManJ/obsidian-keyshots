@@ -2,7 +2,7 @@ import {Plugin} from 'obsidian';
 import {mapBySettings} from "./mappings/hotkeys";
 import {DEFAULT_SETTINGS, KeyshotsSettings} from "./settings";
 import {COMMANDS, DOUBLE_KEY_COMMANDS} from "./commands";
-import DoubleKeyRegistry from "./double-key-registry";
+import DoubleKeyRegistry from "./classes/double-key-registry";
 import {KeyshotsSettingTab} from "./components/settings-tab";
 
 
