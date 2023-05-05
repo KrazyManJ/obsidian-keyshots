@@ -15,16 +15,16 @@ export default class KeyshotsPlugin extends Plugin {
     async onload() {
         await this.loadSettings()
         this.addSettingTab(new KeyshotsSettingTab(this.app, this))
-        this.loadCommands()
         this.doubleKeyRegistry = new DoubleKeyRegistry(this)
         this.loadDoubleKeyCommands()
+        this.loadCommands()
     }
 
     loadCommands() {
         if (this.commandIds !== undefined) {
             if (!this.settings.carets_via_double_ctrl) return;
             this.commandIds.forEach(cmd => this.app.commands.removeCommand(cmd))
-            this._events.splice(1)
+            this._events.splice(5)
         }
         this.commandIds = new Set(COMMANDS(this, mapBySettings(this)).map(cmd => this.addCommand(cmd).id));
     }
