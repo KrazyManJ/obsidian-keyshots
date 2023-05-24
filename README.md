@@ -7,62 +7,60 @@ Visual Studio Code or JetBrains Family.
 
 ## 🌟 Features 
 
-**NOTE**: Checked are already implemented and working, unchecked are planned to be implemented.
-
 ### Switch Obsidian Settings in editor
 
-- [X] Readable line length
-- [X] Show line number
-- [X] Show inline title
+- Readable line length
+- Show line number
+- Show inline title
 
 ### Editor line(s) Actions
 
-- [X] Move line(s) up or down
-- [X] Duplicate line(s) or selection(s)
-- [X] Insert line(s) above or below
-- [X] Join selected line(s)
-- [X] Split selection(s) on new line
-- [X] Expand line selection(s)
-- [X] Sort selected lines
-- [X] Shuffle selected lines
-- [ ] *Reverse lines*
+- Move line(s) up or down
+- Duplicate line(s) or selection(s)
+- Insert line(s) above or below
+- Join selected line(s)
+- Split selection(s) on new line
+- Expand line selection(s)
+- Sort selected lines
+- Shuffle selected lines
+- *Reverse lines (not implemented yet)*
 
 ### Caret/selections add/remove
 
-- [X] Add caret (text cursor) up or down
-- [X] Select all or multiple word instances
-- [X] Split selections by lines
+- Add caret (text cursor) up or down
+- Select all or multiple word instances
+- Split selections by lines
 
 ### Transform selections
 
-- [X] Trim selections
+- Trim selections
 - **Toggle case**:
-  - [X] Snake
-  - [X] Kebab
-  - [X] Lowercase
-  - [X] Uppercase
-  - [X] Titlecase
+  - Snake
+  - Kebab
+  - Lowercase
+  - Uppercase
+  - Titlecase
 - **Multi-toggle**:
-  - [X] Bold
-  - [X] Italic
-  - [X] Code
-  - [X] Highlight
-  - [X] Comment
-  - [X] Strikethrough
-  - [X] Underline
-  - [X] Keyboard input (\<kbd\>)
+  - Bold
+  - Italic
+  - Code
+  - Highlight
+  - Comment
+  - Strikethrough
+  - Underline
+  - Keyboard input (\<kbd\>)
 
 ### Insert components in editor
 
-- [X] Insert ordinal numbering
-- [X] Insert code block
+- Insert ordinal numbering
+- Insert code block
 
 ### Others
 
-- [X] Open developer tools
-- [X] Change Keyshots preset inside editor
-- [X] Switch Keyshots case sensitivity for commands
-- [X] Open Keyshots settings tab
+- Open developer tools
+- Change Keyshots preset inside editor
+- Switch Keyshots case sensitivity for commands
+- Open Keyshots settings tab
 
 ## 🌠 Visual examples
 
