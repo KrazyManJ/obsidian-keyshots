@@ -5,7 +5,66 @@
 Keyshots is an [Obsidian](https://obsidian.md) plugin that adds classic hotkey/shortcuts commands from popular IDEs like
 Visual Studio Code or JetBrains Family.
 
-Apart from that, i want to add as much my custom and usefull commands as possible!
+## 🌟 Features 
+
+**NOTE**: Checked are already implemented and working, unchecked are planned to be implemented.
+
+### Switch Obsidian Settings in editor
+
+- [X] Readable line length
+- [X] Show line number
+- [X] Show inline title
+
+### Editor line(s) Actions
+
+- [X] Move line(s) up or down
+- [X] Duplicate line(s) or selection(s)
+- [X] Insert line(s) above or below
+- [X] Join selected line(s)
+- [X] Split selection(s) on new line
+- [X] Expand line selection(s)
+- [X] Sort selected lines
+- [X] Shuffle selected lines
+- [ ] *Reverse lines*
+
+### Caret/selections add/remove
+
+- [X] Add caret (text cursor) up or down
+- [X] Select all or multiple word instances
+- [X] Split selections by lines
+
+### Transform selections
+
+- [X] Trim selections
+- **Toggle case**:
+  - [X] Snake
+  - [X] Kebab
+  - [X] Lowercase
+  - [X] Uppercase
+  - [X] Titlecase
+- **Multi-toggle**:
+  - [X] Bold
+  - [X] Italic
+  - [X] Code
+  - [X] Highlight
+  - [X] Comment
+  - [X] Strikethrough
+  - [X] Underline
+  - [X] Keyboard input (\<kbd\>)
+
+### Insert components in editor
+
+- [X] Insert ordinal numbering
+- [X] Insert code block
+
+### Others
+
+- [X] Open developer tools
+- [X] Change Keyshots preset inside editor
+- [X] Switch Keyshots case sensitivity for commands
+- [X] Open Keyshots settings tab
+
+## 🌠 Visual examples
 
 Keyshots adds actions like move line up or down...
 
