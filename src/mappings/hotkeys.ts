@@ -26,6 +26,7 @@ export declare interface KeyshotsMap {
     multi_toggle_strikethrough?: Hotkey[]
     open_dev_tools?: Hotkey[]
     open_keyshots_settings_tab?: Hotkey[]
+    reverse_selected_lines?: Hotkey[]
     select_all_word_instances?: Hotkey[]
     select_multiple_word_instances?: Hotkey[]
     shuffle_selected_lines?: Hotkey[]
@@ -71,6 +72,7 @@ export const DEFAULT_MAP: KeyshotsMap = {
     multi_toggle_strikethrough: HotKey("M", "Mod", "Shift"),
     open_dev_tools: HotKey("F12"),
     open_keyshots_settings_tab: HotKey(",", "Mod", "Alt"),
+    reverse_selected_lines: undefined,
     select_all_word_instances: HotKey("L", "Mod", "Shift"),
     select_multiple_word_instances: HotKey("D", "Mod"),
     shuffle_selected_lines: HotKey("S", "Mod", "Shift", "Alt"),

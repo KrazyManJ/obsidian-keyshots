@@ -139,6 +139,12 @@ export const COMMANDS = (plugin: KeyshotsPlugin, map: KeyshotsMap): Command[] =>
         hotkeys: map.shuffle_selected_lines,
         editorCallback: (editor) => functions.shuffleSelectedLines(editor, plugin.settings.shuffle_rounds_amount)
     },
+    {
+        id: 'reverse-selected-lines',
+        name: "Reverse selected lines",
+        hotkeys: map.reverse_selected_lines,
+        editorCallback: (editor) => functions.reverseSelectedLines(editor)
+    },
     /*
     * =======================================================================================
     * SELECTIONS ADDING/REMOVING

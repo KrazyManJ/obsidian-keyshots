@@ -293,3 +293,11 @@ export function insertOrdinalNumbering(editor: Editor) {
         return sel.replaceText((index+1).toString(),true)
     })
 }
+
+export function reverseSelectedLines(editor: Editor) {
+    SelectionsProcessing.selectionsProcessor(editor, arr => arr.filter(s => !s.isCaret()), sel => {
+        const replaceSel = sel.asNormalized().expand()
+        replaceSel.replaceText(replaceSel.getText().split("\n").reverse().join("\n"))
+        return sel
+    })
+}
