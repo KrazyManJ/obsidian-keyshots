@@ -301,3 +301,16 @@ export function reverseSelectedLines(editor: Editor) {
         return sel
     })
 }
+
+export function insertCallout(editor: Editor, id: string) {
+    let moveLine = 0;
+    SelectionsProcessing.selectionsProcessor(editor, undefined, (sel) => {
+        sel.moveLines(moveLine)
+        moveLine += sel.linesCount - 2
+        return sel.normalize()
+            .replaceText(`\n>[!${id}]\n${sel.getText().split("\n").map(p => "> "+p).join("\n")}\n`)
+            .moveLines(2)
+            .expand()
+            .moveChars(2,0)
+    })
+}

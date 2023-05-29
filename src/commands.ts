@@ -6,6 +6,7 @@ import {DoubleKeyCommand} from "./classes/double-key-registry";
 import IDEPresetModal from "./components/ide-preset-modal";
 import CodeBlockModal from "./components/code-block-modal";
 import {VerticalDirection} from "./classes/vertical-direction";
+import CalloutPickerModal from "./components/callout-picker-modal";
 
 
 export const COMMANDS = (plugin: KeyshotsPlugin, map: KeyshotsMap): Command[] => [
@@ -296,6 +297,13 @@ export const COMMANDS = (plugin: KeyshotsPlugin, map: KeyshotsMap): Command[] =>
         hotkeys: map.insert_code_block,
         editorCallback: (editor) => new CodeBlockModal(
             plugin, (item) => functions.insertCodeBlock(editor, item)
+        ).open()
+    },
+    {
+        id: 'better-insert-callout',
+        name: "Better insert callout",
+        editorCallback: (editor) => new CalloutPickerModal(
+            plugin, (item) => functions.insertCallout(editor,item)
         ).open()
     },
     {
