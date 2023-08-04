@@ -338,7 +338,7 @@ export const DOUBLE_KEY_COMMANDS = (plugin: KeyshotsPlugin): PluginConditionalOb
             id: "add-caret",
             name: "Add caret cursors",
             key: "Control",
-            maxDelay: 1000,
+            maxDelay: 400,
             anotherKeyPressedCallback: (ev) => functions.addCaretsViaDoubleKey(plugin,ev)
         }
     },
@@ -348,7 +348,7 @@ export const DOUBLE_KEY_COMMANDS = (plugin: KeyshotsPlugin): PluginConditionalOb
             id: "quick-open",
             name: "Open Quick-Switcher",
             key: "Shift",
-            maxDelay: 1000,
+            maxDelay: 400,
             lastPressedCallback: () => functions.runCommandById(plugin,"switcher:open",
                 () => new Notice("Quick Switcher plugin is not enabled!")
             )

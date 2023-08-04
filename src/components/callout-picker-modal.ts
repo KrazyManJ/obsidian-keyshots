@@ -1,6 +1,6 @@
 import {Component, MarkdownRenderer} from "obsidian";
 import KeyshotsPlugin from "../plugin";
-import {CallbackSuggestModal} from "./abstract/callback-modal";
+import {CallbackSuggestModal} from "./abstract/callback-suggest-modal";
 
 export default class CalloutPickerModal extends CallbackSuggestModal<string> {
 

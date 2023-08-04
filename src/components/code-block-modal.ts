@@ -1,6 +1,6 @@
 import {PRISM_LANGS, PrismLanguage} from "../mappings/prism-langs";
 import KeyshotsPlugin from "../plugin";
-import {CallbackFuzzySuggestModal} from "./abstract/callback-modal";
+import {CallbackFuzzySuggestModal} from "./abstract/callback-suggest-modal";
 
 export default class CodeBlockModal extends CallbackFuzzySuggestModal<PrismLanguage> {
 

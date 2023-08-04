@@ -2,7 +2,6 @@ import {FuzzySuggestModal, SuggestModal} from "obsidian";
 import KeyshotsPlugin from "../../plugin";
 
 export abstract class CallbackSuggestModal<T> extends SuggestModal<T> {
-
     private readonly onSelectCallback
 
     protected constructor(app: KeyshotsPlugin, onSelectCallback: (item: T, evt: MouseEvent | KeyboardEvent) => void) {
