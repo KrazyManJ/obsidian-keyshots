@@ -1,6 +1,8 @@
 import esbuild from "esbuild";
 import process from "process";
 import builtins from 'builtin-modules'
+import DEV_TEST_PLUGIN_PATH from "./scripts/paths.mjs";
+
 
 const banner =
 `/*
@@ -38,5 +40,5 @@ esbuild.build({
 	logLevel: "info",
 	sourcemap: prod ? false : 'inline',
 	treeShaking: true,
-	outfile: 'main.js',
+	outfile: DEV_TEST_PLUGIN_PATH+'/main.js',
 }).catch(() => process.exit(1));
