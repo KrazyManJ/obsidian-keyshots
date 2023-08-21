@@ -1,0 +1,58 @@
+div.keyshots-table-modal {
+    .desc {
+        font-style: italic;
+        font-size: 0.9em;
+        text-align: center;
+        margin-top: 0;
+    }
+    .divider {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 1em;
+
+        .opt {
+            flex: 1;
+        }
+
+        .geometry-label {
+            font-family: var(--font-monospace);
+            text-align: center;
+            line-height: 2em;
+            height: 2em;
+        }
+
+        table {
+            margin-left: auto;
+            margin-right: auto;
+            border-spacing: 0;
+            td {
+                width: 1.5em;
+                height: 1.5em;
+                transition: background-color ease-in-out .05s;
+                cursor: pointer;
+                position: relative;
+
+                &:nth-child(1){
+                    opacity: 0.5;
+                    cursor: initial;
+                }
+                &::before {
+                    border: 0.1px solid #888;
+                    content: "";
+                    display: block;
+                    width: calc(100% - 0.3em);
+                    height: calc(100% - 0.3em);
+                    border-radius: 3px;
+                    position: absolute;
+                    top: 50%;
+                    left: 50%;
+                    transform: translate(-50%,-50%);
+                }
+                &.hovered::before {
+                    background: #313131;
+                }
+            }
+        }
+    }
+}

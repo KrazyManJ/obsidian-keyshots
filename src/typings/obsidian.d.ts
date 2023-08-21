@@ -31,15 +31,20 @@ declare module 'obsidian' {
         enabled: boolean
     }
 
-    interface PluginManager {
+    interface InternalPluginManager {
         plugins: Record<string,InternalPlugin>
+    }
+
+    interface CommunityPluginManager {
+        enabledPlugins: Set<string>
     }
 
     interface App {
         commands: CommandManager
         setting: SettingManager
         vault: Vault
-        internalPlugins: PluginManager
+        internalPlugins: InternalPluginManager
+        plugins: CommunityPluginManager
     }
 
 

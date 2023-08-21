@@ -7,6 +7,7 @@ import IDEPresetModal from "./components/ide-preset-modal";
 import CodeBlockModal from "./components/code-block-modal";
 import {VerticalDirection} from "./classes/vertical-direction";
 import CalloutPickerModal from "./components/callout-picker-modal";
+import TableModal from "./components/table-modal";
 
 
 export const COMMANDS = (plugin: KeyshotsPlugin, map: KeyshotsMap): Command[] => [
@@ -311,6 +312,11 @@ export const COMMANDS = (plugin: KeyshotsPlugin, map: KeyshotsMap): Command[] =>
         name: "Insert ordinal numbering",
         hotkeys: map.insert_ordinal_numbering,
         editorCallback: (editor) => functions.insertOrdinalNumbering(editor)
+    },
+    {
+        id: 'insert-table',
+        name: "Insert Table",
+        editorCallback: (editor) => new TableModal(plugin.app, editor).open()
     },
     /*
     * =======================================================================================
