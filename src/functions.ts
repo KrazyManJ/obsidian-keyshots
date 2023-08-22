@@ -316,11 +316,12 @@ export function insertCallout(editor: Editor, id: string) {
 }
 
 export function insertTable(editor: Editor, rows: number, column: number) {
-    SelectionsProcessing.selectionsProcessor(editor, undefined, (sel) => {
-        return sel.normalize().replaceText(
-            `\n|${"   |".repeat(column)}\n|${"---|".repeat(column)}${("\n|"+"   |".repeat(column)).repeat(rows)}\n`
+    SelectionsProcessing.selectionsProcessor(editor, undefined, (sel) =>
+        sel.normalize()
+            .replaceText(
+            `\n|${"     |".repeat(column)}\n|${" --- |".repeat(column)}${("\n|"+"     |".repeat(column)).repeat(rows)}\n`
         )
             .moveLines(1)
             .moveChars(2)
-    })
+    )
 }

@@ -6,6 +6,7 @@ const HotKey = (key: string, ...modifiers: Modifier[]): Hotkey[] => [{key: key, 
 export declare interface KeyshotsMap {
     add_caret_down?: Hotkey[]
     add_caret_up?: Hotkey[]
+    better_insert_callout?: Hotkey[]
     change_keyshots_preset?: Hotkey[]
     duplicate_line_down?: Hotkey[]
     duplicate_line_up?: Hotkey[]
@@ -15,6 +16,7 @@ export declare interface KeyshotsMap {
     insert_line_above?: Hotkey[]
     insert_line_below?: Hotkey[]
     insert_ordinal_numbering?: Hotkey[]
+    insert_table?: Hotkey[]
     join_selected_lines?: Hotkey[]
     move_line_down?: Hotkey[]
     move_line_up?: Hotkey[]
@@ -52,11 +54,13 @@ export declare interface KeyshotsMap {
 export const DEFAULT_MAP: KeyshotsMap = {
     add_caret_down: HotKey("ArrowDown", "Mod", "Alt"),
     add_caret_up: HotKey("ArrowUp", "Mod", "Alt"),
+    better_insert_callout: undefined,
     change_keyshots_preset: HotKey("P", "Mod", "Shift"),
     duplicate_line_down: HotKey("ArrowDown", "Shift", "Alt"),
     duplicate_line_up: HotKey("ArrowUp", "Shift", "Alt"),
     duplicate_selection_or_line: HotKey("D", "Mod", "Alt"),
     expand_line_selections: HotKey("E", "Alt"),
+    insert_table: undefined,
     insert_code_block: HotKey("`", "Mod", "Shift"),
     insert_line_above: HotKey("Enter", "Ctrl", "Shift"),
     insert_line_below: HotKey("Enter", "Shift"),

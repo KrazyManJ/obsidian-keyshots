@@ -303,6 +303,7 @@ export const COMMANDS = (plugin: KeyshotsPlugin, map: KeyshotsMap): Command[] =>
     {
         id: 'better-insert-callout',
         name: "Better insert callout",
+        hotkeys: map.better_insert_callout,
         editorCallback: (editor) => new CalloutPickerModal(
             plugin, (item) => functions.insertCallout(editor,item)
         ).open()
@@ -316,7 +317,11 @@ export const COMMANDS = (plugin: KeyshotsPlugin, map: KeyshotsMap): Command[] =>
     {
         id: 'insert-table',
         name: "Insert Table",
-        editorCallback: (editor) => new TableModal(plugin.app, editor).open()
+        hotkeys: map.insert_table,
+        editorCallback: (editor) => new TableModal(plugin.app, (data) => {
+            functions.insertTable(editor, data.rows, data.columns)
+            editor.focus()
+        }).open()
     },
     /*
     * =======================================================================================
