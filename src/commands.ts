@@ -325,6 +325,32 @@ export const COMMANDS = (plugin: KeyshotsPlugin, map: KeyshotsMap): Command[] =>
     },
     /*
     * =======================================================================================
+    * RENDERED CONTROL
+    * =======================================================================================
+    */
+    {
+        id: 'open-all-foldable-callouts',
+        name: "Open all foldable callouts",
+        callback: () => document.querySelectorAll("div.callout.is-collapsible.is-collapsed div.callout-title").forEach(c =>
+            (c as HTMLDivElement).click()
+        )
+    },
+    {
+        id: 'close-all-foldable-callouts',
+        name: "Close all foldable callouts",
+        callback: () => document.querySelectorAll("div.callout.is-collapsible:not(.is-collapsed) div.callout-title").forEach(c =>
+            (c as HTMLDivElement).click()
+        )
+    },
+    {
+        id: 'toggle-all-callouts-fold-state',
+        name: "Toggle all callouts fold state",
+        callback: () => document.querySelectorAll("div.callout div.callout-title").forEach(c =>
+            (c as HTMLDivElement).click()
+        )
+    },
+    /*
+    * =======================================================================================
     * OTHERS
     * =======================================================================================
     */
