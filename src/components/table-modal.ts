@@ -1,23 +1,21 @@
-import {App, Modal, Notice, Setting} from "obsidian";
+import {App, Notice, Setting} from "obsidian";
+import CallbackModal from "./abstract/callback-modal";
 
 interface TableData {
     rows: number
     columns: number
 }
 
-export default class TableModal extends Modal {
-
-    private readonly confirmCallback: (data: TableData) => void;
+export default class TableModal extends CallbackModal<TableData> {
 
     constructor(app: App, confirmCallback: (data: TableData) => void) {
-        super(app);
-        this.confirmCallback = confirmCallback;
+        super(app, "Insert Table", confirmCallback);
     }
 
     onOpen() {
-        const {contentEl} = this;
-        this.titleEl.createEl("h1", {"text": "Insert Table"});
-        this.containerEl.classList.add("keyshots-table-modal");
+        super.onOpen()
+        const { contentEl, containerEl } = this;
+        containerEl.classList.add("keyshots-table-modal");
 
         contentEl.createEl("p", {
             "cls": "desc",
@@ -41,8 +39,7 @@ export default class TableModal extends Modal {
                 const td = tr.createEl("td");
                 if (j == 0) continue;
                 td.addEventListener("click", () => {
-                    this.close();
-                    this.confirmCallback({
+                    this.successClose({
                         rows: i + 1,
                         columns: j + 1
                     });
@@ -90,16 +87,11 @@ export default class TableModal extends Modal {
                         new Notice("⚠️ Error: Invalid input of row or column values!");
                         return;
                     }
-                    this.close();
-                    this.confirmCallback({
+                    this.successClose({
                         rows: Math.max(2, data.row),
                         columns: Math.max(2, data.column)
                     });
                 })
             );
-    }
-
-    onClose() {
-        this.containerEl.empty();
     }
 }

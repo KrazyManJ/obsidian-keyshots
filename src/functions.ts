@@ -325,3 +325,8 @@ export function insertTable(editor: Editor, rows: number, column: number) {
             .moveChars(2)
     )
 }
+
+export function replaceRegex(editor: Editor, regex: RegExp, replacer: string, onlySelection: boolean){
+    if (onlySelection) SelectionsProcessing.selectionsReplacer(editor, (val) => val.replace(regex, replacer))
+    else editor.setValue(editor.getValue().replace(regex, replacer))
+}

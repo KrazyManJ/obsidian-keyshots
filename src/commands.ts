@@ -8,6 +8,7 @@ import CodeBlockModal from "./components/code-block-modal";
 import {VerticalDirection} from "./classes/vertical-direction";
 import CalloutPickerModal from "./components/callout-picker-modal";
 import TableModal from "./components/table-modal";
+import RegexModal from "./components/regex-modal";
 
 
 export const COMMANDS = (plugin: KeyshotsPlugin, map: KeyshotsMap): Command[] => [
@@ -321,7 +322,7 @@ export const COMMANDS = (plugin: KeyshotsPlugin, map: KeyshotsMap): Command[] =>
         editorCallback: (editor) => new TableModal(plugin.app, (data) => {
             functions.insertTable(editor, data.rows, data.columns)
             editor.focus()
-        }).open()
+        })
     },
     /*
     * =======================================================================================
@@ -360,6 +361,15 @@ export const COMMANDS = (plugin: KeyshotsPlugin, map: KeyshotsMap): Command[] =>
         hotkeys: map.open_dev_tools,
         callback: () => electron.remote.getCurrentWindow().webContents.openDevTools()
     },
+    {
+        id: 'replace-by-regex',
+        name: "Replace by regex",
+        editorCallback: (editor) => new RegexModal(plugin.app, "Replace by regex", data => {
+                functions.replaceRegex(editor, data.regex, data.replacer, data.only_selections)
+                editor.focus()
+            })
+
+    }
 ]
 
 declare interface PluginConditionalObject<T> {

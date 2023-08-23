@@ -8,6 +8,7 @@ export declare interface KeyshotsMap {
     add_caret_up?: Hotkey[]
     better_insert_callout?: Hotkey[]
     change_keyshots_preset?: Hotkey[]
+    close_all_foldable_callouts?: Hotkey[]
     duplicate_line_down?: Hotkey[]
     duplicate_line_up?: Hotkey[]
     duplicate_selection_or_line?: Hotkey[]
@@ -26,6 +27,7 @@ export declare interface KeyshotsMap {
     multi_toggle_highlight?: Hotkey[]
     multi_toggle_italic?: Hotkey[]
     multi_toggle_strikethrough?: Hotkey[]
+    open_all_foldable_callouts?: Hotkey[]
     open_dev_tools?: Hotkey[]
     open_keyshots_settings_tab?: Hotkey[]
     reverse_selected_lines?: Hotkey[]
@@ -39,6 +41,7 @@ export declare interface KeyshotsMap {
     switch_keyshots_case_sensitivity?: Hotkey[]
     switch_line_numbers_setting?: Hotkey[]
     switch_readable_length_setting?: Hotkey[]
+    toggle_all_callouts_fold_state?: Hotkey[]
     toggle_case_jetbrains?: Hotkey[]
     toggle_kebabcase?: Hotkey[]
     toggle_keyboard_input?: Hotkey[]
@@ -56,6 +59,7 @@ export const DEFAULT_MAP: KeyshotsMap = {
     add_caret_up: HotKey("ArrowUp", "Mod", "Alt"),
     better_insert_callout: undefined,
     change_keyshots_preset: HotKey("P", "Mod", "Shift"),
+    close_all_foldable_callouts: undefined,
     duplicate_line_down: HotKey("ArrowDown", "Shift", "Alt"),
     duplicate_line_up: HotKey("ArrowUp", "Shift", "Alt"),
     duplicate_selection_or_line: HotKey("D", "Mod", "Alt"),
@@ -74,6 +78,7 @@ export const DEFAULT_MAP: KeyshotsMap = {
     multi_toggle_highlight: HotKey("H", "Mod", "Shift"),
     multi_toggle_italic: HotKey("I","Mod", "Shift"),
     multi_toggle_strikethrough: HotKey("M", "Mod", "Shift"),
+    open_all_foldable_callouts: undefined,
     open_dev_tools: HotKey("F12"),
     open_keyshots_settings_tab: HotKey(",", "Mod", "Alt"),
     reverse_selected_lines: undefined,
@@ -87,6 +92,7 @@ export const DEFAULT_MAP: KeyshotsMap = {
     switch_keyshots_case_sensitivity: HotKey("I", "Mod", "Alt"),
     switch_line_numbers_setting: HotKey("N", "Mod", "Alt"),
     switch_readable_length_setting: HotKey("R", "Mod", "Alt"),
+    toggle_all_callouts_fold_state: undefined,
     toggle_case_jetbrains: HotKey("U", "Ctrl", "Shift"),
     toggle_kebabcase: HotKey("-", "Alt"),
     toggle_keyboard_input: HotKey("K", "Mod", "Shift"),
