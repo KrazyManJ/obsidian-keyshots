@@ -8,7 +8,8 @@ import CodeBlockModal from "./components/code-block-modal";
 import {VerticalDirection} from "./classes/vertical-direction";
 import CalloutPickerModal from "./components/callout-picker-modal";
 import TableModal from "./components/table-modal";
-import RegexModal from "./components/regex-modal";
+import RegexReplaceModal from "./components/regex-replace-modal";
+import {countRegexMatches} from "./functions";
 
 
 export const COMMANDS = (plugin: KeyshotsPlugin, map: KeyshotsMap): Command[] => [
@@ -306,7 +307,7 @@ export const COMMANDS = (plugin: KeyshotsPlugin, map: KeyshotsMap): Command[] =>
         name: "Better insert callout",
         hotkeys: map.better_insert_callout,
         editorCallback: (editor) => new CalloutPickerModal(
-            plugin, (item) => functions.insertCallout(editor,item)
+            plugin, (item) => functions.insertCallout(editor, item)
         ).open()
     },
     {
@@ -322,7 +323,7 @@ export const COMMANDS = (plugin: KeyshotsPlugin, map: KeyshotsMap): Command[] =>
         editorCallback: (editor) => new TableModal(plugin.app, (data) => {
             functions.insertTable(editor, data.rows, data.columns)
             editor.focus()
-        })
+        }).open()
     },
     /*
     * =======================================================================================
@@ -364,11 +365,13 @@ export const COMMANDS = (plugin: KeyshotsPlugin, map: KeyshotsMap): Command[] =>
     {
         id: 'replace-by-regex',
         name: "Replace by regex",
-        editorCallback: (editor) => new RegexModal(plugin.app, "Replace by regex", data => {
-                functions.replaceRegex(editor, data.regex, data.replacer, data.only_selections)
-                editor.focus()
-            })
-
+        editorCallback: (editor) => new RegexReplaceModal(plugin.app,
+                data => {
+                    functions.replaceRegex(editor, data.pattern, data.replacer, data.only_selections);
+                    editor.focus();
+                },
+                data => countRegexMatches(editor, data.pattern, data.only_selections)
+        ).open()
     }
 ]
 
@@ -386,7 +389,7 @@ export const DOUBLE_KEY_COMMANDS = (plugin: KeyshotsPlugin): PluginConditionalOb
             name: "Add caret cursors",
             key: "Control",
             maxDelay: 400,
-            anotherKeyPressedCallback: (ev) => functions.addCaretsViaDoubleKey(plugin,ev)
+            anotherKeyPressedCallback: (ev) => functions.addCaretsViaDoubleKey(plugin, ev)
         }
     },
     {
@@ -396,7 +399,7 @@ export const DOUBLE_KEY_COMMANDS = (plugin: KeyshotsPlugin): PluginConditionalOb
             name: "Open Quick-Switcher",
             key: "Shift",
             maxDelay: 400,
-            lastPressedCallback: () => functions.runCommandById(plugin,"switcher:open",
+            lastPressedCallback: () => functions.runCommandById(plugin, "switcher:open",
                 () => new Notice("Quick Switcher plugin is not enabled!")
             )
         }

@@ -17,10 +17,8 @@ export default class IDEPresetModal extends SuggestModal<IDEInfo>{
     }
 
     async onChooseSuggestion(item: IDEInfo, evt: MouseEvent | KeyboardEvent) {
-        this.plugin.settings.ide_mappings = Object.keys(IDE_LABELS).filter(f => IDE_LABELS[f] === item)[0]
-        this.plugin.loadCommands()
+        await this.plugin.changePreset(Object.keys(IDE_LABELS).filter(f => IDE_LABELS[f] === item)[0])
         new Notice(`✅ Preset successfully changed to "${item.name}"!`)
-        await this.plugin.saveSettings()
     }
 
     renderSuggestion(value: IDEInfo, el: HTMLElement) {

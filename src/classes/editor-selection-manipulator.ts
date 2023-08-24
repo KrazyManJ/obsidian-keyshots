@@ -116,6 +116,11 @@ export default class EditorSelectionManipulator implements EditorSelection, Java
         return this
     }
 
+    collapse(): this {
+        if (!this.isCaret()) this.head = this.anchor.clone()
+        return this;
+    }
+
     get linesCount() {
         const norm = this.asNormalized()
         return norm.head.line - norm.anchor.line + 1

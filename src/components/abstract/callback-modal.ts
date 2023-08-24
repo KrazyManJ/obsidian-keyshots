@@ -9,7 +9,6 @@ export default abstract class CallbackModal<T> extends Modal {
         super(app);
         this.confirmCallback = confirmCallback;
         this.modalTitle = modalTitle
-        this.open()
     }
 
     protected successClose(data: T){

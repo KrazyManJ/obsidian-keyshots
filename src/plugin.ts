@@ -4,6 +4,7 @@ import {DEFAULT_SETTINGS, KeyshotsSettings} from "./settings";
 import {COMMANDS, DOUBLE_KEY_COMMANDS} from "./commands";
 import DoubleKeyRegistry from "./classes/double-key-registry";
 import {KeyshotsSettingTab} from "./components/settings-tab";
+import {IDE_LABELS} from "./mappings/ide-info";
 
 
 export default class KeyshotsPlugin extends Plugin {
@@ -33,6 +34,20 @@ export default class KeyshotsPlugin extends Plugin {
         DOUBLE_KEY_COMMANDS(this)
             .filter(cmd => cmd.conditional(this))
             .forEach(cmd => this.doubleKeyRegistry.registerCommand(cmd.object))
+    }
+
+    public async changePreset(presetId: string) {
+        if (!Object.keys(IDE_LABELS).contains(presetId)) {
+            console.warn("Keyshots: Invalid attempt to change Keyshots mappings preset, incorrect preset ID.")
+            return;
+        }
+        this.settings.ide_mappings = presetId;
+        this.loadCommands()
+        await this.saveSettings()
+    }
+
+    public availablePresets() {
+        return Object.keys(IDE_LABELS)
     }
 
     async loadSettings() {

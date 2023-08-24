@@ -36,9 +36,7 @@ export class KeyshotsSettingTab extends PluginSettingTab {
                 }, {}))
                 .setValue(this.plugin.settings.ide_mappings)
                 .onChange(async (value) => {
-                    this.plugin.settings.ide_mappings = value
-                    this.plugin.loadCommands()
-                    await this.plugin.saveSettings()
+                    await this.plugin.changePreset(value)
                 })
             )
         new Setting(containerEl)

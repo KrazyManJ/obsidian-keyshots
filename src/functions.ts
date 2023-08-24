@@ -75,7 +75,7 @@ export function addCarets(editor: Editor, direction: VerticalDirection, border: 
     selections.unshift(main)
     editor.setSelections(selections)
     editor.scrollIntoView(newSel.anchor.clone().setPos(
-        Math.min(editor.lineCount()-1,newSel.anchor.line+direction * 2), newSel.anchor.ch
+        Math.min(editor.lineCount() - 1, newSel.anchor.line + direction * 2), newSel.anchor.ch
     ).asEditorRange())
 }
 
@@ -289,8 +289,8 @@ export function runCommandById(keyshotsPlugin: KeyshotsPlugin, id: string, notAv
 }
 
 export function insertOrdinalNumbering(editor: Editor) {
-    SelectionsProcessing.selectionsProcessor(editor, undefined, (sel,index) => {
-        return sel.replaceText((index+1).toString(),true)
+    SelectionsProcessing.selectionsProcessor(editor, undefined, (sel, index) => {
+        return sel.replaceText((index + 1).toString(), true)
     })
 }
 
@@ -308,10 +308,10 @@ export function insertCallout(editor: Editor, id: string) {
         sel.moveLines(moveLine)
         moveLine += sel.linesCount - 2
         return sel.normalize()
-            .replaceText(`\n>[!${id}]\n${sel.getText().split("\n").map(p => "> "+p).join("\n")}\n`)
+            .replaceText(`\n>[!${id}]\n${sel.getText().split("\n").map(p => "> " + p).join("\n")}\n`)
             .moveLines(2)
             .expand()
-            .moveChars(2,0)
+            .moveChars(2, 0)
     })
 }
 
@@ -319,14 +319,19 @@ export function insertTable(editor: Editor, rows: number, column: number) {
     SelectionsProcessing.selectionsProcessor(editor, undefined, (sel) =>
         sel.normalize()
             .replaceText(
-            `\n|${"     |".repeat(column)}\n|${" --- |".repeat(column)}${("\n|"+"     |".repeat(column)).repeat(rows)}\n`
-        )
+                `\n|${"     |".repeat(column)}\n|${" --- |".repeat(column)}${("\n|" + "     |".repeat(column)).repeat(rows)}\n`
+            )
             .moveLines(1)
             .moveChars(2)
     )
 }
 
-export function replaceRegex(editor: Editor, regex: RegExp, replacer: string, onlySelection: boolean){
+export function replaceRegex(editor: Editor, regex: RegExp, replacer: string, onlySelection: boolean) {
     if (onlySelection) SelectionsProcessing.selectionsReplacer(editor, (val) => val.replace(regex, replacer))
     else editor.setValue(editor.getValue().replace(regex, replacer))
+}
+
+export function countRegexMatches(editor: Editor, regex: RegExp, onlySelection: boolean) {
+    return (onlySelection ? EditorSelectionManipulator.listSelections(editor).map(s => s.getText()) : [editor.getValue()])
+        .map(v => (v.match(regex) || []).length).reduce((part, a) => part + a, 0)
 }
