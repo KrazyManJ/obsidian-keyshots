@@ -64,6 +64,29 @@ div.keyshots-regex-modal {
             border-color: rgba(var(--color-red-rgb),0.5);
         }
     }
+    .last {
+        border-bottom: 1px solid var(--background-modifier-border)
+    }
+    div.test {
+        display: flex;
+        margin-bottom: 1em;
+        gap: 1em;
+        & > * {
+            flex: 1;
+        }
+        textarea {
+            resize: vertical;
+        }
+        pre {
+            background-color: var(--code-background);
+            font-family: var(--font-text);
+            border-radius: var(--radius-s);
+            padding: var(--size-4-2);
+            white-space: pre-wrap;
+            margin: 0;
+            font-size: var(--font-ui-small);
+        }
+    }
     div.matches {
         transition: color ease-in-out 0.15s;
         &.invalid{

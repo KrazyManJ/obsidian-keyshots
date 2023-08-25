@@ -15,9 +15,9 @@ export default class RegexReplaceModal extends CallbackModal<RegexReplaceData> {
 
     onRegexChangeCallback: (data: RegexMatchCountData) => number
 
-    constructor(app: App, confirmCallback: (data: RegexReplaceData) => void,
+    constructor(app: App, modalTitle: string, confirmCallback: (data: RegexReplaceData) => void,
                 onRegexChangeCallback: (data: RegexMatchCountData) => number) {
-        super(app, "Replace by RegEx (Regular Expression)", confirmCallback);
+        super(app, modalTitle, confirmCallback);
         this.onRegexChangeCallback = onRegexChangeCallback
     }
 
@@ -41,6 +41,7 @@ export default class RegexReplaceModal extends CallbackModal<RegexReplaceData> {
         }
         const updateModalState = () => {
             const regex = buildRegex()
+            updateTest()
             if (!regex) {
                 patternInput.inputEl.classList.add("invalid")
                 counter.nameEl.classList.add("invalid")
@@ -59,6 +60,7 @@ export default class RegexReplaceModal extends CallbackModal<RegexReplaceData> {
         let patternInput: TextComponent
         new Setting(contentEl)
             .setName("Pattern")
+            .setDesc("Regular Expression pattern to select text for replacement.")
             .addText(cb => patternInput = cb
                 .setValue(data.pattern)
                 .setPlaceholder("(.*)")
@@ -69,13 +71,18 @@ export default class RegexReplaceModal extends CallbackModal<RegexReplaceData> {
             )
         new Setting(contentEl)
             .setName("Replacer")
+            .setDesc("Text for replacement, can capture groups made by Pattern.")
             .addText(cb => cb
                 .setValue(data.replacer)
                 .setPlaceholder("$1")
-                .onChange(v => data.replacer = v)
+                .onChange(v => {
+                    data.replacer = v
+                    updateTest()
+                })
             )
         new Setting(contentEl)
             .setName("Case sensitive")
+            .setDesc("If should RegEx care about difference between capital or non-capital letters.")
             .addToggle(cb => cb
                 .setValue(data.case_sensitive)
                 .onChange(v => {
@@ -84,7 +91,9 @@ export default class RegexReplaceModal extends CallbackModal<RegexReplaceData> {
                 })
             )
         new Setting(contentEl)
-            .setName("Only already selected")
+            .setName("Replace in already made selections only")
+            .setDesc("If replace action should be applied only in current selections in the editor.")
+            .setClass("last")
             .addToggle(cb => cb
                 .setValue(data.only_selections)
                 .onChange(v => {
@@ -92,6 +101,16 @@ export default class RegexReplaceModal extends CallbackModal<RegexReplaceData> {
                     updateModalState()
                 })
             )
+        contentEl.createEl("h2", {"text": "Testing"})
+        const testEl = contentEl.createEl("div", "test")
+        const testInput = testEl.createEl("textarea",{attr: {placeholder: "Write your test text here..."}})
+        const testOutput = testEl.createEl("pre")
+        const updateTest = () => {
+            const regex = buildRegex()
+            testOutput.textContent = regex ? testInput.value.replace(regex, data.replacer) : testInput.value
+        }
+        testInput.addEventListener("input",() => updateTest())
+
         let button: ButtonComponent;
         const counter = new Setting(contentEl)
             .addButton(cb => button = cb

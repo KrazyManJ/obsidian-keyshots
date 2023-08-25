@@ -364,8 +364,8 @@ export const COMMANDS = (plugin: KeyshotsPlugin, map: KeyshotsMap): Command[] =>
     },
     {
         id: 'replace-by-regex',
-        name: "Replace by regex",
-        editorCallback: (editor) => new RegexReplaceModal(plugin.app,
+        name: "Replace by RegEx (Regular Expression)",
+        editorCallback: (editor) => new RegexReplaceModal(plugin.app, "Replace by RegEx (Regular Expression)",
                 data => {
                     functions.replaceRegex(editor, data.pattern, data.replacer, data.only_selections);
                     editor.focus();
