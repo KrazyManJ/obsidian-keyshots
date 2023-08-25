@@ -5,63 +5,6 @@
 Keyshots is an [Obsidian](https://obsidian.md) plugin that adds classic hotkey/shortcuts commands from popular IDEs like
 Visual Studio Code or JetBrains Family.
 
-## 🌟 Features 
-
-### Switch Obsidian Settings in editor
-
-- Readable line length
-- Show line number
-- Show inline title
-
-### Editor line(s) Actions
-
-- Move line(s) up or down
-- Duplicate line(s) or selection(s)
-- Insert line(s) above or below
-- Join selected line(s)
-- Split selection(s) on new line
-- Expand line selection(s)
-- Sort selected lines
-- Shuffle selected lines
-- *Reverse lines (not implemented yet)*
-
-### Caret/selections add/remove
-
-- Add caret (text cursor) up or down
-- Select all or multiple word instances
-- Split selections by lines
-
-### Transform selections
-
-- Trim selections
-- **Toggle case**:
-  - Snake
-  - Kebab
-  - Lowercase
-  - Uppercase
-  - Titlecase
-- **Multi-toggle**:
-  - Bold
-  - Italic
-  - Code
-  - Highlight
-  - Comment
-  - Strikethrough
-  - Underline
-  - Keyboard input (\<kbd\>)
-
-### Insert components in editor
-
-- Insert ordinal numbering
-- Insert code block
-
-### Others
-
-- Open developer tools
-- Change Keyshots preset inside editor
-- Switch Keyshots case sensitivity for commands
-- Open Keyshots settings tab
-
 ## 🌠 Visual examples
 
 Keyshots adds actions like move line up or down...
@@ -118,10 +61,10 @@ Keyshots adds actions like move line up or down...
 
 ...**and much more commands to explore!**  *(And more are comming soon)*
 
-## ⌨️ IDE Mappings
+## ⌨️ List of Keyshots commands with IDE Mappings
 
 Here is a full list of all mappings that are available. If any of hotkey for IDE action is missing, Keyshots mappings
-hotkey is used instead.
+hotkey is used instead *(This behavior can be changed in settings)*.
 
 | Command Name                                   | Keyshots Mappings                 | Visual Studio Code              | JetBrains IDEs                    | Microsoft Visual Studio     |
 |------------------------------------------------|-----------------------------------|---------------------------------|-----------------------------------|-----------------------------|
@@ -212,7 +155,7 @@ Here is list of all possible conflicts:
 
 ### My conflicts handling
 
-For default Keyshots mappings I will take care of all conflicts with Obsidian hotkeys. However mind that I can take care
+For default Keyshots mappings I will take care of all conflicts with Obsidian hotkeys. However, mind that I can take care
 of obsidian hotkeys only meaning that plugins hotkeys are irrelevant and impossible to handle due to unlimited plugin
 amount.
 

@@ -50,6 +50,10 @@ export default class KeyshotsPlugin extends Plugin {
         return Object.keys(IDE_LABELS)
     }
 
+    public getPresetTitle(presetId: string) {
+        return IDE_LABELS[presetId].name
+    }
+
     async loadSettings() {
         this.settings = Object.assign({}, DEFAULT_SETTINGS, await this.loadData());
     }
