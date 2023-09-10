@@ -57,6 +57,9 @@ div.keyshots-table-modal {
     }
 }
 div.keyshots-regex-modal {
+    & > div.modal {
+        width: initial;
+    }
     input[type=text]{
         font-family: var(--font-monospace);
         &.invalid {
