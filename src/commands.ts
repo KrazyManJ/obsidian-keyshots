@@ -8,8 +8,8 @@ import CodeBlockModal from "./components/code-block-modal";
 import {VerticalDirection} from "./classes/vertical-direction";
 import CalloutPickerModal from "./components/callout-picker-modal";
 import TableModal from "./components/table-modal";
-import RegexReplaceModal from "./components/regex-replace-modal";
-import {countRegexMatches} from "./functions";
+import RegexReplaceModal from "./components/regex/regex-replace-modal";
+import RegexSearchModal from "./components/regex/regex-search-modal";
 
 
 enum Category {
@@ -207,11 +207,20 @@ export const COMMANDS = (plugin: KeyshotsPlugin, map: KeyshotsMap): KeyshotsComm
     {
         category: Category.REPLACE_SELECTIONS,
         id: 'replace-by-regex',
-        name: "Replace by RegEx (Regular Expression)",
-        editorCallback: (editor) => new RegexReplaceModal(plugin.app, "Replace by RegEx (Regular Expression)", data => {
-            functions.replaceRegex(editor, data.pattern, data.replacer, data.only_selections);
-            editor.focus();
-        }, data => countRegexMatches(editor, data.pattern, data.only_selections)).open()
+        name: "Replace by Regular Expression (Regex)",
+        editorCallback: (editor) => new RegexReplaceModal(plugin.app, editor.getValue(), "Replace by Regular Expression",
+            (data) => functions.replaceRegex(editor, data.pattern, data.replacer, data.only_selections),
+            (data) => functions.countRegexMatches(editor, data.pattern, data.only_selections)
+        ).open()
+    },
+    {
+        category: Category.SELECTION_ADD_OR_REMOVE,
+        id: 'search-by-regex',
+        name: "Search by Regular Expression (Regex)",
+        editorCallback: (editor) => new RegexSearchModal(plugin.app, editor.getValue(), "Search by Regular Expression",
+            (data) => functions.selectByRegex(editor, data.pattern, data.only_selections),
+            (data) => functions.countRegexMatches(editor, data.pattern, data.only_selections)
+        ).open()
     },
     {
         category: Category.REPLACE_SELECTIONS,

@@ -329,6 +329,30 @@ export function insertTable(editor: Editor, rows: number, column: number) {
 export function replaceRegex(editor: Editor, regex: RegExp, replacer: string, onlySelection: boolean) {
     if (onlySelection) SelectionsProcessing.selectionsReplacer(editor, (val) => val.replace(regex, replacer))
     else editor.setValue(editor.getValue().replace(regex, replacer))
+    editor.focus()
+}
+
+export function selectByRegex(editor: Editor, regex: RegExp, onlySelection: boolean) {
+    const selections: EditorSelectionManipulator[] = [];
+    if (onlySelection) {
+        EditorSelectionManipulator.listSelections(editor).forEach(sel => {
+            Array.from(sel.getText().matchAll(regex)).forEach(value => {
+                const i = value.index ?? 0;
+                selections.push(EditorSelectionManipulator.documentStart(editor)
+                    .moveChars(sel.asNormalized().anchor.toOffset())
+                    .moveChars(i,i+value[0].length)
+                )
+            })
+        })
+    }
+    else {
+        Array.from(editor.getValue().matchAll(regex)).forEach(value => {
+            const i = value.index ?? 0;
+            selections.push(EditorSelectionManipulator.documentStart(editor).moveChars(i,i+value[0].length))
+        })
+    }
+    editor.setSelections(selections.map(v => v.toEditorSelection()))
+    editor.focus()
 }
 
 export function countRegexMatches(editor: Editor, regex: RegExp, onlySelection: boolean) {
