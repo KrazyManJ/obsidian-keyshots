@@ -13,6 +13,11 @@ export const IDE_LABELS: Record<string,IDEInfo> = {
         description: "Everything is blank, default preset when you install Keyshots",
         svg_icon_content: svgs.EMPTY_SVG
     },
+    "keyshots": {
+        name: "Keyshots Default Mappings",
+        description: "Hotkeys designed by creator of Keyshots that are 100% conflict free with Obsidian",
+        svg_icon_content: svgs.KEYSHOTS_SVG(32)
+    },
     "vscode": {
         name: "Visual Studio Code",
         description: "Compact text editor and light IDE for Web or Python development",
@@ -28,9 +33,4 @@ export const IDE_LABELS: Record<string,IDEInfo> = {
         description: "IDE for making Windows desktop apps, or any other programs using C-Family languages or Visual Basic",
         svg_icon_content: svgs.VS_SVG
     },
-    "keyshots": {
-        name: "Keyshots Default Mappings",
-        description: "Hotkeys designed by creator of Keyshots that are 100% conflict free with Obsidian",
-        svg_icon_content: svgs.KEYSHOTS_SVG(32)
-    }
 }

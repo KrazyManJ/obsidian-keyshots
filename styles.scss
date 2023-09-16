@@ -56,51 +56,6 @@ div.keyshots-table-modal {
         }
     }
 }
-div.keyshots-regex-modal {
-    & > div.modal {
-        width: initial;
-    }
-    input[type=text]{
-        font-family: var(--font-monospace);
-        &.invalid {
-            box-shadow: 0 0 0 2px rgba(var(--color-red-rgb),0.5);
-            border-color: rgba(var(--color-red-rgb),0.5);
-        }
-    }
-    .last {
-        border-bottom: 1px solid var(--background-modifier-border)
-    }
-    div.test {
-        display: flex;
-        margin-bottom: 1em;
-        gap: 1em;
-        & > * {
-            flex: 1;
-        }
-        textarea {
-            resize: vertical;
-        }
-        pre {
-            background-color: var(--code-background);
-            font-family: var(--font-text);
-            border-radius: var(--radius-s);
-            padding: var(--size-4-2);
-            white-space: pre-wrap;
-            margin: 0;
-            font-size: var(--font-ui-small);
-        }
-    }
-    div.matches {
-        transition: color ease-in-out 0.15s;
-        &.invalid{
-            color: var(--text-error);
-        }
-    }
-    button:disabled {
-        opacity: 0.5;
-        cursor: not-allowed;
-    }
-}
 
 div.modal-container.keyshots-regex {
     & > div.modal {
@@ -125,13 +80,13 @@ div.modal-container.keyshots-regex {
                     margin: 0.2em;
                 }
                 div.preview {
-                    width: 400px;
+                    width: calc(400px / var(--zoom-factor));
                     aspect-ratio: 9/12;
                     padding: 1em;
                     box-sizing: border-box;
                     border: 1px solid var(--background-modifier-border);
                     border-radius: 0.5em;
-                    zoom: 0.75;
+                    zoom: 0.8;
                     overflow: auto;
                     &.raw {
                         white-space: pre;
@@ -152,6 +107,10 @@ div.modal-container.keyshots-regex {
             &.invalid{
                 color: var(--text-error);
             }
+        }
+        button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
         }
     }
 }

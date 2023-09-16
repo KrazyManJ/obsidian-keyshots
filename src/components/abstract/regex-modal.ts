@@ -1,6 +1,6 @@
 import CallbackModal from "./callback-modal";
 import {
-    App,
+    App, ButtonComponent,
     Component,
     MarkdownRenderer,
     Setting,
@@ -25,6 +25,7 @@ export default abstract class RegexModal<T extends BaseRegexData> extends Callba
 
     protected patternInput: TextComponent
     protected footer: Setting
+    protected button: ButtonComponent
 
     private previewEl: HTMLElement
     private preview: boolean
@@ -63,11 +64,13 @@ export default abstract class RegexModal<T extends BaseRegexData> extends Callba
             this.patternInput.inputEl.classList.add("invalid")
             this.footer.nameEl.classList.add("invalid")
             this.footer.setName(this.pattern === "" ? "Empty Pattern!" : "Invalid Pattern!")
+            this.button.setDisabled(true)
             return;
         }
         this.patternInput.inputEl.classList.remove("invalid")
         this.footer.nameEl.classList.remove("invalid")
         this.footer.setName("Matches: "+this.matchesCountCallback({pattern: regex, only_selections: this.only_selections}))
+        this.button.setDisabled(false)
     }
 
     protected updatePreview(){
@@ -142,15 +145,12 @@ export default abstract class RegexModal<T extends BaseRegexData> extends Callba
                 })
             )
         this.footer = new Setting(contentEl)
-            .addButton(cb => cb
+            .addButton(cb => this.button = cb
                 .setCta()
                 .setButtonText("Proceed")
                 .onClick(() => {
                     const regex = this.getRegex();
-                    if (regex) this.successClose({
-                        pattern: regex,
-                        only_selections: this.only_selections
-                    })
+                    if (regex) this.successClose(this.buildData())
                 })
             )
         this.footer.nameEl.classList.add("matches")

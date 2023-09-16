@@ -268,6 +268,7 @@ export function insertCodeBlock(editor: Editor, lang: PrismLanguage) {
             .setChars(0)
             .expand()
     })
+    editor.focus()
 }
 
 export function addCaretsViaDoubleKey(plugin: KeyshotsPlugin, ev: KeyboardEvent) {
@@ -313,6 +314,7 @@ export function insertCallout(editor: Editor, id: string) {
             .expand()
             .moveChars(2, 0)
     })
+    editor.focus();
 }
 
 export function insertTable(editor: Editor, rows: number, column: number) {
@@ -324,6 +326,7 @@ export function insertTable(editor: Editor, rows: number, column: number) {
             .moveLines(1)
             .moveChars(2)
     )
+    editor.focus()
 }
 
 export function replaceRegex(editor: Editor, regex: RegExp, replacer: string, onlySelection: boolean) {

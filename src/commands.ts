@@ -118,14 +118,18 @@ export const COMMANDS = (plugin: KeyshotsPlugin, map: KeyshotsMap): KeyshotsComm
         id: 'better-insert-callout',
         name: "Better insert callout",
         hotkeys: map.better_insert_callout,
-        editorCallback: (editor) => new CalloutPickerModal(plugin, (item) => functions.insertCallout(editor, item)).open()
+        editorCallback: (editor) => new CalloutPickerModal(plugin,
+            (item) => functions.insertCallout(editor, item)
+        ).open()
     },
     {
         category: Category.INSERT_COMPONENTS,
         id: 'insert-code-block',
         name: "Insert code block",
         hotkeys: map.insert_code_block,
-        editorCallback: (editor) => new CodeBlockModal(plugin, (item) => functions.insertCodeBlock(editor, item)).open()
+        editorCallback: (editor) => new CodeBlockModal(plugin,
+            (item) => functions.insertCodeBlock(editor, item)
+        ).open()
     },
     {
         category: Category.INSERT_COMPONENTS,
@@ -139,27 +143,29 @@ export const COMMANDS = (plugin: KeyshotsPlugin, map: KeyshotsMap): KeyshotsComm
         id: 'insert-table',
         name: "Insert Table",
         hotkeys: map.insert_table,
-        editorCallback: (editor) => new TableModal(plugin.app, (data) => {
-            functions.insertTable(editor, data.rows, data.columns);
-            editor.focus()
-        }).open()
+        editorCallback: (editor) => new TableModal(plugin.app,
+            (data) => functions.insertTable(editor, data.rows, data.columns)
+        ).open()
     },
     {
         category: Category.RENDERED_CONTROLING,
         id: 'close-all-foldable-callouts',
         name: "Close all foldable callouts",
+        hotkeys: map.close_all_foldable_callouts,
         callback: () => document.querySelectorAll("div.callout.is-collapsible:not(.is-collapsed) div.callout-title").forEach(c => (c as HTMLDivElement).click())
     },
     {
         category: Category.RENDERED_CONTROLING,
         id: 'open-all-foldable-callouts',
         name: "Open all foldable callouts",
+        hotkeys: map.open_all_foldable_callouts,
         callback: () => document.querySelectorAll("div.callout.is-collapsible.is-collapsed div.callout-title").forEach(c => (c as HTMLDivElement).click())
     },
     {
         category: Category.RENDERED_CONTROLING,
         id: 'toggle-all-callouts-fold-state',
         name: "Toggle all callouts fold state",
+        hotkeys: map.toggle_all_callouts_fold_state,
         callback: () => document.querySelectorAll("div.callout div.callout-title").forEach(c => (c as HTMLDivElement).click())
     },
     {
@@ -208,17 +214,9 @@ export const COMMANDS = (plugin: KeyshotsPlugin, map: KeyshotsMap): KeyshotsComm
         category: Category.REPLACE_SELECTIONS,
         id: 'replace-by-regex',
         name: "Replace by Regular Expression (Regex)",
+        hotkeys: map.replace_by_regex,
         editorCallback: (editor) => new RegexReplaceModal(plugin.app, editor.getValue(), "Replace by Regular Expression",
             (data) => functions.replaceRegex(editor, data.pattern, data.replacer, data.only_selections),
-            (data) => functions.countRegexMatches(editor, data.pattern, data.only_selections)
-        ).open()
-    },
-    {
-        category: Category.SELECTION_ADD_OR_REMOVE,
-        id: 'search-by-regex',
-        name: "Search by Regular Expression (Regex)",
-        editorCallback: (editor) => new RegexSearchModal(plugin.app, editor.getValue(), "Search by Regular Expression",
-            (data) => functions.selectByRegex(editor, data.pattern, data.only_selections),
             (data) => functions.countRegexMatches(editor, data.pattern, data.only_selections)
         ).open()
     },
@@ -307,6 +305,16 @@ export const COMMANDS = (plugin: KeyshotsPlugin, map: KeyshotsMap): KeyshotsComm
         repeatable: true,
         hotkeys: map.add_caret_up,
         editorCallback: (editor) => functions.addCarets(editor, VerticalDirection.UP, 0)
+    },
+    {
+        category: Category.SELECTION_ADD_OR_REMOVE,
+        id: 'search-by-regex',
+        name: "Search by Regular Expression (Regex)",
+        hotkeys: map.search_by_regex,
+        editorCallback: (editor) => new RegexSearchModal(plugin.app, editor.getValue(), "Search by Regular Expression",
+            (data) => functions.selectByRegex(editor, data.pattern, data.only_selections),
+            (data) => functions.countRegexMatches(editor, data.pattern, data.only_selections)
+        ).open()
     },
     {
         category: Category.SELECTION_ADD_OR_REMOVE,

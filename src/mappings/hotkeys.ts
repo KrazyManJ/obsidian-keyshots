@@ -30,7 +30,9 @@ export declare interface KeyshotsMap {
     open_all_foldable_callouts?: Hotkey[]
     open_dev_tools?: Hotkey[]
     open_keyshots_settings_tab?: Hotkey[]
+    replace_by_regex?: Hotkey[]
     reverse_selected_lines?: Hotkey[]
+    search_by_regex?: Hotkey[]
     select_all_word_instances?: Hotkey[]
     select_multiple_word_instances?: Hotkey[]
     shuffle_selected_lines?: Hotkey[]
@@ -57,14 +59,14 @@ export declare interface KeyshotsMap {
 export const DEFAULT_MAP: KeyshotsMap = {
     add_caret_down: HotKey("ArrowDown", "Mod", "Alt"),
     add_caret_up: HotKey("ArrowUp", "Mod", "Alt"),
-    better_insert_callout: undefined,
+    better_insert_callout: HotKey("C", "Shift", "Alt"),
     change_keyshots_preset: HotKey("P", "Mod", "Shift"),
-    close_all_foldable_callouts: undefined,
+    close_all_foldable_callouts: HotKey("L", "Shift", "Alt"),
     duplicate_line_down: HotKey("ArrowDown", "Shift", "Alt"),
     duplicate_line_up: HotKey("ArrowUp", "Shift", "Alt"),
     duplicate_selection_or_line: HotKey("D", "Mod", "Alt"),
     expand_line_selections: HotKey("E", "Alt"),
-    insert_table: undefined,
+    insert_table: HotKey("T","Shift","Alt"),
     insert_code_block: HotKey("`", "Mod", "Shift"),
     insert_line_above: HotKey("Enter", "Ctrl", "Shift"),
     insert_line_below: HotKey("Enter", "Shift"),
@@ -78,10 +80,12 @@ export const DEFAULT_MAP: KeyshotsMap = {
     multi_toggle_highlight: HotKey("H", "Mod", "Shift"),
     multi_toggle_italic: HotKey("I","Mod", "Shift"),
     multi_toggle_strikethrough: HotKey("M", "Mod", "Shift"),
-    open_all_foldable_callouts: undefined,
+    open_all_foldable_callouts: HotKey("O", "Shift", "Alt"),
     open_dev_tools: HotKey("F12"),
     open_keyshots_settings_tab: HotKey(",", "Mod", "Alt"),
-    reverse_selected_lines: undefined,
+    replace_by_regex: HotKey("H","Mod","Alt"),
+    reverse_selected_lines: HotKey("R","Alt"),
+    search_by_regex: HotKey("F","Mod","Alt"),
     select_all_word_instances: HotKey("L", "Mod", "Shift"),
     select_multiple_word_instances: HotKey("D", "Mod"),
     shuffle_selected_lines: HotKey("S", "Mod", "Shift", "Alt"),
@@ -92,7 +96,7 @@ export const DEFAULT_MAP: KeyshotsMap = {
     switch_keyshots_case_sensitivity: HotKey("I", "Mod", "Alt"),
     switch_line_numbers_setting: HotKey("N", "Mod", "Alt"),
     switch_readable_length_setting: HotKey("R", "Mod", "Alt"),
-    toggle_all_callouts_fold_state: undefined,
+    toggle_all_callouts_fold_state: HotKey("K", "Shift", "Alt"),
     toggle_case_jetbrains: HotKey("U", "Ctrl", "Shift"),
     toggle_kebabcase: HotKey("-", "Alt"),
     toggle_keyboard_input: HotKey("K", "Mod", "Shift"),
