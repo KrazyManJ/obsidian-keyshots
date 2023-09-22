@@ -19,7 +19,7 @@ export default class EditorSelectionManipulator implements EditorSelection, Java
         return new EditorSelectionManipulator({anchor: this.anchor.clone(), head: this.head.clone()}, this.editor)
     }
 
-    equals(sel: EditorSelection){
+    equals(sel: EditorSelection) {
         return this.anchor.equals(sel.anchor) && this.head.equals(sel.head)
     }
 
@@ -100,9 +100,9 @@ export default class EditorSelectionManipulator implements EditorSelection, Java
     }
 
     replaceText(to: string, resize = false): this {
-        this.sizeChange = to.length-this.getText().length
+        this.sizeChange = to.length - this.getText().length
         this.editor.replaceRange(to, ...this.asFromToPoints())
-        if (resize) this.moveChars(0,this.sizeChange)
+        if (resize) this.moveChars(0, this.sizeChange)
         return this
     }
 
@@ -126,7 +126,7 @@ export default class EditorSelectionManipulator implements EditorSelection, Java
         return norm.head.line - norm.anchor.line + 1
     }
 
-    get replaceSizeChange(){
+    get replaceSizeChange() {
         return this.sizeChange
     }
 

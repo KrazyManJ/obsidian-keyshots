@@ -6,6 +6,7 @@ declare namespace electron {
             openDevTools: () => void;
         };
     }
+
     interface Remote {
         getCurrentWindow(): BrowserWindow;
     }

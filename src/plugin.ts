@@ -61,5 +61,10 @@ export default class KeyshotsPlugin extends Plugin {
     async saveSettings() {
         await this.saveData(this.settings);
     }
+
+    setSetting<K extends keyof KeyshotsSettings>(key: K, value: KeyshotsSettings[K]) {
+        this.settings[key] = value;
+        this.saveSettings().then();
+    }
 }
 

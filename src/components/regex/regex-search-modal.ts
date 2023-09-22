@@ -1,17 +1,17 @@
 import RegexModal, {BaseRegexData} from "../abstract/regex-modal";
-import {App} from "obsidian";
+import KeyshotsPlugin from "../../plugin";
 
 export default class RegexSearchModal extends RegexModal<BaseRegexData> {
 
 
     public constructor(
-        app: App,
+        plugin: KeyshotsPlugin,
         editorContent: string,
         modalTitle: string,
         confirmCallback: (data: BaseRegexData) => void,
         matchesCountCallback: (data: BaseRegexData) => number
     ) {
-        super(app, editorContent, modalTitle, confirmCallback, matchesCountCallback);
+        super(plugin, editorContent, modalTitle, confirmCallback, matchesCountCallback);
     }
 
     previewProcessor(content: string): string {

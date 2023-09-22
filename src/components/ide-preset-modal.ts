@@ -2,7 +2,7 @@ import {Notice, SuggestModal} from "obsidian";
 import {IDE_LABELS, IDEInfo} from "../mappings/ide-info";
 import KeyshotsPlugin from "../plugin";
 
-export default class IDEPresetModal extends SuggestModal<IDEInfo>{
+export default class IDEPresetModal extends SuggestModal<IDEInfo> {
 
     private readonly plugin: KeyshotsPlugin
 
@@ -22,10 +22,10 @@ export default class IDEPresetModal extends SuggestModal<IDEInfo>{
     }
 
     renderSuggestion(value: IDEInfo, el: HTMLElement) {
-        el.setCssProps({"display":"flex","gap":"10px","align-items":"center"})
+        el.setCssProps({"display": "flex", "gap": "10px", "align-items": "center"})
         el.innerHTML += value.svg_icon_content
         const desc = el.createEl("div")
-        desc.createEl("div", { text: value.name })
-        desc.createEl("small", { text: value.description }).setCssProps({"opacity":"0.8"})
+        desc.createEl("div", {text: value.name})
+        desc.createEl("small", {text: value.description}).setCssProps({"opacity": "0.8"})
     }
 }

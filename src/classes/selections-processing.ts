@@ -65,13 +65,13 @@ export default abstract class SelectionsProcessing {
     }
 
 
-    static lowestSelection(selections: EditorSelectionManipulator[]): EditorSelectionManipulator{
+    static lowestSelection(selections: EditorSelectionManipulator[]): EditorSelectionManipulator {
         return selections.sort((a, b) =>
             a.asNormalized().head.toOffset() - b.asNormalized().head.toOffset()
         ).reverse()[0]
     }
 
-    static selectionValuesEqual(selections: EditorSelectionManipulator[], case_sensitive: boolean): boolean{
+    static selectionValuesEqual(selections: EditorSelectionManipulator[], case_sensitive: boolean): boolean {
         return selections.every((val, _i, arr) => {
             const [one, two] = [arr[0], val].map(s => s.asNormalized().getText())
             if (!case_sensitive) return one.toLowerCase() === two.toLowerCase()

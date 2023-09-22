@@ -143,7 +143,7 @@ export const COMMANDS = (plugin: KeyshotsPlugin, map: KeyshotsMap): KeyshotsComm
         id: 'insert-table',
         name: "Insert Table",
         hotkeys: map.insert_table,
-        editorCallback: (editor) => new TableModal(plugin.app,
+        editorCallback: (editor) => new TableModal(plugin,
             (data) => functions.insertTable(editor, data.rows, data.columns)
         ).open()
     },
@@ -215,7 +215,7 @@ export const COMMANDS = (plugin: KeyshotsPlugin, map: KeyshotsMap): KeyshotsComm
         id: 'replace-by-regex',
         name: "Replace by Regular Expression (Regex)",
         hotkeys: map.replace_by_regex,
-        editorCallback: (editor) => new RegexReplaceModal(plugin.app, editor.getValue(), "Replace by Regular Expression",
+        editorCallback: (editor) => new RegexReplaceModal(plugin, editor.getValue(), "Replace by Regular Expression",
             (data) => functions.replaceRegex(editor, data.pattern, data.replacer, data.only_selections),
             (data) => functions.countRegexMatches(editor, data.pattern, data.only_selections)
         ).open()
@@ -311,7 +311,7 @@ export const COMMANDS = (plugin: KeyshotsPlugin, map: KeyshotsMap): KeyshotsComm
         id: 'search-by-regex',
         name: "Search by Regular Expression (Regex)",
         hotkeys: map.search_by_regex,
-        editorCallback: (editor) => new RegexSearchModal(plugin.app, editor.getValue(), "Search by Regular Expression",
+        editorCallback: (editor) => new RegexSearchModal(plugin, editor.getValue(), "Search by Regular Expression",
             (data) => functions.selectByRegex(editor, data.pattern, data.only_selections),
             (data) => functions.countRegexMatches(editor, data.pattern, data.only_selections)
         ).open()

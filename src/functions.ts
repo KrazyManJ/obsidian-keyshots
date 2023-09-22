@@ -343,15 +343,14 @@ export function selectByRegex(editor: Editor, regex: RegExp, onlySelection: bool
                 const i = value.index ?? 0;
                 selections.push(EditorSelectionManipulator.documentStart(editor)
                     .moveChars(sel.asNormalized().anchor.toOffset())
-                    .moveChars(i,i+value[0].length)
+                    .moveChars(i, i + value[0].length)
                 )
             })
         })
-    }
-    else {
+    } else {
         Array.from(editor.getValue().matchAll(regex)).forEach(value => {
             const i = value.index ?? 0;
-            selections.push(EditorSelectionManipulator.documentStart(editor).moveChars(i,i+value[0].length))
+            selections.push(EditorSelectionManipulator.documentStart(editor).moveChars(i, i + value[0].length))
         })
     }
     editor.setSelections(selections.map(v => v.toEditorSelection()))

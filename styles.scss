@@ -108,9 +108,12 @@ div.modal-container.keyshots-regex {
                 color: var(--text-error);
             }
         }
-        button:disabled {
-            opacity: 0.5;
-            cursor: not-allowed;
-        }
+    }
+}
+
+div.keyshots-table-modal, div.modal-container.keyshots-regex {
+    button:disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
     }
 }

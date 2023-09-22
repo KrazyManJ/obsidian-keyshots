@@ -16,6 +16,7 @@ declare module 'obsidian' {
 
     interface CommandManager {
         removeCommand(...id: string[]): void;
+
         executeCommandById(id: string): boolean;
     }
 
@@ -32,7 +33,7 @@ declare module 'obsidian' {
     }
 
     interface InternalPluginManager {
-        plugins: Record<string,InternalPlugin>
+        plugins: Record<string, InternalPlugin>
     }
 
     interface CommunityPluginManager {

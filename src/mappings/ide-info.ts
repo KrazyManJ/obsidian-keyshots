@@ -7,7 +7,7 @@ export interface IDEInfo {
 }
 
 
-export const IDE_LABELS: Record<string,IDEInfo> = {
+export const IDE_LABELS: Record<string, IDEInfo> = {
     "clear": {
         name: "Clear",
         description: "Everything is blank, default preset when you install Keyshots",

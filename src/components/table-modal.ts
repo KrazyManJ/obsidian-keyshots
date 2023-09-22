@@ -1,5 +1,6 @@
-import {App, Notice, Setting} from "obsidian";
+import {ButtonComponent, Setting} from "obsidian";
 import CallbackModal from "./abstract/callback-modal";
+import KeyshotsPlugin from "../plugin";
 
 interface TableData {
     rows: number
@@ -8,13 +9,30 @@ interface TableData {
 
 export default class TableModal extends CallbackModal<TableData> {
 
-    constructor(app: App, confirmCallback: (data: TableData) => void) {
-        super(app, "Insert Table", confirmCallback);
+    private rows: number
+    private columns: number
+
+    private actionButton: ButtonComponent
+
+    constructor(plugin: KeyshotsPlugin, confirmCallback: (data: TableData) => void) {
+        super(plugin, "Insert Table", confirmCallback);
+        this.rows = this.plugin.settings.modal_table_last_used_rows;
+        this.columns = this.plugin.settings.modal_table_last_used_columns;
+    }
+
+    private hasValidValues() {
+        return !(isNaN(this.rows) || isNaN(this.columns))
+            && this.columns >= 2
+            && this.rows >= 1
+    }
+
+    private updateState() {
+        this.actionButton.setDisabled(!this.hasValidValues());
     }
 
     onOpen() {
         super.onOpen()
-        const { contentEl, containerEl } = this;
+        const {contentEl, containerEl} = this;
         containerEl.classList.add("keyshots-table-modal");
 
         contentEl.createEl("p", {
@@ -55,22 +73,28 @@ export default class TableModal extends CallbackModal<TableData> {
             }
         }
         const optEl = divider.createEl("div", {"cls": "opt"});
-        const data = {
-            row: 2,
-            column: 2
-        };
         new Setting(optEl)
             .setName("Rows")
             .setDesc("Does not include headings row.")
             .addText(cb => cb
-                .setValue("2")
-                .onChange(v => data.row = parseInt(v))
+                .setValue(this.rows.toString())
+                .onChange(v => {
+                    this.rows = parseInt(v);
+                    if (!isNaN(this.rows))
+                        this.plugin.setSetting("modal_table_last_used_rows", this.rows);
+                    this.updateState();
+                })
             );
         new Setting(optEl)
             .setName("Columns")
             .addText(cb => cb
-                .setValue("2")
-                .onChange(v => data.column = parseInt(v))
+                .setValue(this.columns.toString())
+                .onChange(v => {
+                    this.columns = parseInt(v);
+                    if (!isNaN(this.columns))
+                        this.plugin.setSetting("modal_table_last_used_columns", this.columns);
+                    this.updateState();
+                })
             );
         optEl.querySelectorAll("input[type=text]").forEach(e => e.setAttrs({
             "type": "number",
@@ -79,19 +103,16 @@ export default class TableModal extends CallbackModal<TableData> {
             "step": "1"
         }));
         new Setting(optEl)
-            .addButton(cb => cb
+            .addButton(cb => this.actionButton = cb
                 .setCta()
                 .setButtonText("Insert table")
                 .onClick(() => {
-                    if (isNaN(data.row) || isNaN(data.column)) {
-                        new Notice("⚠️ Error: Invalid input of row or column values!");
-                        return;
-                    }
                     this.successClose({
-                        rows: Math.max(2, data.row),
-                        columns: Math.max(2, data.column)
+                        rows: this.rows,
+                        columns: this.columns
                     });
                 })
             );
+        this.updateState();
     }
 }

@@ -17,8 +17,8 @@ export class KeyshotsSettingTab extends PluginSettingTab {
         const {containerEl} = this;
         containerEl.empty()
         const title = containerEl.createEl('h1', {text: "Keyshots Settings"})
-        title.innerHTML = KEYSHOTS_SVG(48)+title.innerHTML
-        title.setCssProps({"display": "flex","align-items": "center", "gap":"10px"})
+        title.innerHTML = KEYSHOTS_SVG(48) + title.innerHTML
+        title.setCssProps({"display": "flex", "align-items": "center", "gap": "10px"})
         containerEl.createEl('h2', {text: "⌨️ Default keys"})
         new Setting(containerEl)
             .setName("IDE Keys Mapping")

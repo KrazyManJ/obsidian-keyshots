@@ -1,5 +1,6 @@
 import RegexModal, {BaseRegexData} from "../abstract/regex-modal";
-import {App, Setting} from "obsidian";
+import {Setting} from "obsidian";
+import KeyshotsPlugin from "../../plugin";
 
 interface ReplaceRegexData extends BaseRegexData {
     replacer: string
@@ -7,21 +8,22 @@ interface ReplaceRegexData extends BaseRegexData {
 
 export default class RegexReplaceModal extends RegexModal<ReplaceRegexData> {
 
-    private replacer = ""
+    private replacer: string
 
     public constructor(
-        app: App,
+        plugin: KeyshotsPlugin,
         editorContent: string,
         modalTitle: string,
         confirmCallback: (data: ReplaceRegexData) => void,
         matchesCountCallback: (data: BaseRegexData) => number
     ) {
-        super(app, editorContent, modalTitle, confirmCallback, matchesCountCallback);
+        super(plugin, editorContent, modalTitle, confirmCallback, matchesCountCallback);
+        this.replacer = this.plugin.settings.modal_regex_last_used_replacer;
     }
 
     previewProcessor(content: string): string {
         const regex = this.getRegex();
-        return regex ? content.replace(regex,this.replacer) : content;
+        return regex ? content.replace(regex, this.replacer) : content;
     }
 
     buildData(): ReplaceRegexData {
@@ -43,10 +45,11 @@ export default class RegexReplaceModal extends RegexModal<ReplaceRegexData> {
                 .setPlaceholder("$1")
                 .onChange(v => {
                     this.replacer = v
-                        .replace(/\\n/g,"\n")
-                        .replace(/\\t/g,"\t")
-                        .replace(/\\f/g,"\f")
-                        .replace(/\\b/g,"\b")
+                        .replace(/\\n/g, "\n")
+                        .replace(/\\t/g, "\t")
+                        .replace(/\\f/g, "\f")
+                        .replace(/\\b/g, "\b")
+                    this.plugin.setSetting("modal_regex_last_used_pattern", this.replacer)
                     this.updatePreview()
                 })
             )
