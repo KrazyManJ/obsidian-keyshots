@@ -6,6 +6,7 @@ import {
     Setting,
     TextComponent
 } from "obsidian";
+import {DocumentFragmentBuilder} from "../../classes/document-fragment-builder";
 
 
 export interface BaseRegexData {
@@ -116,7 +117,13 @@ export default abstract class RegexModal<T extends BaseRegexData> extends Callba
     protected addSelectionOnlySetting(){
         new Setting(this.optionsCtrEl)
             .setName("Apply on already made selections only")
-            .setDesc("If regex should be applied only in current selections in the editor.")
+            .setDesc(
+                new DocumentFragmentBuilder()
+                    .appendText("If regex should be applied only in current selections in the editor.")
+                    .createElem("br")
+                    .createElem("b",{text:"❗ This option does not affect Preview mode, it will apply after proceeding action!"})
+                    .toFragment()
+            )
             .setClass("last")
             .addToggle(cb => cb
                 .setValue(this.only_selections)

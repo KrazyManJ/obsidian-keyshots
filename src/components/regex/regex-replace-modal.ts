@@ -43,6 +43,10 @@ export default class RegexReplaceModal extends RegexModal<ReplaceRegexData> {
                 .setPlaceholder("$1")
                 .onChange(v => {
                     this.replacer = v
+                        .replace(/\\n/g,"\n")
+                        .replace(/\\t/g,"\t")
+                        .replace(/\\f/g,"\f")
+                        .replace(/\\b/g,"\b")
                     this.updatePreview()
                 })
             )
