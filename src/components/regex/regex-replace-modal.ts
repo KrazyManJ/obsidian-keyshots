@@ -49,7 +49,7 @@ export default class RegexReplaceModal extends RegexModal<ReplaceRegexData> {
                         .replace(/\\t/g, "\t")
                         .replace(/\\f/g, "\f")
                         .replace(/\\b/g, "\b")
-                    this.plugin.setSetting("modal_regex_last_used_pattern", this.replacer)
+                    this.plugin.setSetting("modal_regex_last_used_replacer", this.replacer)
                     this.updatePreview()
                 })
             )
