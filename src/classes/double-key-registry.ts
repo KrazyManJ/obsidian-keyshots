@@ -31,7 +31,8 @@ export default class DoubleKeyRegistry {
 
     private cancelAction = false
 
-    private lastPressed?: KeyRecord = undefined
+    private lastReleasedKey?: KeyRecord = undefined
+    private lastPressedKey?: string = undefined
     private activeCmdId?: string = undefined
 
     private setStatusBarState(commandName?: string) {
@@ -48,14 +49,17 @@ export default class DoubleKeyRegistry {
         this.statusBarItem.setAttr("aria-label-position", "top")
         this.setStatusBarState()
         const elem = window
+
+
         this.plugin.registerDomEvent(elem, "keydown", (ev) => {
             if (Object.keys(this.cmds).length === 0) return;
             if (this.cancelAction) this.cancelAction = false
             const currCmd = this.activeCmdId ? this.cmds[this.activeCmdId] : undefined
-            if (this.lastPressed && !currCmd && this.lastPressed.key === ev.key) {
+            this.lastPressedKey = ev.key
+            if (this.lastReleasedKey && !currCmd && this.lastReleasedKey.key === ev.key) {
                 this.activeCmdId = Object.keys(this.cmds).filter(cmd => this.cmds[cmd].key === ev.key)[0]
                 const currCmd = this.cmds[this.activeCmdId]
-                if (Math.abs(ev.timeStamp - this.lastPressed.timeStamp) > currCmd.maxDelay) {
+                if (Math.abs(ev.timeStamp - this.lastReleasedKey.timeStamp) > currCmd.maxDelay) {
                     this.activeCmdId = undefined
                     return
                 }
@@ -63,15 +67,16 @@ export default class DoubleKeyRegistry {
                 if (currCmd.lastPressedCallback) currCmd.lastPressedCallback()
                 if (!currCmd.anotherKeyPressedCallback) this.cancelCurrentCommand(true)
             } else if (currCmd && ev.key !== currCmd.key && currCmd.anotherKeyPressedCallback) currCmd.anotherKeyPressedCallback(ev)
-            else if (this.lastPressed && this.lastPressed.key !== ev.key) this.cancelCurrentCommand()
+            else if (this.lastReleasedKey && this.lastReleasedKey.key !== ev.key) this.cancelCurrentCommand()
         })
         this.plugin.registerDomEvent(elem, "keyup", (ev) => {
             if (Object.keys(this.cmds).length === 0) return;
             if (this.cancelAction) return
+            if (this.lastPressedKey && this.lastPressedKey != ev.key && !this.activeCmdId) this.cancelCurrentCommand();
             const currCmd = this.activeCmdId ? this.cmds[this.activeCmdId] : undefined
             if (!currCmd && Object.values(this.cmds).map(c => c.key).includes(ev.key))
-                this.lastPressed = {key: ev.key, timeStamp: ev.timeStamp}
-            else if (currCmd && currCmd.key === ev.key) this.cancelCurrentCommand()
+                this.lastReleasedKey = {key: ev.key, timeStamp: ev.timeStamp}
+            else if (currCmd && currCmd.key === ev.key) this.cancelCurrentCommand(true)
         })
         this.plugin.registerDomEvent(elem, "mousedown", () => {
             if (Object.keys(this.cmds).length === 0) return;
@@ -83,7 +88,7 @@ export default class DoubleKeyRegistry {
         this.setStatusBarState()
         this.cancelAction = ingoreNextKeyUp
         this.activeCmdId = undefined
-        this.lastPressed = undefined
+        this.lastReleasedKey = undefined
     }
 
     registerCommand(cmd: DoubleKeyCommand) {
