@@ -10,6 +10,13 @@ export default class RegexReplaceModal extends RegexModal<ReplaceRegexData> {
 
     private replacer: string
 
+    private parseEscapes(str: string) {
+        return str.replace(/\\n/g, "\n")
+            .replace(/\\t/g, "\t")
+            .replace(/\\f/g, "\f")
+            .replace(/\\b/g, "\b");
+    }
+
     public constructor(
         plugin: KeyshotsPlugin,
         editorContent: string,
@@ -18,18 +25,18 @@ export default class RegexReplaceModal extends RegexModal<ReplaceRegexData> {
         matchesCountCallback: (data: BaseRegexData) => number
     ) {
         super(plugin, editorContent, modalTitle, confirmCallback, matchesCountCallback);
-        this.replacer = this.plugin.settings.modal_regex_last_used_replacer;
+        this.replacer = this.plugin.settings.modal_regex_last_used_replacer
     }
 
     previewProcessor(content: string): string {
         const regex = this.getRegex();
-        return regex ? content.replace(regex, this.replacer) : content;
+        return regex ? content.replace(regex, this.parseEscapes(this.replacer)) : content;
     }
 
     buildData(): ReplaceRegexData {
         return <ReplaceRegexData>{
             pattern: this.getRegex(),
-            replacer: this.replacer,
+            replacer: this.parseEscapes(this.replacer),
             only_selections: this.only_selections
         }
     }
@@ -45,10 +52,6 @@ export default class RegexReplaceModal extends RegexModal<ReplaceRegexData> {
                 .setPlaceholder("$1")
                 .onChange(v => {
                     this.replacer = v
-                        .replace(/\\n/g, "\n")
-                        .replace(/\\t/g, "\t")
-                        .replace(/\\f/g, "\f")
-                        .replace(/\\b/g, "\b")
                     this.plugin.setSetting("modal_regex_last_used_replacer", v)
                     this.updatePreview()
                 })
