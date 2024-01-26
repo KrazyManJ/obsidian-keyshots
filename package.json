@@ -15,6 +15,8 @@
 	"license": "MIT",
 	"devDependencies": {
 		"@types/node": "^16.11.6",
+		"@types/react": "^18.2.48",
+		"@types/react-dom": "^18.2.18",
 		"@typescript-eslint/eslint-plugin": "5.29.0",
 		"@typescript-eslint/parser": "5.29.0",
 		"builtin-modules": "3.3.0",
@@ -24,6 +26,8 @@
 		"typescript": "4.7.4"
 	},
 	"dependencies": {
-		"jszip": "^3.10.1"
+		"jszip": "^3.10.1",
+		"react": "^18.2.0",
+		"react-dom": "^18.2.0"
 	}
 }

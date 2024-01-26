@@ -1,6 +1,10 @@
 import {ButtonComponent, Setting} from "obsidian";
 import CallbackModal from "./abstract/callback-modal";
 import KeyshotsPlugin from "../plugin";
+import {createRoot, Root} from "react-dom/client";
+import * as React from "react";
+import {useState} from "react";
+import Repeater from "./react/Repeater";
 
 interface TableData {
     rows: number
@@ -11,6 +15,7 @@ export default class TableModal extends CallbackModal<TableData> {
 
     private rows: number
     private columns: number
+    private root: Root | null = null;
 
     private actionButton: ButtonComponent
 
@@ -30,48 +35,45 @@ export default class TableModal extends CallbackModal<TableData> {
         this.actionButton.setDisabled(!this.hasValidValues());
     }
 
+    private TablePicker = () => {
+        const [hoverPos, setHoverPos] = useState<TableData>({rows: 0, columns: 0})
+
+        const isHover = () => hoverPos.rows > 0 && hoverPos.columns > 0;
+
+        return <>
+            <table>
+                <tbody>
+                <Repeater times={10} elem={
+                    (i) => <tr key={i}>
+                        <Repeater times={10} elem={(j) =>
+                            <td
+                                key={j}
+                                className={i < hoverPos.rows && j < hoverPos.columns ? "hovered" : "nope"}
+                                onClick={j != 0 ? () => this.successClose({rows: i + 1, columns: j + 1}) : undefined}
+                                onMouseEnter={() => setHoverPos({rows: i + 1, columns: j + 1})}
+                                onMouseOut={() => setHoverPos({rows: 0, columns: 0})}
+                            />
+                        }/>
+                    </tr>
+                }/>
+                </tbody>
+            </table>
+            <div className="geometry-label">{isHover() && `${hoverPos.rows}R x ${hoverPos.columns}C`}</div>
+        </>
+    }
+
     onOpen() {
         super.onOpen()
         const {contentEl, containerEl} = this;
         containerEl.classList.add("keyshots-table-modal");
-
         contentEl.createEl("p", {
             "cls": "desc",
             "text": "Quick-select size in grid or write exact values and confirm them via button."
         });
-
         const divider = contentEl.createEl("div", "divider");
-        const tableEl = divider.createEl("div", "table-selector-container");
-        const matrix = tableEl.createEl("table");
-
-        const processCellsInTable = (rN: number, cN: number, callback: (cell: HTMLTableCellElement, r: number, c: number) => void) => {
-            Array.from(matrix.rows).slice(0, rN).forEach((row, i) => {
-                Array.from(row.getElementsByTagName("td")).slice(0, cN).forEach((col, j) => callback(col, i, j))
-            })
-        }
-
-        const geometryLabel = tableEl.createEl("div", "geometry-label")
-        for (let i = 0; i < 10; i++) {
-            const tr = matrix.createEl("tr");
-            for (let j = 0; j < 10; j++) {
-                const td = tr.createEl("td");
-                if (j == 0) continue;
-                td.addEventListener("click", () => {
-                    this.successClose({
-                        rows: i + 1,
-                        columns: j + 1
-                    });
-                })
-                td.addEventListener("mouseenter", () => {
-                    processCellsInTable(i + 1, j + 1, (cell) => cell.classList.add("hovered"))
-                    geometryLabel.textContent = `${i + 1}R x ${j + 1}C`
-                });
-                td.addEventListener("mouseleave", () => {
-                    processCellsInTable(i + 1, j + 1, (cell) => cell.removeAttribute("class"))
-                    geometryLabel.textContent = ``
-                });
-            }
-        }
+        const table = divider.createEl("div", "table-selector-container")
+        this.root = createRoot(table);
+        this.root.render(<this.TablePicker/>)
         const optEl = divider.createEl("div", {"cls": "opt"});
         new Setting(optEl)
             .setName("Rows")
@@ -114,5 +116,9 @@ export default class TableModal extends CallbackModal<TableData> {
                 })
             );
         this.updateState();
+    }
+
+    onClose() {
+        this.root?.unmount();
     }
 }
