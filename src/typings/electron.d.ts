@@ -1,13 +1,21 @@
 declare namespace electron {
     const remote: Remote
 
+    interface WebContents {
+        openDevTools(): void;
+    }
+
+    interface Window {
+        webContents: WebContents;
+        setFullScreen(state: boolean): void;
+    }
+
     interface BrowserWindow {
-        webContents: {
-            openDevTools: () => void;
-        };
+        getAllWindows(): Window[];
     }
 
     interface Remote {
-        getCurrentWindow(): BrowserWindow;
+        getCurrentWindow(): Window;
+        BrowserWindow: BrowserWindow;
     }
 }
