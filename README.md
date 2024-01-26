@@ -169,3 +169,143 @@ amount.
 
 Also, obsidian team recommends to don't set default hotkeys for commands and that is why Keyshots installs with "clear"
 preset!
+
+## ⏰ Changelog
+
+### 1.0.0 - First release of plugin
+
+---
+
+### 1.1.0 - New commands
+
+- `Transform selections to Uppercase`
+- `Transform selections to Lowercase`
+- `Transform selections to Titlecase`
+- `Sort selected lines by alphanumeric comparison`
+- `Encode / Decode URI selections`
+- `Toggle line numbers`
+- `Join selected lines`
+- `Split selections on new line`
+
+---
+
+### 1.2.0 - IDE Keymap Settings
+
+Now, Keyshots are able to pick from one of presets that you choose and use their's default hotkeys.
+
+Available presets:
+
+- Visual Studio Code
+- Jetbrains IDEs (IntelliJ IDEA, PyCharm, WebStorm, ...)
+
+---
+
+### 1.3.0 - Visual Studio Mappings
+
+In new version I added keymaps of Visual Studio. From now you can change it in plugin settings!
+
+---
+
+### 1.4.0 - Clear (Blank) Key Mappings
+
+Based on a recommendation by Obsidian Team, I added preset, that is set in default, which has no default Hotkeys.
+
+---
+
+### 1.5.0 - 10 NEW COMMANDS!
+
+#### New commands:
+
+- `Open Keyshots settings`
+- `Select all word instances`
+- `Select multiple word instances`
+- `Shuffle selected lines` (with shuffle rounds option)
+- `Toggle Keyshots case sensitivity`
+- `Toggle case (JetBrains)`
+- `Transform selections from / to Kebabcase`
+- `Toggle inline title (setting)`
+- `Split selections by lines`
+- `Expand line selections`
+
+#### New features:
+
+- Toggle case sensitivity in settings - toggles case sensitivity for `Select multiple word instances` and `Select all word instances` commands
+- Use keyshots hotkeys combined with selected IDE - whenever you select any IDE preset, then keyshots merge it's mapping with IDE mapping, if you don't want this to happen, you can just disable it!
+
+#### Improvements:
+
+- Now commands will not "glitch" text when performing undo/redo action on them
+- Now all presets have full mappings for all actions (if specific IDE has it defaultly) - i have full map in README!
+
+---
+
+### 2.0.0 - Huge update | 🌟Double-key commands🌟
+
+#### New commands:
+
+**Multi-togglers** are commands that are already in Obsidian, but they provide ability to perform actions with multiple selections.
+For example `Multi-toggle bold` surrounds text like this `**<text>**`  but with multiple selections anywhere in editor.
+
+- `Change Keyshots preset` - changing keys preset in editor
+- `Multi-toggle bold`
+- `Multi-toggle italic`
+- `Multi-toggle code`
+- `Multi-toggle highlight`
+- `Multi-toggle comment`
+- `Multi-toggle strikethrough`
+- `Toggle underline` - underline selected texts
+- `Toggle keyboard input (<kbd>)` - surrounds text with keyboard-input tags
+- `Insert code block` - inserts code blocks in selections with ability to choose language/code block processing
+- `Insert ordinal numbering` - inserts numbers on each selections (1,2,3,4,...)
+- `Open developer tools` - opens developer tools (great for developers of plugins)
+
+#### Double-key Commands are available
+
+JetBrains feature to do action after certain key is pressed twice. 
+All about double key commands is mentioned in [README](https://github.com/KrazyManJ/obsidian-keyshots#%EF%B8%8F%EF%B8%8F-double-key-commands).
+
+Current available commands are:
+
+- `Open Quick Switcher` (double <kbd>Shift</kbd> key press)
+- `Add caret cursor` (double <kbd>Ctrl</kbd>/<kbd>⌘</kbd> key press and hold last, then press <kbd>↑</kbd> or <kbd>↓</kbd> to add caret cursors upwards or downwards)
+
+#### Fixes
+
+- Updated hotkeys for rest of all commands
+- Fixed select word regex to select word correctly
+- Fixed selection processing to correctly handle selection replacing on same lines
+- Updated commands names to be more clearer and shorter
+
+---
+
+### 2.0.1
+
+- Fixed events unregistering for DoubleKeyRegistry when user changed preset
+
+---
+
+### 2.1.0
+
+#### New Commands
+
+- `Better insert callout` *(displays available callouts to use)*
+- `Insert Table`
+- `Search by Regular Expression (Regex)`
+- `Replace by Regular Expression (Regex)`
+- `Toggle all callouts fold state`
+- `Open all foldable callouts`
+- `Close all foldable callouts`
+
+---
+
+### 2.1.1
+
+- Double key commands won't cancel when interrupted with key while pressing command key #4
+- Replace regex modal bad parsing of escape characters
+
+---
+
+### 2.1.2 *(Release comming soon)*
+
+- Fixed Double key registry previous fix to work 100%
+- Added react support to my code
