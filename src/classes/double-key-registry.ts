@@ -71,8 +71,11 @@ export default class DoubleKeyRegistry {
         })
         this.plugin.registerDomEvent(elem, "keyup", (ev) => {
             if (Object.keys(this.cmds).length === 0) return;
-            if (this.cancelAction) return
-            if (this.lastPressedKey && this.lastPressedKey != ev.key && !this.activeCmdId) this.cancelCurrentCommand();
+            if (this.cancelAction) return;
+            if (this.lastPressedKey && this.lastPressedKey != ev.key && !this.activeCmdId) {
+                this.cancelCurrentCommand();
+                return;
+            }
             const currCmd = this.activeCmdId ? this.cmds[this.activeCmdId] : undefined
             if (!currCmd && Object.values(this.cmds).map(c => c.key).includes(ev.key))
                 this.lastReleasedKey = {key: ev.key, timeStamp: ev.timeStamp}
