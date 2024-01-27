@@ -69,7 +69,6 @@ export default class DoubleKeyRegistry {
             if (this.pressedKeys.includes(ev.key)) return;
             this.pressedKeys.push(ev.key);
             this.lastPressedKey = this.createKeyRecord(ev);
-            // console.log("changed pressed key", this.lastPressedKey)
             if (this.cancelAction) this.cancelAction = false
             const currCmd = this.activeCmdId ? this.cmds[this.activeCmdId] : undefined
             if (this.lastReleasedKey && !currCmd && this.lastReleasedKey.key === ev.key) {
