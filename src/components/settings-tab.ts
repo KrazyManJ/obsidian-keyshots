@@ -149,5 +149,26 @@ export class KeyshotsSettingTab extends PluginSettingTab {
                     this.plugin.loadDoubleKeyCommands()
                 })
             )
+        new Setting(containerEl)
+            .setName(new DocumentFragmentBuilder()
+                .appendText("Opening Command-Palette via double ")
+                .createElem("kbd", {text: "Ctrl"})
+                .appendText(" shortcut")
+                .toFragment()
+            )
+            .setDesc(new DocumentFragmentBuilder()
+                .appendText("If you have Command Palette plugin enabled, hitting ")
+                .createElem("kbd", {text: "Ctrl"})
+                .appendText(" twice will open command palette window.")
+                .toFragment()
+            )
+            .addToggle(cb => cb
+                .setValue(this.plugin.settings.command_palette_via_double_ctrl)
+                .onChange(async (value) => {
+                    this.plugin.settings.command_palette_via_double_ctrl = value
+                    await this.plugin.saveSettings()
+                    this.plugin.loadDoubleKeyCommands()
+                })
+            )
     }
 }

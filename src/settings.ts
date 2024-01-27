@@ -5,6 +5,7 @@ export declare interface KeyshotsSettings {
     shuffle_rounds_amount: number
     carets_via_double_ctrl: boolean
     quick_switch_via_double_shift: boolean
+    command_palette_via_double_ctrl: boolean
     modal_table_last_used_rows: number
     modal_table_last_used_columns: number
     modal_regex_last_used_pattern: string
@@ -21,6 +22,7 @@ export const DEFAULT_SETTINGS: KeyshotsSettings = {
     shuffle_rounds_amount: 10,
     carets_via_double_ctrl: false,
     quick_switch_via_double_shift: false,
+    command_palette_via_double_ctrl: false,
     modal_table_last_used_rows: 2,
     modal_table_last_used_columns: 2,
     modal_regex_last_used_pattern: "",

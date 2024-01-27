@@ -410,13 +410,25 @@ declare interface PluginConditionalObject<T> {
 
 export const DOUBLE_KEY_COMMANDS = (plugin: KeyshotsPlugin): PluginConditionalObject<DoubleKeyCommand>[] => [
     {
-        conditional: (plugin) => plugin.settings.carets_via_double_ctrl,
+        conditional: (plugin) => plugin.settings.carets_via_double_ctrl || plugin.settings.command_palette_via_double_ctrl,
         object: {
-            id: "add-caret",
-            name: "Add caret cursors",
+            id: "add-caret-and-open-command-palette",
+            name: "Add caret cursors and open Command-Palette",
             key: "Control",
             maxDelay: 400,
-            anotherKeyPressedCallback: (ev) => functions.addCaretsViaDoubleKey(plugin, ev)
+            anotherKeyPressedCallback:
+                plugin.settings.carets_via_double_ctrl
+                ? (ev) => functions.addCaretsViaDoubleKey(plugin, ev)
+                : undefined
+            ,
+            lastReleasedCallback:
+                plugin.settings.command_palette_via_double_ctrl
+                ? (interrupted) => {
+                    if (!interrupted) functions.runCommandById(plugin, "command-palette:open",
+                        () => new Notice("Command Pallete plugin is not enabled!")
+                    )
+                }
+                : undefined
         }
     },
     {
@@ -426,9 +438,12 @@ export const DOUBLE_KEY_COMMANDS = (plugin: KeyshotsPlugin): PluginConditionalOb
             name: "Open Quick-Switcher",
             key: "Shift",
             maxDelay: 400,
-            lastPressedCallback: () => functions.runCommandById(plugin, "switcher:open",
-                () => new Notice("Quick Switcher plugin is not enabled!")
-            )
+            lastReleasedCallback: (interrupted) => {
+                if (!interrupted) functions.runCommandById(plugin, "switcher:open",
+                    () => new Notice("Quick Switcher plugin is not enabled!")
+                )
+            }
+
         }
     }
 ]

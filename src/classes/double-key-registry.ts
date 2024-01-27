@@ -15,6 +15,11 @@ export interface DoubleKeyCommand {
      * Called when another key is pressed while holding last key of `hotkeys` array
      */
     anotherKeyPressedCallback?: (ev: KeyboardEvent) => void
+    /**
+     * Called when last key is released
+     * @param interrupted state of situation, if another key was pressed while holding command key
+     */
+    lastReleasedCallback?: (interrupted: boolean) => void
 }
 
 declare interface KeyRecord {
@@ -32,8 +37,16 @@ export default class DoubleKeyRegistry {
     private cancelAction = false
 
     private lastReleasedKey?: KeyRecord = undefined
-    private lastPressedKey?: string = undefined
+    private lastPressedKey?: KeyRecord = undefined
     private activeCmdId?: string = undefined
+    private pressedKeys: string[] = []
+
+    private createKeyRecord(ev: KeyboardEvent): KeyRecord {
+        return {
+            key: ev.key,
+            timeStamp: ev.timeStamp
+        }
+    }
 
     private setStatusBarState(commandName?: string) {
         this.statusBarItem.setText(commandName ? "🟩" : "🟨")
@@ -53,9 +66,12 @@ export default class DoubleKeyRegistry {
 
         this.plugin.registerDomEvent(elem, "keydown", (ev) => {
             if (Object.keys(this.cmds).length === 0) return;
+            if (this.pressedKeys.includes(ev.key)) return;
+            this.pressedKeys.push(ev.key);
+            this.lastPressedKey = this.createKeyRecord(ev);
+            // console.log("changed pressed key", this.lastPressedKey)
             if (this.cancelAction) this.cancelAction = false
             const currCmd = this.activeCmdId ? this.cmds[this.activeCmdId] : undefined
-            this.lastPressedKey = ev.key
             if (this.lastReleasedKey && !currCmd && this.lastReleasedKey.key === ev.key) {
                 this.activeCmdId = Object.keys(this.cmds).filter(cmd => this.cmds[cmd].key === ev.key)[0]
                 const currCmd = this.cmds[this.activeCmdId]
@@ -63,28 +79,49 @@ export default class DoubleKeyRegistry {
                     this.activeCmdId = undefined
                     return
                 }
-                this.setStatusBarState(currCmd.name)
-                if (currCmd.lastPressedCallback) currCmd.lastPressedCallback()
-                if (!currCmd.anotherKeyPressedCallback) this.cancelCurrentCommand(true)
-            } else if (currCmd && ev.key !== currCmd.key && currCmd.anotherKeyPressedCallback) currCmd.anotherKeyPressedCallback(ev)
-            else if (this.lastReleasedKey && this.lastReleasedKey.key !== ev.key) this.cancelCurrentCommand()
-        })
+                if (currCmd.anotherKeyPressedCallback)
+                    this.setStatusBarState(currCmd.name)
+                if (currCmd.lastPressedCallback)
+                    currCmd.lastPressedCallback()
+            }
+            else if (currCmd && ev.key !== currCmd.key && currCmd.anotherKeyPressedCallback)
+                currCmd.anotherKeyPressedCallback(ev)
+            else if (this.lastReleasedKey && this.lastReleasedKey.key !== ev.key)
+                this.cancelCurrentCommand()
+        },{})
         this.plugin.registerDomEvent(elem, "keyup", (ev) => {
             if (Object.keys(this.cmds).length === 0) return;
+            this.pressedKeys.remove(ev.key);
             if (this.cancelAction) return;
-            if (this.lastPressedKey && this.lastPressedKey != ev.key && !this.activeCmdId) {
+            if (this.lastPressedKey?.key != ev.key && !this.activeCmdId) {
                 this.cancelCurrentCommand();
                 return;
             }
             const currCmd = this.activeCmdId ? this.cmds[this.activeCmdId] : undefined
-            if (!currCmd && Object.values(this.cmds).map(c => c.key).includes(ev.key))
-                this.lastReleasedKey = {key: ev.key, timeStamp: ev.timeStamp}
-            else if (currCmd && currCmd.key === ev.key) this.cancelCurrentCommand(true)
+            if (!currCmd && Object.values(this.cmds).map(c => c.key).includes(ev.key)) {
+                this.lastReleasedKey = this.createKeyRecord(ev)
+            }
+            else if (currCmd && currCmd.key === ev.key) {
+                if (
+                    this.lastPressedKey
+                    && Math.abs(ev.timeStamp - this.lastPressedKey.timeStamp) <= currCmd.maxDelay
+                    && currCmd.lastReleasedCallback
+                )
+                    currCmd.lastReleasedCallback(this.lastPressedKey?.key != ev.key)
+                this.cancelCurrentCommand(true)
+            }
         })
+
         this.plugin.registerDomEvent(elem, "mousedown", () => {
             if (Object.keys(this.cmds).length === 0) return;
             this.cancelCurrentCommand(true)
         })
+
+        this.plugin.app.workspace.on("editor-change", () => {
+                if (Object.keys(this.cmds).length === 0) return;
+                this.cancelCurrentCommand(true)
+            }
+        )
     }
 
     private cancelCurrentCommand(ingoreNextKeyUp = false) {
