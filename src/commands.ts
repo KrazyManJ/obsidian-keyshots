@@ -380,6 +380,13 @@ export const COMMANDS = (plugin: KeyshotsPlugin, map: KeyshotsMap): KeyshotsComm
         callback: () => electron.remote.getCurrentWindow().webContents.openDevTools()
     },
     {
+        category: Category.OTHER,
+        id: 'toggle-focus-mode',
+        name: "Toggle focus mode",
+        hotkeys: map.toggle_focus_mode,
+        callback: () => functions.toggleFocusMode()
+    },
+    {
         category: Category.KEYSHOTS_SETTINGS,
         id: 'change-keyshots-preset',
         name: "Change Keyshots preset",

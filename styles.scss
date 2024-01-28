@@ -117,3 +117,11 @@ div.keyshots-table-modal, div.modal-container.keyshots-regex {
         cursor: not-allowed;
     }
 }
+
+
+body.keyshots-focus-mode {
+    div.side-dock-ribbon, div.sidebar-toggle-button {
+        display: none;
+    }
+}
+

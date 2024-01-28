@@ -45,6 +45,7 @@ export declare interface KeyshotsMap {
     switch_readable_length_setting?: Hotkey[]
     toggle_all_callouts_fold_state?: Hotkey[]
     toggle_case_jetbrains?: Hotkey[]
+    toggle_focus_mode?: Hotkey[]
     toggle_kebabcase?: Hotkey[]
     toggle_keyboard_input?: Hotkey[]
     toggle_snakecase?: Hotkey[]
@@ -68,7 +69,7 @@ export const DEFAULT_MAP: KeyshotsMap = {
     expand_line_selections: HotKey("E", "Alt"),
     insert_table: HotKey("T", "Shift", "Alt"),
     insert_code_block: HotKey("`", "Mod", "Shift"),
-    insert_line_above: HotKey("Enter", "Ctrl", "Shift"),
+    insert_line_above: HotKey("Enter", "Mod", "Shift"),
     insert_line_below: HotKey("Enter", "Shift"),
     insert_ordinal_numbering: HotKey("N", "Shift", "Alt"),
     join_selected_lines: HotKey("J", "Mod", "Shift"),
@@ -85,7 +86,7 @@ export const DEFAULT_MAP: KeyshotsMap = {
     open_keyshots_settings_tab: HotKey(",", "Mod", "Alt"),
     replace_by_regex: HotKey("H", "Mod", "Alt"),
     reverse_selected_lines: HotKey("R", "Alt"),
-    search_by_regex: HotKey("F", "Mod", "Alt"),
+    search_by_regex: HotKey("S", "Mod", "Alt"),
     select_all_word_instances: HotKey("L", "Mod", "Shift"),
     select_multiple_word_instances: HotKey("D", "Mod"),
     shuffle_selected_lines: HotKey("S", "Mod", "Shift", "Alt"),
@@ -97,7 +98,8 @@ export const DEFAULT_MAP: KeyshotsMap = {
     switch_line_numbers_setting: HotKey("N", "Mod", "Alt"),
     switch_readable_length_setting: HotKey("R", "Mod", "Alt"),
     toggle_all_callouts_fold_state: HotKey("K", "Shift", "Alt"),
-    toggle_case_jetbrains: HotKey("U", "Ctrl", "Shift"),
+    toggle_case_jetbrains: HotKey("U", "Mod", "Shift"),
+    toggle_focus_mode: HotKey("F", "Mod", "Alt"),
     toggle_kebabcase: HotKey("-", "Alt"),
     toggle_keyboard_input: HotKey("K", "Mod", "Shift"),
     toggle_snakecase: HotKey("-", "Shift", "Alt"),
