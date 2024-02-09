@@ -314,6 +314,12 @@ Current available commands are:
 
 ### 2.2.0 *(Release comming soon)*
 
+#### New commands
+
+- `Toggle focus mode` - hides ribbon menu, sidebars, and toggle app fullscreen
+
+#### Fixes
+
 - Made double key quick switcher shortcut to be triggered on second release rather than on second press
 - Double key registry registers command on release only if command released in desired timestamp
 - Added double key `Open Command-Palette` command via double <kbd>Ctrl</kbd> shortcut.
