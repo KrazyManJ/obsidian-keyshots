@@ -66,11 +66,11 @@ export default class DoubleKeyRegistry {
 
         this.plugin.registerDomEvent(elem, "keydown", (ev) => {
             if (Object.keys(this.cmds).length === 0) return;
-            if (this.pressedKeys.includes(ev.key)) return;
             this.pressedKeys.push(ev.key);
-            this.lastPressedKey = this.createKeyRecord(ev);
             if (this.cancelAction) this.cancelAction = false
-            const currCmd = this.activeCmdId ? this.cmds[this.activeCmdId] : undefined
+            const currCmd = this.activeCmdId ? this.cmds[this.activeCmdId] : undefined;
+            if (currCmd && ev.key == currCmd.key && this.pressedKeys.includes(ev.key)) return;
+            this.lastPressedKey = this.createKeyRecord(ev);
             if (this.lastReleasedKey && !currCmd && this.lastReleasedKey.key === ev.key) {
                 this.activeCmdId = Object.keys(this.cmds).filter(cmd => this.cmds[cmd].key === ev.key)[0]
                 const currCmd = this.cmds[this.activeCmdId]
