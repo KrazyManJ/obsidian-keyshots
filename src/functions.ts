@@ -4,6 +4,7 @@ import KeyshotsPlugin from "./plugin";
 import {PrismLanguage} from "./mappings/prism-langs";
 import SelectionsProcessing from "./classes/selections-processing"
 import {VerticalDirection} from "./classes/vertical-direction";
+import EditorPositionManipulator from "./classes/editor-position-manipulator";
 
 export function moveLine(editor: Editor, direction: VerticalDirection, border: number) {
     SelectionsProcessing.selectionsProcessor(editor, undefined, (sel) => {
@@ -95,7 +96,10 @@ export function insertLine(editor: Editor, direction: VerticalDirection) {
     })
 }
 
-export function flipBooleanSetting(app: App, setting: keyof VaultConfig) {
+export function flipBooleanSetting(
+    app: App,
+    setting: { [k in keyof VaultConfig]: VaultConfig[k] extends boolean ? k : never }[keyof VaultConfig]
+) {
     app.vault.setConfig(setting, !app.vault.getConfig(setting))
 }
 
@@ -375,4 +379,86 @@ export function toggleFocusMode() {
         cls.remove("keyshots-focus-mode");
     else
         cls.add("keyshots-focus-mode");
+}
+
+const FOLDING_REGEX = /#{1,6} .+/
+
+export function goToNextFolding(editor: Editor){
+    const cursor = EditorPositionManipulator.mainCursor(editor);
+    if (!editor.getValue().substring(cursor.toOffset()).includes("\n")) return;
+    const browseDoc = editor.getValue().substring(cursor.clone().setPos(cursor.line+1,0).toOffset());
+    browseDoc.split("\n").every((v,i,arr)=>{
+        let cursorIndent = 0;
+        const indentMatch = v.match(/^((?:\t| {4})*)(-|\d+\.) /);
+        if (indentMatch){
+            const indentString = indentMatch[1];
+            const indent = indentString.includes(" ") ? indentString.length/4 : indentString.length;
+            if (!arr[i+1].match(new RegExp(`(?:\t| {4}){${indent+1}}(?=- |\\d+\\. )`))) return true;
+            cursorIndent = (indentString.includes(" ") ? indent*4 : indent)+indentMatch[2].length+1;
+        }
+        else if (!v.match(FOLDING_REGEX)) return true;
+
+        cursor.setPos(cursor.line+1+i,cursorIndent);
+        editor.setCursor(cursor.line,cursor.ch);
+        return false;
+    })
+}
+
+export function goToPreviousFolding(editor: Editor){
+    const cursor = EditorPositionManipulator.mainCursor(editor);
+    if (!editor.getValue().substring(0,cursor.toOffset()).includes("\n")) return;
+    const browseDoc = editor.getValue().substring(0,cursor.clone().setPos(cursor.line-1,editor.getLine(cursor.line-1).length).toOffset());
+    browseDoc.split("\n").reverse().every((v,i,arr)=>{
+        let cursorIndent = 0;
+        const indentMatch = v.match(/^((?:\t| {4})*)(-|\d+\.) /);
+        if (indentMatch){
+            const indentString = indentMatch[1];
+            const indent = indentString.includes(" ") ? indentString.length/4 : indentString.length;
+            if (!arr[i+1].match(new RegExp(`(?:\t| {4}){${indent-1}}(?=- |\\d+\\. )`))) return true;
+            cursorIndent = (indentString.includes(" ") ? indent*4 : indent)+indentMatch[2].length+1;
+        }
+        else if (!v.match(FOLDING_REGEX)) return true;
+        cursor.setPos(cursor.line-1-i,cursorIndent);
+        editor.setCursor(cursor.line,cursor.ch);
+        return false;
+    })
+}
+
+export function goToParentFolding(editor: Editor){
+    const cursor = EditorPositionManipulator.mainCursor(editor);
+    if (!editor.getValue().substring(0,cursor.toOffset()).includes("\n")) return;
+    const browseDoc = editor.getValue().substring(0,cursor.clone().setPos(cursor.line-1,editor.getLine(cursor.line-1).length).toOffset());
+    const line = editor.getLine(cursor.line);
+
+    const listMatch = line.match(/^((?:\t| {4})*)(-|\d+\.) /)
+    if (listMatch) {
+
+        const indentString = listMatch[1];
+        const indent = indentString.includes(" ") ? indentString.length/4 : indentString.length;
+
+        if (!browseDoc.split("\n").reverse().every((v,i)=> {
+            const prevMatch = v.match(new RegExp(`^(?:\\t| {4}){${indent-1}}(-|\\d+\\.) `));
+            if (!prevMatch) return true;
+            cursor.setPos(cursor.line-1-i,(indentString.includes(" ") ? indent*4 :indent)+prevMatch[1].length);
+            editor.setCursor(cursor.line,cursor.ch);
+            return false;
+        })) return;
+    }
+    const headingMatch = line.match(/^(#{1,6}) /);
+    if (headingMatch) {
+        const headingLevel = headingMatch[1].length;
+        if (!browseDoc.split("\n").reverse().every((v,i)=> {
+            const prevMatch = v.match(new RegExp(`^#{1,${headingLevel-1}} `));
+            if (!prevMatch) return true;
+            cursor.setPos(cursor.line-1-i,prevMatch[0].length);
+            editor.setCursor(cursor.line,cursor.ch);
+            return false;
+        })) return;
+    }
+    browseDoc.split("\n").reverse().every((v,i)=>{
+        if (!v.match(FOLDING_REGEX)) return true;
+        cursor.setPos(cursor.line-1-i,0);
+        editor.setCursor(cursor.line,cursor.ch);
+        return false;
+    })
 }

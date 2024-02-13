@@ -352,6 +352,27 @@ export const COMMANDS = (plugin: KeyshotsPlugin, map: KeyshotsMap): KeyshotsComm
         editorCallback: (editor) => functions.splitSelectedTextOnNewLine(editor)
     },
     {
+        category: Category.TRANSFORM_SELECTIONS,
+        id: 'go-to-next-fold',
+        name: "Go to next fold",
+        hotkeys: map.go_to_next_fold,
+        editorCallback: (editor) => functions.goToNextFolding(editor)
+    },
+    {
+        category: Category.TRANSFORM_SELECTIONS,
+        id: 'go-to-previous-fold',
+        name: "Go to previous fold",
+        hotkeys: map.go_to_previous_fold,
+        editorCallback: (editor) => functions.goToPreviousFolding(editor)
+    },
+    {
+        category: Category.TRANSFORM_SELECTIONS,
+        id: 'go-to-parent-fold',
+        name: "Go to parent fold",
+        hotkeys: map.go_to_parent_fold,
+        editorCallback: (editor) => functions.goToParentFolding(editor)
+    },
+    {
         category: Category.OBSIDIAN_SETTINGS,
         id: 'switch-inline-title-setting',
         name: "Switch 'inline title' setting",

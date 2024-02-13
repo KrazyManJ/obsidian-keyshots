@@ -317,6 +317,9 @@ Current available commands are:
 #### New commands
 
 - `Toggle focus mode` - hides ribbon menu, sidebars, and toggle app fullscreen
+- `Go to next fold` -
+- `Go to previous fold` -
+- `Go to parent fold` -
 
 #### Fixes
 

@@ -51,7 +51,10 @@ export default class EditorPositionManipulator implements EditorPosition, JavaLi
     }
 
     static documentStart(editor: Editor): EditorPositionManipulator {
-        return new EditorPositionManipulator({ch: 0, line: 0}, editor)
+        return new EditorPositionManipulator({ch: 0, line: 0}, editor);
     }
 
+    static mainCursor(editor: Editor): EditorPositionManipulator {
+        return new EditorPositionManipulator(editor.getCursor(), editor);
+    }
 }
