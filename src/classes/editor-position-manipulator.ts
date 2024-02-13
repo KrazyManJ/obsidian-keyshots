@@ -22,7 +22,7 @@ export default class EditorPositionManipulator implements EditorPosition, JavaLi
     }
 
     asEditorRange(): EditorRange {
-        return {from: this, to: this}
+        return {from: this.toEditorPosition(), to: this.toEditorPosition()}
     }
 
     getLine(): string {
@@ -46,8 +46,22 @@ export default class EditorPositionManipulator implements EditorPosition, JavaLi
         return this
     }
 
+    moveToEndOfLine(): this {
+        this.ch = this.editor.getLine(this.line).length;
+        return this;
+    }
+
+    moveToStartOfLine(): this {
+        this.ch = 0;
+        return this;
+    }
+
     toOffset(): number {
         return this.editor.posToOffset(this)
+    }
+
+    toEditorPosition(): EditorPosition {
+        return { line: this.line, ch: this.ch}
     }
 
     static documentStart(editor: Editor): EditorPositionManipulator {

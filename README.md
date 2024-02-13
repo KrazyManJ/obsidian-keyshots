@@ -320,9 +320,9 @@ Current available commands are:
 - `Go to next fold` -
 - `Go to previous fold` -
 - `Go to parent fold` -
+- Double key `Open Command-Palette` command via double <kbd>Ctrl</kbd> shortcut.
 
 #### Fixes
 
 - Made double key quick switcher shortcut to be triggered on second release rather than on second press
 - Double key registry registers command on release only if command released in desired timestamp
-- Added double key `Open Command-Palette` command via double <kbd>Ctrl</kbd> shortcut.

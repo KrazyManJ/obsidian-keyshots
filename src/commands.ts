@@ -356,14 +356,14 @@ export const COMMANDS = (plugin: KeyshotsPlugin, map: KeyshotsMap): KeyshotsComm
         id: 'go-to-next-fold',
         name: "Go to next fold",
         hotkeys: map.go_to_next_fold,
-        editorCallback: (editor) => functions.goToNextFolding(editor)
+        editorCallback: (editor) => functions.goToFolding(editor, VerticalDirection.DOWN)
     },
     {
         category: Category.TRANSFORM_SELECTIONS,
         id: 'go-to-previous-fold',
         name: "Go to previous fold",
         hotkeys: map.go_to_previous_fold,
-        editorCallback: (editor) => functions.goToPreviousFolding(editor)
+        editorCallback: (editor) => functions.goToFolding(editor, VerticalDirection.UP)
     },
     {
         category: Category.TRANSFORM_SELECTIONS,
