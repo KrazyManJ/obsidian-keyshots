@@ -312,7 +312,7 @@ Current available commands are:
 
 ---
 
-### 2.2.0
+### 2.2.0 (Latest Release)
 
 #### New commands
 
