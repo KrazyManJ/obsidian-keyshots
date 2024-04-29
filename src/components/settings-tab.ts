@@ -5,6 +5,17 @@ import {IDE_LABELS} from "../mappings/ide-info";
 import {DEFAULT_SETTINGS} from "../settings";
 import {KEYSHOTS_SVG} from "../svgs";
 
+
+function getOpenCommands() {
+    const cmds: Record<string, string> = {}
+    Array.of("switcher", "omnisearch", "darlal-switcher-plus").forEach((pluginId) => {
+        Object.values(app.commands.commands)
+            .filter((v) => v.id.startsWith(pluginId))
+            .forEach((v) => cmds[v.id] = v.name)
+    })
+    return cmds;
+}
+
 export class KeyshotsSettingTab extends PluginSettingTab {
     plugin: KeyshotsPlugin;
 
@@ -15,6 +26,7 @@ export class KeyshotsSettingTab extends PluginSettingTab {
 
     display() {
         const {containerEl} = this;
+        containerEl.classList.add("keyshots-settings")
         containerEl.empty()
         const title = containerEl.createEl('h1', {text: "Keyshots Settings"})
         title.innerHTML = KEYSHOTS_SVG(48) + title.innerHTML
@@ -105,11 +117,11 @@ export class KeyshotsSettingTab extends PluginSettingTab {
             .setDesc(
                 new DocumentFragmentBuilder()
                     .appendText("Adds new callout types defined by user separated by new line (")
-                    .createElem("kbd",{text:"Enter"})
+                    .createElem("kbd", {text: "Enter"})
                     .appendText("), you can specify aliases as well on same line separated by comma ( ")
-                    .createElem("kbd",{text:","})
+                    .createElem("kbd", {text: ","})
                     .appendText(" ). These will be used in ")
-                    .createElem("code",{text:"Better insert callout"})
+                    .createElem("code", {text: "Better insert callout"})
                     .appendText(" command to expand it's choice with user defined callouts.")
                     .toFragment()
             )
@@ -148,17 +160,18 @@ export class KeyshotsSettingTab extends PluginSettingTab {
                     this.plugin.loadDoubleKeyCommands()
                 })
             )
+        let searchEngineEl : Setting | null = null;
         new Setting(containerEl)
             .setName(new DocumentFragmentBuilder()
-                .appendText("Opening Quick-Switcher via double ")
+                .appendText("Opening switch modal via double ")
                 .createElem("kbd", {text: "Shift"})
                 .appendText(" shortcut")
                 .toFragment()
             )
             .setDesc(new DocumentFragmentBuilder()
-                .appendText("If you have Quick Switcher plugin enabled, hitting ")
+                .appendText("If you have any of switch engine selected, hitting ")
                 .createElem("kbd", {text: "Shift"})
-                .appendText(" twice will open quick switcher window.")
+                .appendText(" twice will select open switch modal window.")
                 .toFragment()
             )
             .addToggle(cb => cb
@@ -166,9 +179,43 @@ export class KeyshotsSettingTab extends PluginSettingTab {
                 .onChange(async (value) => {
                     this.plugin.settings.quick_switch_via_double_shift = value
                     await this.plugin.saveSettings()
+                    searchEngineEl?.setDisabled(!value)
                     this.plugin.loadDoubleKeyCommands()
                 })
             )
+        searchEngineEl = new Setting(containerEl)
+            .setName(new DocumentFragmentBuilder()
+                .appendText("Switch engine for double ")
+                .createElem("kbd", {text: "Shift"})
+                .appendText(" shortcut")
+                .toFragment()
+            )
+            .setDesc(new DocumentFragmentBuilder()
+                .appendText("Here you can select any of supported switch engines.")
+                .createElem("br")
+                .appendText("Currently supported: Quick switcher, ")
+                .createElem("a",{text:"Omnisearch",href:"https://obsidian.md/plugins?id=omnisearch"})
+                .appendText(", ")
+                .createElem("a",{text:"Quick Switcher++",href:"https://obsidian.md/plugins?id=darlal-switcher-plus"})
+                .appendText(".")
+                .toFragment()
+            )
+            .setClass("indent")
+            .addDropdown(cb => {
+                const cmds = getOpenCommands()
+                const currSetting = this.plugin.settings.open_file_command
+                cb.addOption("","-- No engine selected --")
+                cb.addOptions(cmds)
+                cb.setValue(Object.keys(cmds).contains(currSetting) ? currSetting : "")
+                cb.onChange(async (value) => {
+                    this.plugin.settings.open_file_command = value
+                    await this.plugin.saveSettings()
+                })
+            })
+
+        if (!this.plugin.settings.quick_switch_via_double_shift) {
+            searchEngineEl.setDisabled(true)
+        }
         new Setting(containerEl)
             .setName(new DocumentFragmentBuilder()
                 .appendText("Opening Command-Palette via double ")

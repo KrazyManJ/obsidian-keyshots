@@ -125,3 +125,11 @@ body.keyshots-focus-mode {
     }
 }
 
+div.keyshots-settings {
+    .is-disabled {
+        opacity: 0.5;
+    }
+    .indent {
+        padding-left: 2em;
+    }
+}

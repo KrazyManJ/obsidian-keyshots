@@ -7,6 +7,7 @@ export declare interface KeyshotsSettings {
     quick_switch_via_double_shift: boolean
     command_palette_via_double_ctrl: boolean
     callouts_list: string[]
+    open_file_command: string
     modal_table_last_used_rows: number
     modal_table_last_used_columns: number
     modal_regex_last_used_pattern: string
@@ -25,6 +26,7 @@ export const DEFAULT_SETTINGS: KeyshotsSettings = {
     quick_switch_via_double_shift: false,
     command_palette_via_double_ctrl: false,
     callouts_list: [],
+    open_file_command: "",
     modal_table_last_used_rows: 2,
     modal_table_last_used_columns: 2,
     modal_regex_last_used_pattern: "",

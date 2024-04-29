@@ -467,9 +467,15 @@ export const DOUBLE_KEY_COMMANDS = (plugin: KeyshotsPlugin): PluginConditionalOb
             key: "Shift",
             maxDelay: 400,
             lastReleasedCallback: (interrupted) => {
-                if (!interrupted) functions.runCommandById(plugin, "switcher:open",
-                    () => new Notice("Quick Switcher plugin is not enabled!")
-                )
+                if (!interrupted) {
+                    if (plugin.settings.open_file_command === ""){
+                        new Notice("You have no selected switch engine to use with double shift command!")
+                        return
+                    }
+                    functions.runCommandById(plugin, plugin.settings.open_file_command,
+                        () => new Notice("Selected switch engine is no longer available, please select another one in settings!")
+                    )
+                }
             }
 
         }

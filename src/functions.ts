@@ -288,8 +288,7 @@ export function addCaretsViaDoubleKey(plugin: KeyshotsPlugin, ev: KeyboardEvent)
 }
 
 export function runCommandById(keyshotsPlugin: KeyshotsPlugin, id: string, notAvailableCallback: () => void) {
-    const plugin = keyshotsPlugin.app.internalPlugins.plugins[id.split(":")[0]]
-    if (plugin && plugin.enabled) keyshotsPlugin.app.commands.executeCommandById(id)
+    if (Object.keys(keyshotsPlugin.app.commands.commands).contains(id)) keyshotsPlugin.app.commands.executeCommandById(id)
     else notAvailableCallback()
 }
 

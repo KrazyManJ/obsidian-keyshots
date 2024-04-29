@@ -14,10 +14,17 @@ declare module 'obsidian' {
         setConfig<T extends keyof VaultConfig>(config: T, value: VaultConfig[T]): void;
     }
 
+    interface ACommand {
+        id: string
+        name: string
+    }
+
     interface CommandManager {
         removeCommand(...id: string[]): void;
 
         executeCommandById(id: string): boolean;
+
+        commands: Record<string, ACommand>
     }
 
     interface SettingManager {
