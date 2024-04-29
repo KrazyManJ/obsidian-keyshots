@@ -4,7 +4,7 @@ import {CallbackSuggestModal} from "./abstract/callback-suggest-modal";
 
 export default class CalloutPickerModal extends CallbackSuggestModal<string> {
 
-    private static readonly CALLOUTS: string[][] = [
+    private static readonly ROOT_CALLOUTS: string[][] = [
         ["note"],
         ["abstract", "summary", "tldr"],
         ["info"],
@@ -25,7 +25,14 @@ export default class CalloutPickerModal extends CallbackSuggestModal<string> {
     }
 
     getSuggestions(query: string): string[] | Promise<string[]> {
-        return CalloutPickerModal.CALLOUTS.filter(ids => ids.filter(id => id.includes(query.toLowerCase())).length > 0).map(ids => ids[0]);
+        return CalloutPickerModal.ROOT_CALLOUTS
+            .concat(
+                this.plugin.settings.callouts_list
+                    .filter(v => v.length > 0 && v.replace(/\s/g,'').length != 0)
+                    .map(v => v.split(","))
+            )
+            .filter(ids => ids.filter(id => id.includes(query.toLowerCase())).length > 0)
+            .map(ids => ids[0]);
     }
 
     renderSuggestion(value: string, el: HTMLElement) {
