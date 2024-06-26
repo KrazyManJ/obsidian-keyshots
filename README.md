@@ -312,7 +312,7 @@ Current available commands are:
 
 ---
 
-### 2.2.0 (Latest Release)
+### 2.2.0
 
 #### New commands
 
@@ -326,3 +326,19 @@ Current available commands are:
 
 - Made double key quick switcher shortcut to be triggered on second release rather than on second press
 - Double key registry registers command on release only if command released in desired timestamp
+
+---
+
+### 2.3.0 - Few fixes and improvements (Latest Release)
+
+#### New features
+
+- Ability to add custom callouts for `Better insert callout` command (#8)
+- Double <kbd>shift</kbd> now improved to be able to select community switch engines, supported plugins are (#7):
+  - Quick switcher (Core plugin)
+  - Omnisearch
+  - Quick Switcher++
+
+#### Improvements
+
+- Fixed behavior of `Go to next/previous fold` commands (#5)
