@@ -398,17 +398,58 @@ export function goToFolding(editor: Editor, direction: VerticalDirection) {
     );
     const lines = browseDoc.split("\n");
     if (!isDown()) lines.reverse();
-    lines.every((v, i, arr) => {
-        let cursorIndent = 0;
-        if (v.match(FOLDING_REGEX) && i == 0) return true;
-        const indentMatch = v.match(/^((?:\t| {4})*)(-|\d+\.|- \[[x ]]) /);
-        if (indentMatch) {
-            const indentString = indentMatch[1];
-            const indent = indentString.includes(" ") ? indentString.length / 4 : indentString.length;
-            if (!(arr[i + (isDown() ? 1 : -1)] ?? "").match(new RegExp(`^(?:\\t| {4}){${indent+1}}(?=- |\\d+\\. |- \\[[x ]] )`))) return true; /* diff */
-            cursorIndent = (indentString.includes(" ") ? indent * 4 : indent) + indentMatch[2].length + 1;
-        } else if (!v.match(FOLDING_REGEX)) return true;
-        editor.setCursor(cursor.setPos(isDown() ? cursor.line + 1 + i : cursor.line - i, cursorIndent).toEditorPosition());
+
+    const currLine = editor.getLine(cursor.line);
+
+    const HEAD_REGEX = /^(#{1,6})\s/;
+    const LIST_REGEX = /^([\s\t]*)(?:[0-9]+\.|-(?=\s[^[])|- \[[ x]])\s/;
+    const ALL_FOLDING_REGEX = new RegExp(`${HEAD_REGEX.source}|${LIST_REGEX.source}`)
+
+    //HEAD
+    let currLineMatch = currLine.match(HEAD_REGEX);
+    if (currLineMatch){
+        if (!lines.every((v,i) => {
+            const m = v.match(HEAD_REGEX)
+
+            if (!m) return true;
+            // @ts-ignore
+            if (m[1].length < currLineMatch?.[1].length) return false;
+            if (m[1] != currLineMatch?.[1]) return true;
+
+            editor.setCursor(cursor.setPos(isDown() ? cursor.line + 1 + i : cursor.line - i, m?.[0].length).toEditorPosition());
+            return false;
+        })) return;
+    }
+
+    //LIST
+    currLineMatch = currLine.match(LIST_REGEX)
+    if (currLineMatch){
+        if (!lines.every((v,i,arr) => {
+            const m = v.match(LIST_REGEX)
+            if (!m) return true;
+            // @ts-ignore
+            if (m[1].length < currLineMatch?.[1].length) return false;
+            if (m[1] != currLineMatch?.[1]) return true;
+            const possibleChild = arr[i+direction] ? arr[i+direction].match(LIST_REGEX) : undefined
+            const indentFactor = (currLineMatch[0].startsWith("\t") || (possibleChild && possibleChild[0].startsWith("\t"))) ? 1 : app.vault.getConfig("tabSize")
+            if (!(possibleChild && possibleChild[1].length == m[1].length+indentFactor)) return true;
+            editor.setCursor(cursor.setPos(isDown() ? cursor.line + 1 + i : cursor.line - i, m?.[0].length).toEditorPosition());
+            return false;
+        }))
+        return;
+    }
+
+    //ANYTHING
+    lines.every((v,i,arr) => {
+        const m = v.match(ALL_FOLDING_REGEX)
+        if (!m) return true;
+        const indent = m[1] ? m[1] : m[2]
+        if (v.match(LIST_REGEX)) {
+            const possibleChild = arr[i+direction] ? arr[i+direction].match(LIST_REGEX) : undefined
+            const indentFactor = possibleChild && possibleChild[0].startsWith("\t") ? 1 : app.vault.getConfig("tabSize")
+            if (!(possibleChild && possibleChild[1].length == indent.length+indentFactor)) return true;
+        }
+        editor.setCursor(cursor.setPos(isDown() ? cursor.line + 1 + i : cursor.line - i, m?.[0].length).toEditorPosition());
         return false;
     })
 }

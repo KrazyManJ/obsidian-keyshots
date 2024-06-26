@@ -6,6 +6,7 @@ declare module 'obsidian' {
         showLineNumber: boolean
         livePreview: boolean
         showInlineTitle: boolean
+        tabSize: number
     }
 
     interface Vault {
