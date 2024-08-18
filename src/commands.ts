@@ -402,6 +402,22 @@ export const COMMANDS = (plugin: KeyshotsPlugin, map: KeyshotsMap): KeyshotsComm
     },
     {
         category: Category.OTHER,
+        id: 'reopen-current-note',
+        name: "Reopen current note",
+        hotkeys: map.reopen_current_note,
+        checkCallback: (checking) => {
+            const file = app.workspace.getActiveFile();
+            if (file){
+                if (!checking)
+                    // @ts-ignore
+                    app.workspace.getLeaf(false).open(null).then(() => app.workspace.getLeaf(false).openFile(file));
+                else return true;
+            }
+            return false
+        }
+    },
+    {
+        category: Category.OTHER,
         id: 'toggle-focus-mode',
         name: "Toggle focus mode",
         hotkeys: map.toggle_focus_mode,

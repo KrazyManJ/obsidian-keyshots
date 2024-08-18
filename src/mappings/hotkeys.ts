@@ -33,6 +33,7 @@ export declare interface KeyshotsMap {
     open_all_foldable_callouts?: Hotkey[]
     open_dev_tools?: Hotkey[]
     open_keyshots_settings_tab?: Hotkey[]
+    reopen_current_note?: Hotkey[]
     replace_by_regex?: Hotkey[]
     reverse_selected_lines?: Hotkey[]
     search_by_regex?: Hotkey[]
@@ -90,6 +91,7 @@ export const DEFAULT_MAP: KeyshotsMap = {
     open_all_foldable_callouts: HotKey("O", "Shift", "Alt"),
     open_dev_tools: HotKey("F12"),
     open_keyshots_settings_tab: HotKey(",", "Mod", "Alt"),
+    reopen_current_note: HotKey("Q", "Alt"),
     replace_by_regex: HotKey("H", "Mod", "Alt"),
     reverse_selected_lines: HotKey("R", "Alt"),
     search_by_regex: HotKey("S", "Mod", "Alt"),
