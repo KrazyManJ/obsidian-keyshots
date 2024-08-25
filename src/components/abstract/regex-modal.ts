@@ -110,7 +110,9 @@ export default abstract class RegexModal<T extends BaseRegexData> extends Callba
     protected updatePreview() {
         this.previewEl.empty();
         if (this.preview) {
-            MarkdownRenderer.renderMarkdown(this.previewProcessor(this.editorContent), this.previewEl, "", new Component()).then();
+            MarkdownRenderer.renderMarkdown(this.previewProcessor(
+                this.editorContent.replace(/(^---\n(?:[\s\S]*?|))excalidraw-plugin:.+\n((?:[\s\S]*?\n|)---$)/m,"$1$2")
+            ), this.previewEl, "", new Component()).then();
             this.previewEl.classList.replace("raw", "markdown-rendered")
         } else {
             const content = this.previewEl.createEl("div")
