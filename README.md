@@ -105,20 +105,24 @@ hotkey is used instead *(This behavior can be changed in settings)*.
 | `Trim selections`                                | <kbd>Alt</kbd> + <kbd>T</kbd>                                      |                                                       |                                                                    |                                                   |
 | `Add caret cursor down`                          | <kbd>Ctrl</kbd> + <kbd>Alt</kbd> + <kbd>↓</kbd>                    | <kbd>Ctrl</kbd> + <kbd>Alt</kbd> + <kbd>↓</kbd>       |                                                                    | <kbd>Shift</kbd> + <kbd>Alt</kbd> + <kbd>↓</kbd>  |
 | `Add caret cursor up`                            | <kbd>Ctrl</kbd> + <kbd>Alt</kbd> + <kbd>↑</kbd>                    | <kbd>Ctrl</kbd> + <kbd>Alt</kbd> + <kbd>↑</kbd>       |                                                                    | <kbd>Shift</kbd> + <kbd>Alt</kbd> + <kbd>↑</kbd>  |
-| `Search by Regular Expression (Regex)`           | <kbd>Ctrl</kbd> + <kbd>Alt</kbd> + <kbd>F</kbd>                    |                                                       |                                                                    |                                                   |
+| `Search by Regular Expression (Regex)`           | <kbd>Ctrl</kbd> + <kbd>Alt</kbd> + <kbd>S</kbd>                    |                                                       |                                                                    |                                                   |
 | `Select all word instances`                      | <kbd>Ctrl</kbd> + <kbd>Shift</kbd> + <kbd>L</kbd>                  | <kbd>Ctrl</kbd> + <kbd>Shift</kbd> + <kbd>L</kbd>     | <kbd>Ctrl</kbd> + <kbd>Shift</kbd> + <kbd>Alt</kbd> + <kbd>J</kbd> | <kbd>Shift</kbd> + <kbd>Alt</kbd> + <kbd>;</kbd>  |
 | `Select multiple word instances`                 | <kbd>Ctrl</kbd> + <kbd>D</kbd>                                     | <kbd>Ctrl</kbd> + <kbd>D</kbd>                        | <kbd>Alt</kbd> + <kbd>J</kbd>                                      | <kbd>Shift</kbd> + <kbd>Alt</kbd> + <kbd>.</kbd>  |
 | `Split selections by lines`                      | <kbd>Ctrl</kbd> + <kbd>Alt</kbd> + <kbd>L</kbd>                    |                                                       |                                                                    |                                                   |
 | `Expand line selections`                         | <kbd>Alt</kbd> + <kbd>E</kbd>                                      | <kbd>Ctrl</kbd> + <kbd>L</kbd>                        | <kbd>Ctrl</kbd> + <kbd>W</kbd>                                     | <kbd>Shift</kbd> + <kbd>Alt</kbd> + <kbd>=</kbd>  |
 | `Split selections on new line`                   | <kbd>Alt</kbd> + <kbd>S</kbd>                                      |                                                       |                                                                    |                                                   |
+| `Go to next fold`                                | <kbd>Ctrl</kbd> + <kbd>Alt</kbd> + <kbd>]</kbd>                    |                                                       |                                                                    |                                                   |
+| `Go to previous fold`                            | <kbd>Ctrl</kbd> + <kbd>Alt</kbd> + <kbd>[</kbd>                    |                                                       |                                                                    |                                                   |
+| `Go to parent fold`                              | <kbd>Ctrl</kbd> + <kbd>Alt</kbd> + <kbd>P</kbd>                    |                                                       |                                                                    |                                                   |
 | `Switch 'inline title' setting`                  | <kbd>Ctrl</kbd> + <kbd>Alt</kbd> + <kbd>T</kbd>                    |                                                       |                                                                    |                                                   |
 | `Switch 'line numbers' setting`                  | <kbd>Ctrl</kbd> + <kbd>Alt</kbd> + <kbd>N</kbd>                    |                                                       |                                                                    |                                                   |
 | `Switch 'readable line length' setting`          | <kbd>Ctrl</kbd> + <kbd>Alt</kbd> + <kbd>R</kbd>                    |                                                       |                                                                    |                                                   |
 | `Open developer tools`                           | <kbd>F12</kbd>                                                     |                                                       |                                                                    |                                                   |
+| `Reopen current note`                            | <kbd>Alt</kbd> + <kbd>Q</kbd>                                      |                                                       |                                                                    |                                                   |
+| `Toggle focus mode`                              | <kbd>Ctrl</kbd> + <kbd>Alt</kbd> + <kbd>F</kbd>                    |                                                       |                                                                    |                                                   |
 | `Change Keyshots preset`                         | <kbd>Ctrl</kbd> + <kbd>Shift</kbd> + <kbd>P</kbd>                  |                                                       |                                                                    |                                                   |
 | `Open Keyshots settings tab`                     | <kbd>Ctrl</kbd> + <kbd>Alt</kbd> + <kbd>,</kbd>                    |                                                       |                                                                    |                                                   |
 | `Switch Keyshots case sensitivity`               | <kbd>Ctrl</kbd> + <kbd>Alt</kbd> + <kbd>I</kbd>                    |                                                       |                                                                    |                                                   |
-
 ## ✌️⌨️ Double-Key commands
 
 Double key commands are feature used in JetBrains IDEs, that are 
@@ -342,3 +346,15 @@ Current available commands are:
 #### Improvements
 
 - Fixed behavior of `Go to next/previous fold` commands (#5)
+
+### 2.4.0
+
+#### New commands
+
+- `Reopen current note` - reopens current note (useful for reloading content that re-loads only when note is closed and opened)
+
+#### Fixes
+
+- Fixed behavior of `Expand line selection` command (#11)
+- Fixed preview behavior of `excalidraw` for commands based on regex modal
+- Fixed coloring for `Insert table` command
