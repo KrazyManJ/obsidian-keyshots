@@ -1,4 +1,4 @@
-import {Command, Notice} from "obsidian";
+import {Command, Notice, WorkspaceLeaf} from "obsidian";
 import * as functions from "./functions";
 import {KeyshotsMap} from "./mappings/hotkeys"
 import KeyshotsPlugin from "./plugin";
@@ -410,7 +410,7 @@ export const COMMANDS = (plugin: KeyshotsPlugin, map: KeyshotsMap): KeyshotsComm
             if (file){
                 if (!checking)
                     // @ts-ignore
-                    app.workspace.getLeaf(false).open(null).then(() => app.workspace.getLeaf(false).openFile(file));
+                    (app.workspace.getLeaf(false) as WorkspaceLeaf & {rebuildView(): void}).rebuildView();
                 else return true;
             }
             return false

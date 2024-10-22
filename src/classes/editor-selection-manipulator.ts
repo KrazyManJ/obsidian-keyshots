@@ -52,9 +52,9 @@ export default class EditorSelectionManipulator implements EditorSelection, Java
         return this.clone().normalize()
     }
 
-    expand(): this {
+    expand(addLine = false): this {
         this.normalize()
-        if (this.anchor.ch === 0 && this.head.ch === this.editor.getLine(this.head.line).length)
+        if (this.anchor.ch === 0 && this.head.ch === this.editor.getLine(this.head.line).length && addLine)
             this.moveLines(0,1)
         this.setChars(0,this.editor.getLine(this.head.line).length)
         return this

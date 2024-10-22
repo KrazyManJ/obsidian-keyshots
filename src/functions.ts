@@ -138,7 +138,7 @@ export function sortSelectedLines(editor: Editor) {
         const replaceSel = sel.asNormalized().expand()
         replaceSel.replaceText(replaceSel.getText()
             .split("\n")
-            .sort((a, b) => a.localeCompare(b, undefined, {numeric: true, sensitivity: "base"}))
+            .sort((a: string, b: string) => a.localeCompare(b, undefined, {numeric: true, sensitivity: "base"}))
             .join("\n")
         )
         return sel
@@ -197,7 +197,7 @@ export function selectAllWordInstances(editor: Editor, case_sensitive: boolean) 
 }
 
 export function expandSelections(editor: Editor) {
-    SelectionsProcessing.selectionsProcessor(editor, undefined, sel => sel.expand())
+    SelectionsProcessing.selectionsProcessor(editor, undefined, sel => sel.expand(true))
 }
 
 export async function toggleCaseSensitivity(plugin: KeyshotsPlugin) {
