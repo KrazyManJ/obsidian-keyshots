@@ -36,6 +36,7 @@ div.keyshots-table-modal {
                 &:nth-child(1){
                     opacity: 0.5;
                     cursor: initial;
+                    pointer-events: none;
                 }
                 &::before {
                     border: 0.1px solid #888;
@@ -50,7 +51,7 @@ div.keyshots-table-modal {
                     transform: translate(-50%,-50%);
                 }
                 &.hovered::before {
-                    background: #313131;
+                    background: var(--color-base-30);
                 }
             }
         }
