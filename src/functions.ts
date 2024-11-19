@@ -74,6 +74,7 @@ export function addCarets(editor: Editor, direction: VerticalDirection, border: 
     }
     selections.splice(mainIndex, 1)
     selections.unshift(main)
+    editor.setSelections([newSel])
     editor.setSelections(selections)
     editor.scrollIntoView(newSel.anchor.clone().setPos(
         Math.min(editor.lineCount() - 1, newSel.anchor.line + direction * 2), newSel.anchor.ch
