@@ -1,6 +1,6 @@
 import CallbackModal from "./callback-modal";
 import {ButtonComponent, Component, MarkdownRenderer, Setting, TextComponent} from "obsidian";
-import {DocumentFragmentBuilder} from "../../classes/document-fragment-builder";
+import DocumentFragmentBuilder from "../../classes/DocumentFragmentBuilder";
 import KeyshotsPlugin from "../../plugin";
 
 

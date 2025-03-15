@@ -1,10 +1,10 @@
-import EditorSelectionManipulator from "./classes/editor-selection-manipulator";
+import EditorSelectionManipulator from "./classes/EditorSelectionManipulator";
 import {App, Editor, EditorRange, MarkdownView, Notice, VaultConfig} from "obsidian";
 import KeyshotsPlugin from "./plugin";
 import {PrismLanguage} from "./mappings/prism-langs";
-import SelectionsProcessing from "./classes/selections-processing"
-import {VerticalDirection} from "./classes/vertical-direction";
-import EditorPositionManipulator from "./classes/editor-position-manipulator";
+import SelectionsProcessing from "./classes/SelectionsProcessing"
+import {VerticalDirection} from "./model/VerticalDirection";
+import EditorPositionManipulator from "./classes/EditorPositionManipulator";
 
 export function moveLine(editor: Editor, direction: VerticalDirection, border: number) {
     SelectionsProcessing.selectionsProcessor(editor, undefined, (sel) => {

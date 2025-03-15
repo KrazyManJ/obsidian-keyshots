@@ -2,14 +2,14 @@ import {Command, Notice, WorkspaceLeaf} from "obsidian";
 import * as functions from "./functions";
 import {KeyshotsMap} from "./mappings/hotkeys"
 import KeyshotsPlugin from "./plugin";
-import {DoubleKeyCommand} from "./classes/double-key-registry";
 import IDEPresetModal from "./components/ide-preset-modal";
 import CodeBlockModal from "./components/code-block-modal";
-import {VerticalDirection} from "./classes/vertical-direction";
+import {VerticalDirection} from "./model/VerticalDirection";
 import CalloutPickerModal from "./components/callout-picker-modal";
 import TableModal from "./components/table-modal";
 import RegexReplaceModal from "./components/regex/regex-replace-modal";
 import RegexSearchModal from "./components/regex/regex-search-modal";
+import {DoubleKeyCommand} from "./model/DoubleKeyCommand";
 
 
 enum Category {

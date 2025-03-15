@@ -1,8 +1,7 @@
 import {Editor, EditorPosition, EditorRange, EditorSelection} from "obsidian";
-import EditorPositionManipulator from "./editor-position-manipulator";
-import {JavaLikeObject} from "./java-like-object";
+import EditorPositionManipulator from "./EditorPositionManipulator";
 
-export default class EditorSelectionManipulator implements EditorSelection, JavaLikeObject<EditorSelectionManipulator> {
+export default class EditorSelectionManipulator implements EditorSelection {
 
     anchor: EditorPositionManipulator
     head: EditorPositionManipulator

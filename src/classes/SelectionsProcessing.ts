@@ -1,5 +1,5 @@
 import {Editor, EditorSelection} from "obsidian";
-import EditorSelectionManipulator from "./editor-selection-manipulator";
+import EditorSelectionManipulator from "./EditorSelectionManipulator";
 
 
 export default abstract class SelectionsProcessing {

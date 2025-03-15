@@ -1,4 +1,4 @@
-export class DocumentFragmentBuilder {
+export default class DocumentFragmentBuilder {
     readonly #fragment: DocumentFragment
 
     constructor() {
