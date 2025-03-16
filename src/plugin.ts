@@ -1,5 +1,4 @@
 import {Command, Plugin} from 'obsidian';
-import {mapBySettings} from "./mappings/hotkeys";
 import {DEFAULT_SETTINGS, KeyshotsSettings} from "./model/KeyshotsSettings";
 import {COMMANDS, DOUBLE_KEY_COMMANDS} from "./commands";
 import DoubleKeyRegistry from "./classes/DoubleKeyRegistry";
@@ -7,7 +6,11 @@ import {KeyshotsSettingTab} from "./components/settings-tab";
 import {IDE_LABELS} from "./mappings/ide-info";
 import KeyshotsCommand from "./model/KeyshotsCommand";
 import {Preset} from "./model/Preset";
+
 import {duplicateLineDown, duplicateLineUp} from "./commands/duplicate-line";
+import {duplicateSelectionOrLine} from "./commands/duplicate-selection-or-line";
+import {insertLineAbove, insertLineBelow} from "./commands/insert-line";
+import {mapBySettings} from "./mappings/hotkeys";
 
 
 export default class KeyshotsPlugin extends Plugin {
@@ -24,7 +27,10 @@ export default class KeyshotsPlugin extends Plugin {
     private registerPluginCommands() {
         const commands: KeyshotsCommand[] = [
             duplicateLineUp,
-            duplicateLineDown
+            duplicateLineDown,
+            duplicateSelectionOrLine,
+            insertLineAbove,
+            insertLineBelow
         ]
         const preset = Preset[this.settings.ide_mappings.toUpperCase() as keyof typeof Preset]
         this._events = this._events.filter(e => !e.toString().contains(".removeCommand("))

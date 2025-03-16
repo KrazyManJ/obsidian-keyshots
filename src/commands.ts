@@ -20,30 +20,6 @@ interface KeyshotsCommand extends Command {
 export const COMMANDS = (plugin: KeyshotsPlugin, map: KeyshotsMap): KeyshotsCommand[] => [
     {
         category: Category.EDITOR_LINES_MANIPULATION,
-        id: 'duplicate-selection-or-line',
-        name: 'Duplicate selection or line (JetBrains IDEs)',
-        repeatable: true,
-        hotkeys: map.duplicate_selection_or_line,
-        editorCallback: (editor) => functions.jetBrainsDuplicate(editor)
-    },
-    {
-        category: Category.EDITOR_LINES_MANIPULATION,
-        id: 'insert-line-above',
-        name: "Insert line above",
-        repeatable: true,
-        hotkeys: map.insert_line_above,
-        editorCallback: (editor) => functions.insertLine(editor, VerticalDirection.UP)
-    },
-    {
-        category: Category.EDITOR_LINES_MANIPULATION,
-        id: 'insert-line-below',
-        name: "Insert line below",
-        repeatable: true,
-        hotkeys: map.insert_line_below,
-        editorCallback: (editor) => functions.insertLine(editor, VerticalDirection.DOWN)
-    },
-    {
-        category: Category.EDITOR_LINES_MANIPULATION,
         id: 'join-selected-lines',
         name: "Join selected lines",
         hotkeys: map.join_selected_lines,

@@ -27,19 +27,6 @@ export function moveLine(editor: Editor, direction: VerticalDirection, border: n
     })
 }
 
-export function jetBrainsDuplicate(editor: Editor) {
-    SelectionsProcessing.selectionsProcessor(editor, undefined, (sel) => {
-        if (sel.isCaret()) {
-            const tx = sel.anchor.getLine()
-            sel.anchor.setLine(tx + "\n" + tx)
-            return sel.moveLines(1)
-        } else {
-            const tx = sel.asNormalized().getText()
-            return sel.asNormalized().replaceText(tx + tx).moveChars(tx.length)
-        }
-    })
-}
-
 export function addCarets(editor: Editor, direction: VerticalDirection, border: number) {
     const selections: EditorSelectionManipulator[] = EditorSelectionManipulator.listSelections(editor)
         .sort((a, b) => a.anchor.toOffset() - b.anchor.toOffset())
@@ -62,22 +49,6 @@ export function addCarets(editor: Editor, direction: VerticalDirection, border: 
     editor.scrollIntoView(newSel.anchor.clone().setPos(
         Math.min(editor.lineCount() - 1, newSel.anchor.line + direction * 2), newSel.anchor.ch
     ).asEditorRange())
-}
-
-export function insertLine(editor: Editor, direction: VerticalDirection) {
-    SelectionsProcessing.selectionsProcessor(editor, (s) => s.sort((a, b) => a.anchor.line - b.anchor.line), (sel, index) => {
-        const a = (ln: number) => {
-            const tx = [editor.getLine(ln), "\n"]
-            if (direction < 0) tx.reverse()
-            editor.setLine(ln, tx.join(""))
-            return EditorSelectionManipulator.documentStart(editor).setLines(ln + (direction > 0 ? direction : 0))
-        }
-        if (sel.isCaret()) return a(sel.anchor.line + index)
-        else {
-            const normSel = sel.asNormalized()
-            return a((direction > 0 ? normSel.anchor.line : normSel.head.line) + index)
-        }
-    })
 }
 
 export function flipBooleanSetting(

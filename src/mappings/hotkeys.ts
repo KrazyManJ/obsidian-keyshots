@@ -9,15 +9,15 @@ export declare interface KeyshotsMap {
     better_insert_callout?: Hotkey[]
     change_keyshots_preset?: Hotkey[]
     close_all_foldable_callouts?: Hotkey[]
-    duplicate_line_down?: Hotkey[]
-    duplicate_line_up?: Hotkey[]
-    duplicate_selection_or_line?: Hotkey[]
+    // duplicate_line_down?: Hotkey[]
+    // duplicate_line_up?: Hotkey[]
+    // duplicate_selection_or_line?: Hotkey[]
     expand_line_selections?: Hotkey[]
     go_to_next_fold?: Hotkey[]
     go_to_previous_fold?: Hotkey[]
     go_to_parent_fold?: Hotkey[]
     insert_code_block?: Hotkey[]
-    insert_line_above?: Hotkey[]
+    // insert_line_above?: Hotkey[]
     insert_line_below?: Hotkey[]
     insert_ordinal_numbering?: Hotkey[]
     insert_table?: Hotkey[]
@@ -67,17 +67,17 @@ export const DEFAULT_MAP: KeyshotsMap = {
     better_insert_callout: HotKey("C", "Shift", "Alt"),
     change_keyshots_preset: HotKey("P", "Mod", "Shift"),
     close_all_foldable_callouts: HotKey("L", "Shift", "Alt"),
-    duplicate_line_down: HotKey("ArrowDown", "Shift", "Alt"),
-    duplicate_line_up: HotKey("ArrowUp", "Shift", "Alt"),
-    duplicate_selection_or_line: HotKey("D", "Mod", "Alt"),
+    // duplicate_line_down: HotKey("ArrowDown", "Shift", "Alt"),
+    // duplicate_line_up: HotKey("ArrowUp", "Shift", "Alt"),
+    // duplicate_selection_or_line: HotKey("D", "Mod", "Alt"),
     expand_line_selections: HotKey("E", "Alt"),
     go_to_next_fold: HotKey("]", "Mod", "Alt"),
     go_to_previous_fold: HotKey("[", "Mod", "Alt"),
     go_to_parent_fold: HotKey("P", "Mod", "Alt"),
     insert_table: HotKey("T", "Shift", "Alt"),
     insert_code_block: HotKey("`", "Mod", "Shift"),
-    insert_line_above: HotKey("Enter", "Mod", "Shift"),
-    insert_line_below: HotKey("Enter", "Shift"),
+    // insert_line_above: HotKey("Enter", "Mod", "Shift"),
+    // insert_line_below: HotKey("Enter", "Shift"),
     insert_ordinal_numbering: HotKey("N", "Shift", "Alt"),
     join_selected_lines: HotKey("J", "Mod", "Shift"),
     move_line_down: HotKey("ArrowDown", "Alt"),
@@ -124,12 +124,12 @@ export const KEYSHOTS_MAPS: { [key: string]: KeyshotsMap } = {
     "vscode": {
         add_caret_down: HotKey("ArrowDown", "Mod", "Alt"),
         add_caret_up: HotKey("ArrowUp", "Mod", "Alt"),
-        duplicate_line_down: HotKey("ArrowDown", "Shift", "Alt"),
-        duplicate_line_up: HotKey("ArrowUp", "Shift", "Alt"),
-        duplicate_selection_or_line: undefined,
+        // duplicate_line_down: HotKey("ArrowDown", "Shift", "Alt"),
+        // duplicate_line_up: HotKey("ArrowUp", "Shift", "Alt"),
+        // duplicate_selection_or_line: undefined,
         expand_line_selections: HotKey("L", "Mod"),
-        insert_line_above: HotKey("Enter", "Mod", "Shift"),
-        insert_line_below: HotKey("Enter", "Mod"),
+        // insert_line_above: HotKey("Enter", "Mod", "Shift"),
+        // insert_line_below: HotKey("Enter", "Mod"),
         join_selected_lines: HotKey("J", "Mod"),
         move_line_down: HotKey("ArrowDown", "Alt"),
         move_line_up: HotKey("ArrowUp", "Alt"),
@@ -140,12 +140,12 @@ export const KEYSHOTS_MAPS: { [key: string]: KeyshotsMap } = {
     "jetbrains": {
         add_caret_down: undefined,
         add_caret_up: undefined,
-        duplicate_line_down: undefined,
-        duplicate_line_up: undefined,
-        duplicate_selection_or_line: HotKey("D", "Mod"),
+        // duplicate_line_down: undefined,
+        // duplicate_line_up: undefined,
+        // duplicate_selection_or_line: HotKey("D", "Mod"),
         expand_line_selections: HotKey("W", "Mod"),
-        insert_line_above: HotKey("Enter", "Mod", "Alt"),
-        insert_line_below: HotKey("Enter", "Shift"),
+        // insert_line_above: HotKey("Enter", "Mod", "Alt"),
+        // insert_line_below: HotKey("Enter", "Shift"),
         join_selected_lines: HotKey("J", "Mod", "Shift"),
         move_line_down: HotKey("ArrowDown", "Shift", "Alt"),
         move_line_up: HotKey("ArrowUp", "Shift", "Alt"),
@@ -156,12 +156,12 @@ export const KEYSHOTS_MAPS: { [key: string]: KeyshotsMap } = {
     "visual_studio": {
         add_caret_down: HotKey("ArrowDown", "Shift", "Alt"),
         add_caret_up: HotKey("ArrowUp", "Shift", "Alt"),
-        duplicate_line_down: undefined,
-        duplicate_line_up: undefined,
-        duplicate_selection_or_line: HotKey("D", "Mod"),
+        // duplicate_line_down: undefined,
+        // duplicate_line_up: undefined,
+        // duplicate_selection_or_line: HotKey("D", "Mod"),
         expand_line_selections: HotKey("=", "Shift", "Alt"),
-        insert_line_above: HotKey("Enter", "Mod"),
-        insert_line_below: HotKey("Enter", "Shift"),
+        // insert_line_above: HotKey("Enter", "Mod"),
+        // insert_line_below: HotKey("Enter", "Shift"),
         move_line_down: HotKey("ArrowDown", "Alt"),
         move_line_up: HotKey("ArrowUp", "Alt"),
         select_all_word_instances: HotKey(";", "Shift", "Alt"),
