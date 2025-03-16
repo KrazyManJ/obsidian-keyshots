@@ -4,12 +4,11 @@ import {KeyshotsMap} from "./mappings/hotkeys"
 import KeyshotsPlugin from "./plugin";
 import IDEPresetModal from "./components/ide-preset-modal";
 import CodeBlockModal from "./components/code-block-modal";
-import {VerticalDirection} from "./constants/VerticalDirection";
-import CalloutPickerModal from "./components/callout-picker-modal";
+import VerticalDirection from "./constants/VerticalDirection";
 import TableModal from "./components/table-modal";
 import RegexReplaceModal from "./components/regex/regex-replace-modal";
 import RegexSearchModal from "./components/regex/regex-search-modal";
-import {DoubleKeyCommand} from "./model/DoubleKeyCommand";
+import DoubleKeyCommand from "./model/DoubleKeyCommand";
 import {Category} from "./constants/Category";
 
 
@@ -18,59 +17,6 @@ interface KeyshotsCommand extends Command {
 }
 
 export const COMMANDS = (plugin: KeyshotsPlugin, map: KeyshotsMap): KeyshotsCommand[] => [
-    {
-        category: Category.EDITOR_LINES_MANIPULATION,
-        id: 'join-selected-lines',
-        name: "Join selected lines",
-        hotkeys: map.join_selected_lines,
-        editorCallback: (editor) => functions.replaceSelections(editor, (s) => s.replace(/\n/g, ""))
-    },
-    {
-        category: Category.EDITOR_LINES_MANIPULATION,
-        id: 'move-line-down',
-        name: 'Move line down',
-        repeatable: true,
-        hotkeys: map.move_line_down,
-        editorCallback: (editor) => functions.moveLine(editor, VerticalDirection.DOWN, editor.lineCount() - 1)
-    },
-    {
-        category: Category.EDITOR_LINES_MANIPULATION,
-        id: 'move-line-up',
-        name: 'Move line up',
-        repeatable: true,
-        hotkeys: map.move_line_up,
-        editorCallback: (editor) => functions.moveLine(editor, VerticalDirection.UP, 0)
-    },
-    {
-        category: Category.EDITOR_LINES_MANIPULATION,
-        id: 'reverse-selected-lines',
-        name: "Reverse selected lines",
-        hotkeys: map.reverse_selected_lines,
-        editorCallback: (editor) => functions.reverseSelectedLines(editor)
-    },
-    {
-        category: Category.EDITOR_LINES_MANIPULATION,
-        id: 'shuffle-selected-lines',
-        name: "Shuffle selected lines",
-        hotkeys: map.shuffle_selected_lines,
-        editorCallback: (editor) => functions.shuffleSelectedLines(editor, plugin.settings.shuffle_rounds_amount)
-    },
-    {
-        category: Category.EDITOR_LINES_MANIPULATION,
-        id: 'sort-selected-lines',
-        name: "Sort selected lines",
-        hotkeys: map.sort_selected_lines,
-        editorCallback: (editor) => functions.sortSelectedLines(editor)
-    },
-    {
-        category: Category.INSERT_COMPONENTS,
-        id: 'better-insert-callout',
-        name: "Better insert callout",
-        hotkeys: map.better_insert_callout,
-        editorCallback: (editor) => new CalloutPickerModal(plugin,
-            (item) => functions.insertCallout(editor, item)
-        ).open()
-    },
     {
         category: Category.INSERT_COMPONENTS,
         id: 'insert-code-block',
@@ -169,13 +115,13 @@ export const COMMANDS = (plugin: KeyshotsPlugin, map: KeyshotsMap): KeyshotsComm
             (data) => functions.countRegexMatches(editor, data.pattern, data.only_selections)
         ).open()
     },
-    {
-        category: Category.REPLACE_SELECTIONS,
-        id: 'toggle-case-jetbrains',
-        name: "Toggle case (JetBrains)",
-        hotkeys: map.toggle_case_jetbrains,
-        editorCallback: (editor) => functions.replaceSelections(editor, (str) => str === str.toLowerCase() ? str.toUpperCase() : str.toLowerCase())
-    },
+    // {
+    //     category: Category.REPLACE_SELECTIONS,
+    //     id: 'toggle-case-jetbrains',
+    //     name: "Toggle case (JetBrains)",
+    //     hotkeys: map.toggle_case_jetbrains,
+    //     editorCallback: (editor) => functions.replaceSelections(editor, (str) => str === str.toLowerCase() ? str.toUpperCase() : str.toLowerCase())
+    // },
     {
         category: Category.REPLACE_SELECTIONS,
         id: 'toggle-kebab-case',
@@ -211,13 +157,13 @@ export const COMMANDS = (plugin: KeyshotsPlugin, map: KeyshotsMap): KeyshotsComm
         hotkeys: map.toggle_uri_encoded_or_decoded,
         editorCallback: (editor) => functions.convertURI(editor)
     },
-    {
-        category: Category.REPLACE_SELECTIONS,
-        id: 'transform-selections-to-lowercase',
-        name: "Transform selections to lowercase",
-        hotkeys: map.transform_selections_to_lowercase,
-        editorCallback: (editor) => functions.replaceSelections(editor, (s) => s.toLowerCase())
-    },
+    // {
+    //     category: Category.REPLACE_SELECTIONS,
+    //     id: 'transform-selections-to-lowercase',
+    //     name: "Transform selections to lowercase",
+    //     hotkeys: map.transform_selections_to_lowercase,
+    //     editorCallback: (editor) => functions.replaceSelections(editor, (s) => s.toLowerCase())
+    // },
     {
         category: Category.REPLACE_SELECTIONS,
         id: 'transform-selections-to-titlecase',
@@ -225,13 +171,13 @@ export const COMMANDS = (plugin: KeyshotsPlugin, map: KeyshotsMap): KeyshotsComm
         hotkeys: map.transform_selections_to_titlecase,
         editorCallback: (editor) => functions.replaceSelections(editor, (s) => s.replace(/\w\S*/g, (txt) => txt.charAt(0).toUpperCase() + txt.substring(1).toLowerCase()))
     },
-    {
-        category: Category.REPLACE_SELECTIONS,
-        id: 'transform-selections-to-uppercase',
-        name: "Transform selections to uppercase",
-        hotkeys: map.transform_selections_to_uppercase,
-        editorCallback: (editor) => functions.replaceSelections(editor, (s) => s.toUpperCase())
-    },
+    // {
+    //     category: Category.REPLACE_SELECTIONS,
+    //     id: 'transform-selections-to-uppercase',
+    //     name: "Transform selections to uppercase",
+    //     hotkeys: map.transform_selections_to_uppercase,
+    //     editorCallback: (editor) => functions.replaceSelections(editor, (s) => s.toUpperCase())
+    // },
     {
         category: Category.REPLACE_SELECTIONS,
         id: 'trim-selections',
@@ -239,22 +185,22 @@ export const COMMANDS = (plugin: KeyshotsPlugin, map: KeyshotsMap): KeyshotsComm
         hotkeys: map.trim_selections,
         editorCallback: (editor) => functions.replaceSelections(editor, (s) => s.trim())
     },
-    {
-        category: Category.SELECTION_ADD_OR_REMOVE,
-        id: 'add-caret-down',
-        name: 'Add caret cursor down',
-        repeatable: true,
-        hotkeys: map.add_caret_down,
-        editorCallback: (editor) => functions.addCarets(editor, VerticalDirection.DOWN, editor.lineCount())
-    },
-    {
-        category: Category.SELECTION_ADD_OR_REMOVE,
-        id: 'add-caret-up',
-        name: 'Add caret cursor up',
-        repeatable: true,
-        hotkeys: map.add_caret_up,
-        editorCallback: (editor) => functions.addCarets(editor, VerticalDirection.UP, 0)
-    },
+    // {
+    //     category: Category.SELECTION_ADD_OR_REMOVE,
+    //     id: 'add-caret-down',
+    //     name: 'Add caret cursor down',
+    //     repeatable: true,
+    //     hotkeys: map.add_caret_down,
+    //     editorCallback: (editor) => functions.addCarets(editor, VerticalDirection.DOWN, editor.lineCount())
+    // },
+    // {
+    //     category: Category.SELECTION_ADD_OR_REMOVE,
+    //     id: 'add-caret-up',
+    //     name: 'Add caret cursor up',
+    //     repeatable: true,
+    //     hotkeys: map.add_caret_up,
+    //     editorCallback: (editor) => functions.addCarets(editor, VerticalDirection.UP, 0)
+    // },
     {
         category: Category.SELECTION_ADD_OR_REMOVE,
         id: 'search-by-regex',
@@ -265,20 +211,20 @@ export const COMMANDS = (plugin: KeyshotsPlugin, map: KeyshotsMap): KeyshotsComm
             (data) => functions.countRegexMatches(editor, data.pattern, data.only_selections)
         ).open()
     },
-    {
-        category: Category.SELECTION_ADD_OR_REMOVE,
-        id: 'select-all-word-instances',
-        name: "Select all word instances",
-        hotkeys: map.select_all_word_instances,
-        editorCallback: (editor) => functions.selectAllWordInstances(editor, plugin.settings.case_sensitive)
-    },
-    {
-        category: Category.SELECTION_ADD_OR_REMOVE,
-        id: 'select-multiple-word-instances',
-        name: "Select multiple word instances",
-        hotkeys: map.select_multiple_word_instances,
-        editorCallback: (editor) => functions.selectWordInstances(editor, plugin.settings.case_sensitive)
-    },
+    // {
+    //     category: Category.SELECTION_ADD_OR_REMOVE,
+    //     id: 'select-all-word-instances',
+    //     name: "Select all word instances",
+    //     hotkeys: map.select_all_word_instances,
+    //     editorCallback: (editor) => functions.selectAllWordInstances(editor, plugin.settings.case_sensitive)
+    // },
+    // {
+    //     category: Category.SELECTION_ADD_OR_REMOVE,
+    //     id: 'select-multiple-word-instances',
+    //     name: "Select multiple word instances",
+    //     hotkeys: map.select_multiple_word_instances,
+    //     editorCallback: (editor) => functions.selectWordInstances(editor, plugin.settings.case_sensitive)
+    // },
     {
         category: Category.SELECTION_ADD_OR_REMOVE,
         id: 'split-selections-by-lines',
@@ -286,13 +232,13 @@ export const COMMANDS = (plugin: KeyshotsPlugin, map: KeyshotsMap): KeyshotsComm
         hotkeys: map.split_selections_by_lines,
         editorCallback: (editor) => functions.splitSelectionsByLines(editor)
     },
-    {
-        category: Category.TRANSFORM_SELECTIONS,
-        id: 'expand-line-selections',
-        name: "Expand line selections",
-        hotkeys: map.expand_line_selections,
-        editorCallback: (editor) => functions.expandSelections(editor)
-    },
+    // {
+    //     category: Category.TRANSFORM_SELECTIONS,
+    //     id: 'expand-line-selections',
+    //     name: "Expand line selections",
+    //     hotkeys: map.expand_line_selections,
+    //     editorCallback: (editor) => functions.expandSelections(editor)
+    // },
     {
         category: Category.TRANSFORM_SELECTIONS,
         id: 'split-selections-on-new-line',

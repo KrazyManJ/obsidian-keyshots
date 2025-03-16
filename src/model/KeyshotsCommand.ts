@@ -15,6 +15,8 @@ export default interface KeyshotsCommand extends Omit<Command, "hotkeys"> {
      * Hotkeys in record structure to determine hotkeys for presets
      *
      * **Does not allow clear preset as it have to stay clear :)**
+     *
+     * If hotkey is {@link null}, it cannot be overriden with Keyshots preset if configured
      */
-    hotkeys?: Partial<Record<Preset, Hotkey[]>> & Partial<Record<ClearPreset, never>>
+    hotkeys?: Partial<Record<Preset, Hotkey[] | null>> & Partial<Record<ClearPreset, never>>
 }

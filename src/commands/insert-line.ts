@@ -1,5 +1,5 @@
 import {Category} from "../constants/Category";
-import {VerticalDirection} from "../constants/VerticalDirection";
+import VerticalDirection from "../constants/VerticalDirection";
 import KeyshotsCommand from "../model/KeyshotsCommand";
 import {HotKey} from "../utils";
 import {Editor} from "obsidian";

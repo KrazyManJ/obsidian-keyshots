@@ -10,6 +10,7 @@ export const duplicateSelectionOrLine: KeyshotsCommand = {
     repeatable: true,
     hotkeys: {
         keyshots: [HotKey("D", "Mod", "Alt")],
+        vscode: null,
         jetbrains: [HotKey("D", "Mod")],
         visual_studio: [HotKey("D", "Mod")],
     },
