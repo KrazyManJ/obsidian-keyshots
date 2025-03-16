@@ -1,4 +1,4 @@
-export interface DoubleKeyCommand {
+export default interface DoubleKeyCommand {
     id: string
     name: string
     key: string

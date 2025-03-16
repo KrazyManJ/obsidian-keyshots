@@ -172,7 +172,6 @@ export const KEYSHOTS_SVG = (size: number) => `
 </svg>
 `
 
-
 export const EMPTY_SVG = `
 <svg width="32" height="32" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">
 `

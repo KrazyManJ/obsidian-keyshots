@@ -1,15 +1,16 @@
 import {Command, Plugin} from 'obsidian';
-import {DEFAULT_SETTINGS, KeyshotsSettings} from "./model/KeyshotsSettings";
+import KeyshotsSettings from "./model/KeyshotsSettings";
 import {COMMANDS, DOUBLE_KEY_COMMANDS} from "./commands";
 import DoubleKeyRegistry from "./classes/DoubleKeyRegistry";
 import {KeyshotsSettingTab} from "./components/settings-tab";
 import KeyshotsCommand from "./model/KeyshotsCommand";
-import {PresetsInfo, Preset} from "./constants/Presets";
+import {PRESETS_INFO, Preset} from "./constants/Presets";
 
 import {duplicateLineDown, duplicateLineUp} from "./commands/duplicate-line";
 import {duplicateSelectionOrLine} from "./commands/duplicate-selection-or-line";
 import {insertLineAbove, insertLineBelow} from "./commands/insert-line";
 import {mapBySettings} from "./mappings/hotkeys";
+import DEFAULT_KEYSHOTS_SETTINGS from "./constants/DefaultKeyshotsSettings";
 
 
 export default class KeyshotsPlugin extends Plugin {
@@ -64,7 +65,7 @@ export default class KeyshotsPlugin extends Plugin {
     }
 
     public async changePreset(presetId: Preset) {
-        if (!Object.keys(PresetsInfo).contains(presetId)) {
+        if (!Object.keys(PRESETS_INFO).contains(presetId)) {
             console.warn("Keyshots: Invalid attempt to change Keyshots mappings preset, incorrect preset ID.")
             return;
         }
@@ -74,15 +75,15 @@ export default class KeyshotsPlugin extends Plugin {
     }
 
     public availablePresets() {
-        return Object.keys(PresetsInfo)
+        return Object.keys(PRESETS_INFO)
     }
 
     public getPresetTitle(presetId: Preset) {
-        return PresetsInfo[presetId].name
+        return PRESETS_INFO[presetId].name
     }
 
     async loadSettings() {
-        this.settings = Object.assign({}, DEFAULT_SETTINGS, await this.loadData());
+        this.settings = Object.assign({}, DEFAULT_KEYSHOTS_SETTINGS, await this.loadData());
     }
 
     async saveSettings() {

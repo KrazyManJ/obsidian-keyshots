@@ -1,9 +1,9 @@
 import {App, PluginSettingTab, Setting, SliderComponent} from "obsidian";
 import KeyshotsPlugin from "../plugin";
 import DocumentFragmentBuilder from "../classes/DocumentFragmentBuilder";
-import {DEFAULT_SETTINGS} from "../model/KeyshotsSettings";
-import {KEYSHOTS_SVG} from "../svgs";
-import {Preset, PresetsInfo} from "../constants/Presets";
+import {KEYSHOTS_SVG} from "../constants/SVGs";
+import {Preset, PRESETS_INFO} from "../constants/Presets";
+import DEFAULT_KEYSHOTS_SETTINGS from "../constants/DefaultKeyshotsSettings";
 
 
 function getOpenCommands() {
@@ -42,7 +42,7 @@ export class KeyshotsSettingTab extends PluginSettingTab {
                 .toFragment()
             )
             .addDropdown(cb => cb
-                .addOptions(Object.entries(PresetsInfo).reduce((acc: Record<string, string>, [id, presetInfo]) => {
+                .addOptions(Object.entries(PRESETS_INFO).reduce((acc: Record<string, string>, [id, presetInfo]) => {
                     acc[id] = presetInfo.name;
                     return acc;
                 }, {}))
@@ -107,8 +107,8 @@ export class KeyshotsSettingTab extends PluginSettingTab {
                 .setIcon("refresh-ccw")
                 .setTooltip("Reset to default")
                 .onClick(async () => {
-                    this.plugin.settings.shuffle_rounds_amount = DEFAULT_SETTINGS.shuffle_rounds_amount
-                    slider.setValue(DEFAULT_SETTINGS.shuffle_rounds_amount)
+                    this.plugin.settings.shuffle_rounds_amount = DEFAULT_KEYSHOTS_SETTINGS.shuffle_rounds_amount
+                    slider.setValue(DEFAULT_KEYSHOTS_SETTINGS.shuffle_rounds_amount)
                     await this.plugin.saveSettings()
                 })
             )

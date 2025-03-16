@@ -2,8 +2,8 @@ import {Notice, SuggestModal} from "obsidian";
 import KeyshotsPlugin from "../plugin";
 import {createRoot, Root} from "react-dom/client";
 import * as React from "react";
-import {PresetInfo} from "../model/PresetInfo";
-import {PresetsInfo} from "../constants/Presets";
+import PresetInfo from "../model/PresetInfo";
+import {Preset, PRESETS_INFO} from "../constants/Presets";
 
 export default class IDEPresetModal extends SuggestModal<PresetInfo> {
 
@@ -17,11 +17,11 @@ export default class IDEPresetModal extends SuggestModal<PresetInfo> {
     }
 
     getSuggestions(query: string): PresetInfo[] | Promise<PresetInfo[]> {
-        return Object.values(PresetsInfo).filter(v => v.name.toLowerCase().includes(query.toLowerCase()));
+        return Object.values(PRESETS_INFO).filter(v => v.name.toLowerCase().includes(query.toLowerCase()));
     }
 
-    async onChooseSuggestion(item: PresetInfo, evt: MouseEvent | KeyboardEvent) {
-        await this.plugin.changePreset(Object.keys(PresetsInfo).filter(f => PresetsInfo[f] === item)[0])
+    async onChooseSuggestion(item: PresetInfo) {
+        await this.plugin.changePreset((Object.keys(PRESETS_INFO) as Preset[]).filter(f => PRESETS_INFO[f] === item)[0])
         new Notice(`✅ Preset successfully changed to "${item.name}"!`)
     }
 
@@ -29,7 +29,7 @@ export default class IDEPresetModal extends SuggestModal<PresetInfo> {
         this.root = createRoot(el);
         this.root.render(
             <div style={{"display": "flex", "gap": "10px", "alignItems": "center"}}>
-                <div style={{display: "flex"}} dangerouslySetInnerHTML={{__html: value.svg_icon_content}}/>
+                <div style={{display: "flex"}} dangerouslySetInnerHTML={{__html: value.iconSvgContent}}/>
                 <div>
                     <div>{value.name}</div>
                     <small style={{opacity: 0.8}}>{value.description}</small>

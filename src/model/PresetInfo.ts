@@ -1,5 +1,5 @@
-export interface PresetInfo {
+export default interface PresetInfo {
     name: string,
     description: string,
-    svg_icon_content: string
+    iconSvgContent: string
 }

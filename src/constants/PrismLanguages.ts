@@ -1,9 +1,7 @@
-export interface PrismLanguage {
-    id: string
-    name: string
-}
+import PrismLanguage from "../model/PrismLanguage";
 
-export const PRISM_LANGS: PrismLanguage[] = [
+
+const PRISM_LANGUAGES: PrismLanguage[] = [
     {
         id: "",
         name: "Blank"
@@ -1198,3 +1196,5 @@ export const PRISM_LANGS: PrismLanguage[] = [
     }
 ].sort((a,b) => a.name.localeCompare(b.name))
 ]
+
+export default PRISM_LANGUAGES
