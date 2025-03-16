@@ -1,10 +1,13 @@
-import {Plugin} from 'obsidian';
+import {Command, Plugin} from 'obsidian';
 import {mapBySettings} from "./mappings/hotkeys";
 import {DEFAULT_SETTINGS, KeyshotsSettings} from "./model/KeyshotsSettings";
 import {COMMANDS, DOUBLE_KEY_COMMANDS} from "./commands";
 import DoubleKeyRegistry from "./classes/DoubleKeyRegistry";
 import {KeyshotsSettingTab} from "./components/settings-tab";
 import {IDE_LABELS} from "./mappings/ide-info";
+import KeyshotsCommand from "./model/KeyshotsCommand";
+import {Preset} from "./model/Preset";
+import {duplicateLineDown, duplicateLineUp} from "./commands/duplicate-line";
 
 
 export default class KeyshotsPlugin extends Plugin {
@@ -12,6 +15,24 @@ export default class KeyshotsPlugin extends Plugin {
     settings: KeyshotsSettings
     private commandIds: Set<string>
     private doubleKeyRegistry: DoubleKeyRegistry
+
+
+    private keyshotsCommandToObsidianCommand(cmd: KeyshotsCommand, preset: Preset): Command {
+        return {...cmd, ...{hotkeys: cmd.hotkeys ? cmd.hotkeys[preset] : undefined}}
+    }
+
+    private registerPluginCommands() {
+        const commands: KeyshotsCommand[] = [
+            duplicateLineUp,
+            duplicateLineDown
+        ]
+        const preset = Preset[this.settings.ide_mappings.toUpperCase() as keyof typeof Preset]
+        this._events = this._events.filter(e => !e.toString().contains(".removeCommand("))
+        commands.forEach(c => {
+            app.commands.removeCommand("keyshots:"+c.id)
+            this.addCommand(this.keyshotsCommandToObsidianCommand(c,preset))
+        })
+    }
 
     async onload() {
         await this.loadSettings()
@@ -22,6 +43,7 @@ export default class KeyshotsPlugin extends Plugin {
     }
 
     loadCommands() {
+        this.registerPluginCommands()
         if (this.commandIds !== undefined) {
             this.commandIds.forEach(cmd => this.app.commands.removeCommand(cmd))
             this._events = this._events.filter(e => !e.toString().contains(".removeCommand("))

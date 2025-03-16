@@ -10,41 +10,14 @@ import TableModal from "./components/table-modal";
 import RegexReplaceModal from "./components/regex/regex-replace-modal";
 import RegexSearchModal from "./components/regex/regex-search-modal";
 import {DoubleKeyCommand} from "./model/DoubleKeyCommand";
+import {Category} from "./model/Category";
 
-
-enum Category {
-    OBSIDIAN_SETTINGS = "Obsidian Settings",
-    KEYSHOTS_SETTINGS = "Keyshots Settings",
-    EDITOR_LINES_MANIPULATION = "Editor Lines Manipulation",
-    SELECTION_ADD_OR_REMOVE = "Selection Adding or Removing",
-    REPLACE_SELECTIONS = "Replace Selections",
-    TRANSFORM_SELECTIONS = "Transform Selections",
-    INSERT_COMPONENTS = "Insert Components",
-    RENDERED_CONTROLING = "Rendered Controling",
-    OTHER = "Other"
-}
 
 interface KeyshotsCommand extends Command {
     category: Category
 }
 
 export const COMMANDS = (plugin: KeyshotsPlugin, map: KeyshotsMap): KeyshotsCommand[] => [
-    {
-        category: Category.EDITOR_LINES_MANIPULATION,
-        id: 'duplicate-line-down',
-        name: 'Duplicate line down (Visual Studio Code)',
-        repeatable: true,
-        hotkeys: map.duplicate_line_down,
-        editorCallback: (editor) => functions.vscodeDuplicate(editor, VerticalDirection.DOWN)
-    },
-    {
-        category: Category.EDITOR_LINES_MANIPULATION,
-        id: 'duplicate-line-up',
-        name: 'Duplicate line up (Visual Studio Code)',
-        repeatable: true,
-        hotkeys: map.duplicate_line_up,
-        editorCallback: (editor) => functions.vscodeDuplicate(editor, VerticalDirection.UP)
-    },
     {
         category: Category.EDITOR_LINES_MANIPULATION,
         id: 'duplicate-selection-or-line',
