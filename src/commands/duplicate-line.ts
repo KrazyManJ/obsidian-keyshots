@@ -1,10 +1,9 @@
 import KeyshotsCommand from "../model/KeyshotsCommand";
-import {VerticalDirection} from "../model/VerticalDirection";
-import {Preset} from "../model/Preset";
+import {VerticalDirection} from "../constants/VerticalDirection";
 import {Editor} from "obsidian";
 import SelectionsProcessing from "../classes/SelectionsProcessing";
 import {HotKey} from "../utils";
-import {Category} from "../model/Category";
+import {Category} from "../constants/Category";
 
 export function vscodeDuplicate(editor: Editor, direction: VerticalDirection) {
     SelectionsProcessing.selectionsProcessor(editor, undefined, (sel) => {
@@ -28,8 +27,8 @@ export const duplicateLineDown: KeyshotsCommand = {
     name: 'Duplicate line down (Visual Studio Code)',
     repeatable: true,
     hotkeys: {
-        [Preset.KEYSHOTS]: [HotKey("ArrowDown", "Shift", "Alt")],
-        [Preset.VSCODE]: [HotKey("ArrowDown", "Shift", "Alt")],
+        keyshots: [HotKey("ArrowDown", "Shift", "Alt")],
+        jetbrains: [HotKey("ArrowDown", "Shift", "Alt")],
     },
     editorCallback: (editor) => vscodeDuplicate(editor, VerticalDirection.DOWN)
 }
@@ -40,8 +39,8 @@ export const duplicateLineUp: KeyshotsCommand = {
     name: 'Duplicate line up (Visual Studio Code)',
     repeatable: true,
     hotkeys: {
-        [Preset.KEYSHOTS]: [HotKey("ArrowUp", "Shift", "Alt")],
-        [Preset.VSCODE]: [HotKey("ArrowUp", "Shift", "Alt")],
+        keyshots: [HotKey("ArrowUp", "Shift", "Alt")],
+        vscode: [HotKey("ArrowUp", "Shift", "Alt")],
     },
     editorCallback: (editor) => vscodeDuplicate(editor, VerticalDirection.UP)
 }

@@ -3,9 +3,8 @@ import {DEFAULT_SETTINGS, KeyshotsSettings} from "./model/KeyshotsSettings";
 import {COMMANDS, DOUBLE_KEY_COMMANDS} from "./commands";
 import DoubleKeyRegistry from "./classes/DoubleKeyRegistry";
 import {KeyshotsSettingTab} from "./components/settings-tab";
-import {IDE_LABELS} from "./mappings/ide-info";
 import KeyshotsCommand from "./model/KeyshotsCommand";
-import {Preset} from "./model/Preset";
+import {PresetsInfo, Preset} from "./constants/Presets";
 
 import {duplicateLineDown, duplicateLineUp} from "./commands/duplicate-line";
 import {duplicateSelectionOrLine} from "./commands/duplicate-selection-or-line";
@@ -32,7 +31,7 @@ export default class KeyshotsPlugin extends Plugin {
             insertLineAbove,
             insertLineBelow
         ]
-        const preset = Preset[this.settings.ide_mappings.toUpperCase() as keyof typeof Preset]
+        const preset = this.settings.ide_mappings
         this._events = this._events.filter(e => !e.toString().contains(".removeCommand("))
         commands.forEach(c => {
             app.commands.removeCommand("keyshots:"+c.id)
@@ -64,8 +63,8 @@ export default class KeyshotsPlugin extends Plugin {
             .forEach(cmd => this.doubleKeyRegistry.registerCommand(cmd.object))
     }
 
-    public async changePreset(presetId: string) {
-        if (!Object.keys(IDE_LABELS).contains(presetId)) {
+    public async changePreset(presetId: Preset) {
+        if (!Object.keys(PresetsInfo).contains(presetId)) {
             console.warn("Keyshots: Invalid attempt to change Keyshots mappings preset, incorrect preset ID.")
             return;
         }
@@ -75,11 +74,11 @@ export default class KeyshotsPlugin extends Plugin {
     }
 
     public availablePresets() {
-        return Object.keys(IDE_LABELS)
+        return Object.keys(PresetsInfo)
     }
 
-    public getPresetTitle(presetId: string) {
-        return IDE_LABELS[presetId].name
+    public getPresetTitle(presetId: Preset) {
+        return PresetsInfo[presetId].name
     }
 
     async loadSettings() {

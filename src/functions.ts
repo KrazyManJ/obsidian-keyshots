@@ -3,7 +3,7 @@ import {App, Editor, EditorRange, MarkdownView, Notice, VaultConfig} from "obsid
 import KeyshotsPlugin from "./plugin";
 import {PrismLanguage} from "./mappings/prism-langs";
 import SelectionsProcessing from "./classes/SelectionsProcessing"
-import {VerticalDirection} from "./model/VerticalDirection";
+import {VerticalDirection} from "./constants/VerticalDirection";
 import EditorPositionManipulator from "./classes/EditorPositionManipulator";
 
 export function moveLine(editor: Editor, direction: VerticalDirection, border: number) {

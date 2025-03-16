@@ -1,9 +1,9 @@
 import {App, PluginSettingTab, Setting, SliderComponent} from "obsidian";
 import KeyshotsPlugin from "../plugin";
 import DocumentFragmentBuilder from "../classes/DocumentFragmentBuilder";
-import {IDE_LABELS} from "../mappings/ide-info";
 import {DEFAULT_SETTINGS} from "../model/KeyshotsSettings";
 import {KEYSHOTS_SVG} from "../svgs";
+import {Preset, PresetsInfo} from "../constants/Presets";
 
 
 function getOpenCommands() {
@@ -42,13 +42,13 @@ export class KeyshotsSettingTab extends PluginSettingTab {
                 .toFragment()
             )
             .addDropdown(cb => cb
-                .addOptions(Object.entries(IDE_LABELS).reduce((acc: Record<string, string>, [key, ideInfo]) => {
-                    acc[key] = ideInfo.name;
+                .addOptions(Object.entries(PresetsInfo).reduce((acc: Record<string, string>, [id, presetInfo]) => {
+                    acc[id] = presetInfo.name;
                     return acc;
                 }, {}))
                 .setValue(this.plugin.settings.ide_mappings)
                 .onChange(async (value) => {
-                    await this.plugin.changePreset(value)
+                    await this.plugin.changePreset(value as Preset)
                 })
             )
         new Setting(containerEl)

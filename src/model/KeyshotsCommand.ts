@@ -1,6 +1,6 @@
 import {Command, Hotkey} from "obsidian";
-import {Preset} from "./Preset";
-import {Category} from "./Category";
+import {ClearPreset, Preset} from "../constants/Presets";
+import {Category} from "../constants/Category";
 
 /**
  * The same implementation as {@link Command} with addition of hotkey selection based on preset and category
@@ -14,8 +14,7 @@ export default interface KeyshotsCommand extends Omit<Command, "hotkeys"> {
     /**
      * Hotkeys in record structure to determine hotkeys for presets
      *
-     * **Does not allow Preset.CLEAR as it have to stay clear :)**
+     * **Does not allow clear preset as it have to stay clear :)**
      */
-    hotkeys?: Partial<Record<Preset, Hotkey[]>>
-        & Partial<Record<Preset.CLEAR,never>>
+    hotkeys?: Partial<Record<Preset, Hotkey[]>> & Partial<Record<ClearPreset, never>>
 }

@@ -4,13 +4,13 @@ import {KeyshotsMap} from "./mappings/hotkeys"
 import KeyshotsPlugin from "./plugin";
 import IDEPresetModal from "./components/ide-preset-modal";
 import CodeBlockModal from "./components/code-block-modal";
-import {VerticalDirection} from "./model/VerticalDirection";
+import {VerticalDirection} from "./constants/VerticalDirection";
 import CalloutPickerModal from "./components/callout-picker-modal";
 import TableModal from "./components/table-modal";
 import RegexReplaceModal from "./components/regex/regex-replace-modal";
 import RegexSearchModal from "./components/regex/regex-search-modal";
 import {DoubleKeyCommand} from "./model/DoubleKeyCommand";
-import {Category} from "./model/Category";
+import {Category} from "./constants/Category";
 
 
 interface KeyshotsCommand extends Command {

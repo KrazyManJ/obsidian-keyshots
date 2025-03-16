@@ -1,7 +1,6 @@
-import {Category} from "../model/Category";
-import {VerticalDirection} from "../model/VerticalDirection";
+import {Category} from "../constants/Category";
+import {VerticalDirection} from "../constants/VerticalDirection";
 import KeyshotsCommand from "../model/KeyshotsCommand";
-import {Preset} from "../model/Preset";
 import {HotKey} from "../utils";
 import {Editor} from "obsidian";
 import SelectionsProcessing from "../classes/SelectionsProcessing";
@@ -29,10 +28,10 @@ export const insertLineAbove: KeyshotsCommand = {
     name: "Insert line above",
     repeatable: true,
     hotkeys: {
-        [Preset.KEYSHOTS]: [HotKey("Enter", "Mod", "Shift")],
-        [Preset.VSCODE]: [HotKey("Enter", "Mod", "Shift")],
-        [Preset.JETBRAINS]: [HotKey("Enter", "Mod", "Alt")],
-        [Preset.VISUAL_STUDIO]: [HotKey("Enter", "Mod")],
+        keyshots: [HotKey("Enter", "Mod", "Shift")],
+        vscode: [HotKey("Enter", "Mod", "Shift")],
+        jetbrains: [HotKey("Enter", "Mod", "Alt")],
+        visual_studio: [HotKey("Enter", "Mod")],
     },
     editorCallback: (editor) => insertLine(editor, VerticalDirection.UP)
 }
@@ -43,10 +42,10 @@ export const insertLineBelow: KeyshotsCommand = {
     name: "Insert line below",
     repeatable: true,
     hotkeys: {
-        [Preset.KEYSHOTS]: [HotKey("Enter", "Shift")],
-        [Preset.VSCODE]: [HotKey("Enter", "Mod")],
-        [Preset.JETBRAINS]: [HotKey("Enter", "Shift")],
-        [Preset.VISUAL_STUDIO]: [HotKey("Enter", "Shift")],
+        keyshots: [HotKey("Enter", "Shift")],
+        vscode: [HotKey("Enter", "Mod")],
+        jetbrains: [HotKey("Enter", "Shift")],
+        visual_studio: [HotKey("Enter", "Shift")],
     },
     editorCallback: (editor) => insertLine(editor, VerticalDirection.DOWN)
 }

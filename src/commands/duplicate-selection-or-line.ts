@@ -1,7 +1,6 @@
-import {Category} from "../model/Category";
+import {Category} from "../constants/Category";
 import KeyshotsCommand from "../model/KeyshotsCommand";
 import SelectionsProcessing from "../classes/SelectionsProcessing";
-import {Preset} from "../model/Preset";
 import {HotKey} from "../utils";
 
 export const duplicateSelectionOrLine: KeyshotsCommand = {
@@ -10,9 +9,9 @@ export const duplicateSelectionOrLine: KeyshotsCommand = {
     name: 'Duplicate selection or line (JetBrains IDEs)',
     repeatable: true,
     hotkeys: {
-        [Preset.KEYSHOTS]: [HotKey("D", "Mod", "Alt")],
-        [Preset.JETBRAINS]: [HotKey("D", "Mod")],
-        [Preset.VISUAL_STUDIO]: [HotKey("D", "Mod")],
+        keyshots: [HotKey("D", "Mod", "Alt")],
+        jetbrains: [HotKey("D", "Mod")],
+        visual_studio: [HotKey("D", "Mod")],
     },
     editorCallback: (editor) => {
         SelectionsProcessing.selectionsProcessor(editor, undefined, (sel) => {

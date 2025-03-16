@@ -1,5 +1,7 @@
+import {Preset} from "../constants/Presets";
+
 export declare interface KeyshotsSettings {
-    ide_mappings: string
+    ide_mappings: Preset
     keyshot_mappings: boolean
     case_sensitive: boolean
     shuffle_rounds_amount: number
