@@ -1,6 +1,7 @@
 import KeyshotsCommand from "../model/KeyshotsCommand";
 import {Category} from "../constants/Category";
-import {convertOneToOtherChars, HotKey} from "../utils";
+import {HotKey} from "../utils";
+import SelectionsProcessing from "../classes/SelectionsProcessing";
 
 export const toggleSnakeCase: KeyshotsCommand = {
     category: Category.REPLACE_SELECTIONS,
@@ -10,5 +11,5 @@ export const toggleSnakeCase: KeyshotsCommand = {
         keyshots: [HotKey("-", "Shift", "Alt")]
     },
     editorCallback: (editor) =>
-        convertOneToOtherChars(editor, " ", "_")
+        SelectionsProcessing.convertOneToOtherChars(editor, " ", "_")
 }

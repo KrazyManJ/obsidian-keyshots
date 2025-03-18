@@ -1,6 +1,8 @@
 import KeyshotsCommand from "../model/KeyshotsCommand";
 import {Category} from "../constants/Category";
-import {HotKey, surroundWithChars} from "../utils";
+import {HotKey} from "../utils";
+import SelectionsProcessing from "../classes/SelectionsProcessing";
+
 
 export const toggleKeyboardInput: KeyshotsCommand = {
     category: Category.REPLACE_SELECTIONS,
@@ -10,5 +12,5 @@ export const toggleKeyboardInput: KeyshotsCommand = {
         keyshots: [HotKey("K", "Mod", "Shift")]
     },
     editorCallback: (editor) =>
-        surroundWithChars(editor, "<kbd>", "</kbd>")
+        SelectionsProcessing.surroundWithChars(editor, "<kbd>", "</kbd>")
 }

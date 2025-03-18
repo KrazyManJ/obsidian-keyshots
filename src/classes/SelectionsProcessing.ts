@@ -34,7 +34,6 @@ export default abstract class SelectionsProcessing {
         if (newSelections.length > 0) editor.setSelections(newSelections)
     }
 
-
     /**
      * Replaces text in all selections using function
      * @param editor Obsidian Markdown Editor instance
@@ -76,6 +75,30 @@ export default abstract class SelectionsProcessing {
             const [one, two] = [arr[0], val].map(s => s.asNormalized().getText())
             if (!case_sensitive) return one.toLowerCase() === two.toLowerCase()
             return one === two
+        })
+    }
+
+    static surroundWithChars(editor: Editor, chars: string, endchars?: string) {
+        SelectionsProcessing.selectionsProcessor(editor, undefined, (sel) => {
+            const surroundSel = sel.clone().normalize().moveChars(-chars.length, (endchars ?? chars).length);
+            if (surroundSel.getText().startsWith(chars) && surroundSel.getText().endsWith(endchars ?? chars)) {
+                return surroundSel.replaceText(
+                    surroundSel.getText().substring(chars.length, surroundSel.getText().length - (endchars ?? chars).length)
+                ).moveChars(0, -chars.length - (endchars ?? chars).length)
+            }
+            return sel.replaceText(chars + sel.getText() + (endchars ?? chars)).moveChars(chars.length, sel.isOneLine() ? chars.length : 0)
+        })
+    }
+
+    static convertOneToOtherChars(editor: Editor, first: string, second: string) {
+        SelectionsProcessing.selectionsReplacer(editor, (tx) => {
+            const [underI, spaceI] = [tx.indexOf(first), tx.indexOf(second)]
+            const replaceFromTo = (s: string, ch1: string, ch2: string) => s.replace(new RegExp(ch1, "gm"), ch2)
+            if (underI !== -1 || spaceI !== -1) return tx
+            if (underI === -1) return replaceFromTo(tx, second, first)
+            if (spaceI === -1) replaceFromTo(tx, first, second)
+            if (underI > spaceI) return replaceFromTo(tx, second, first)
+            return replaceFromTo(tx, first, second)
         })
     }
 }

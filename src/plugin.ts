@@ -1,6 +1,5 @@
 import {Command, Hotkey, Plugin} from 'obsidian';
 import KeyshotsSettings from "./model/KeyshotsSettings";
-import {DOUBLE_KEY_COMMANDS} from "./commands";
 import DoubleKeyRegistry from "./classes/DoubleKeyRegistry";
 import {KeyshotsSettingTab} from "./components/settings-tab";
 import KeyshotsCommand from "./model/KeyshotsCommand";
@@ -51,14 +50,13 @@ import {toggleFocusMode} from "./commands/toggle-focus-mode";
 import {changeKeyshotsPreset} from "./commands/change-keyshots-preset";
 import {openKeyshotsSettingsTab} from "./commands/open-keyshots-settings-tab";
 import {switchKeyshotsCaseSensitivity} from "./commands/switch-keyshots-case-sensitivity";
-
+import {addCaretAndOpenCommandPalette} from "./commands/double-key/add-caret-and-open-command-palette";
+import {quickOpen} from "./commands/double-key/quick-open";
 
 export default class KeyshotsPlugin extends Plugin {
 
     settings: KeyshotsSettings
-    // private commandIds: Set<string>
     private doubleKeyRegistry: DoubleKeyRegistry
-
 
     private keyshotsCommandToObsidianCommand(
         cmd: KeyshotsCommand,
@@ -75,8 +73,8 @@ export default class KeyshotsPlugin extends Plugin {
         return {...cmd, ...{hotkeys: hotkeys}}
     }
 
-    private registerPluginCommands() {
-        const commands: KeyshotsCommand[] = [
+    private getCommands() : KeyshotsCommand[] {
+        return [
             duplicateLineUp,
             duplicateLineDown,
             duplicateSelectionOrLine,
@@ -127,12 +125,6 @@ export default class KeyshotsPlugin extends Plugin {
             openKeyshotsSettingsTab,
             switchKeyshotsCaseSensitivity(this)
         ]
-        const preset = this.settings.ide_mappings
-        this._events = this._events.filter(e => !e.toString().contains(".removeCommand("))
-        commands.forEach(c => {
-            app.commands.removeCommand("keyshots:"+c.id)
-            this.addCommand(this.keyshotsCommandToObsidianCommand(c,preset,this.settings.keyshot_mappings))
-        })
     }
 
     async onload() {
@@ -144,19 +136,22 @@ export default class KeyshotsPlugin extends Plugin {
     }
 
     loadCommands() {
-        this.registerPluginCommands()
-        // if (this.commandIds !== undefined) {
-        //     this.commandIds.forEach(cmd => this.app.commands.removeCommand(cmd))
-        //     this._events = this._events.filter(e => !e.toString().contains(".removeCommand("))
-        // }
-        // this.commandIds = new Set(COMMANDS(this, mapBySettings(this)).map(cmd => this.addCommand(cmd).id));
+        const preset = this.settings.ide_mappings
+        this._events = this._events.filter(e => !e.toString().contains(".removeCommand("))
+        this.getCommands().forEach(c => {
+            app.commands.removeCommand("keyshots:"+c.id)
+            this.addCommand(this.keyshotsCommandToObsidianCommand(c,preset,this.settings.keyshot_mappings))
+        })
     }
 
     loadDoubleKeyCommands() {
         this.doubleKeyRegistry.unregisterAllCommands()
-        DOUBLE_KEY_COMMANDS(this)
-            .filter(cmd => cmd.conditional(this))
-            .forEach(cmd => this.doubleKeyRegistry.registerCommand(cmd.object))
+        if (this.settings.carets_via_double_ctrl) {
+            this.doubleKeyRegistry.registerCommand(addCaretAndOpenCommandPalette(this))
+        }
+        if (this.settings.quick_switch_via_double_shift) {
+            this.doubleKeyRegistry.registerCommand(quickOpen(this))
+        }
     }
 
     public async changePreset(presetId: Preset) {

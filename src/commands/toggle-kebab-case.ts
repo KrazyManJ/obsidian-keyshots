@@ -1,6 +1,7 @@
 import KeyshotsCommand from "../model/KeyshotsCommand";
 import {Category} from "../constants/Category";
-import {convertOneToOtherChars, HotKey} from "../utils";
+import {HotKey} from "../utils";
+import SelectionsProcessing from "../classes/SelectionsProcessing";
 
 export const toggleKebabCase: KeyshotsCommand = {
     category: Category.REPLACE_SELECTIONS,
@@ -10,5 +11,5 @@ export const toggleKebabCase: KeyshotsCommand = {
         keyshots: [HotKey("-", "Alt")]
     },
     editorCallback: (editor) =>
-        convertOneToOtherChars(editor, " ", "-")
+        SelectionsProcessing.convertOneToOtherChars(editor, " ", "-")
 }

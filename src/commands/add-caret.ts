@@ -5,6 +5,7 @@ import {Editor} from "obsidian";
 import EditorSelectionManipulator from "../classes/EditorSelectionManipulator";
 import {HotKey} from "../utils";
 
+
 function addCarets(editor: Editor, direction: VerticalDirection, border: number) {
     const selections: EditorSelectionManipulator[] = EditorSelectionManipulator.listSelections(editor)
         .sort((a, b) => a.anchor.toOffset() - b.anchor.toOffset())
@@ -43,7 +44,7 @@ export const addCaretDown: KeyshotsCommand = {
     editorCallback: (editor) => addCarets(editor, VerticalDirection.DOWN, editor.lineCount())
 }
 
-export const addCaretUp: KeyshotsCommand ={
+export const addCaretUp: KeyshotsCommand = {
     category: Category.SELECTION_ADD_OR_REMOVE,
     id: 'add-caret-up',
     name: 'Add caret cursor up',

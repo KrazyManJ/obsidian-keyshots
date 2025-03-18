@@ -1,6 +1,7 @@
 import KeyshotsCommand from "../model/KeyshotsCommand";
 import {Category} from "../constants/Category";
-import {HotKey, surroundWithChars} from "../utils";
+import {HotKey} from "../utils";
+import SelectionsProcessing from "../classes/SelectionsProcessing";
 
 
 export const toggleUnderline: KeyshotsCommand = {
@@ -11,5 +12,5 @@ export const toggleUnderline: KeyshotsCommand = {
         keyshots: [HotKey("N", "Alt")]
     },
     editorCallback: (editor) =>
-        surroundWithChars(editor, "<u>", "</u>")
+        SelectionsProcessing.surroundWithChars(editor, "<u>", "</u>")
 }
