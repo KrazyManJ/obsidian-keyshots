@@ -14,10 +14,7 @@ export const insertCodeBlock: (plugin: KeyshotsPlugin) => KeyshotsCommand = (plu
     },
     editorCallback: (editor) => new CodeBlockModal(plugin,
         (lang) => {
-            let moveLine = 0;
             SelectionsProcessing.selectionsProcessor(editor, undefined, (sel) => {
-                sel.moveLines(moveLine)
-                moveLine += sel.linesCount + 1
                 return sel.normalize()
                     .replaceText(`\n\`\`\`${lang.id}\n${sel.getText()}\n\`\`\`\n`)
                     .moveLines(2)

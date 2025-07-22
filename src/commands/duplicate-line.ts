@@ -10,14 +10,14 @@ export function vscodeDuplicate(editor: Editor, direction: VerticalDirection) {
         if (sel.isCaret()) {
             const tx = sel.anchor.getLine()
             sel.anchor.setLine(tx + "\n" + tx)
-            if (direction > 0) return sel.moveLines(1);
+            if (direction > 0) return sel.moveLines(1).withLineDifference(1);
         } else {
             const replaceSel = sel.asNormalized().expand()
             const tx = replaceSel.getText()
             replaceSel.replaceText(tx + "\n" + tx)
-            if (direction > 0) return sel.moveLines(sel.linesCount + 1)
+            if (direction > 0) return sel.moveLines(sel.linesCount).withLineDifference(sel.linesCount)
         }
-        return sel
+        return sel.withLineDifference(sel.linesCount)
     })
 }
 

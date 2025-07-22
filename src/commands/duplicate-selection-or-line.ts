@@ -19,7 +19,7 @@ export const duplicateSelectionOrLine: KeyshotsCommand = {
             if (sel.isCaret()) {
                 const tx = sel.anchor.getLine()
                 sel.anchor.setLine(tx + "\n" + tx)
-                return sel.moveLines(1)
+                return sel.moveLines(1).withLineDifference(1)
             } else {
                 const tx = sel.asNormalized().getText()
                 return sel.asNormalized().replaceText(tx + tx).moveChars(tx.length)

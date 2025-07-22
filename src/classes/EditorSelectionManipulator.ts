@@ -7,6 +7,7 @@ export default class EditorSelectionManipulator implements EditorSelection {
     head: EditorPositionManipulator
     private readonly editor: Editor
     private sizeChange = 0
+    private lineDifference = 0
 
     constructor(selection: EditorSelection, editor: Editor) {
         this.anchor = new EditorPositionManipulator(selection.anchor, editor)
@@ -102,6 +103,7 @@ export default class EditorSelectionManipulator implements EditorSelection {
 
     replaceText(to: string, resize = false): this {
         this.sizeChange = to.length - this.getText().length
+        this.lineDifference = to.split("\n").length - this.linesCount
         this.editor.replaceRange(to, ...this.asFromToPoints())
         if (resize) this.moveChars(0, this.sizeChange)
         return this
@@ -121,6 +123,11 @@ export default class EditorSelectionManipulator implements EditorSelection {
         if (!this.isCaret()) this.head = this.anchor.clone()
         return this;
     }
+    
+    withLineDifference(diff: number) {
+        this.lineDifference += diff
+        return this
+    }
 
     get linesCount() {
         const norm = this.asNormalized()
@@ -129,6 +136,10 @@ export default class EditorSelectionManipulator implements EditorSelection {
 
     get replaceSizeChange() {
         return this.sizeChange
+    }
+
+    get replaceLineDifference() {
+        return this.lineDifference
     }
 
     static listSelections(editor: Editor) {

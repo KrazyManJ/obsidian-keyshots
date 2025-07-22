@@ -14,10 +14,7 @@ export const betterInsertCallout: (plugin: KeyshotsPlugin) => KeyshotsCommand = 
     },
     editorCallback: (editor) => new CalloutPickerModal(plugin,
         (calloutId) => {
-            let moveLine = 0;
             SelectionsProcessing.selectionsProcessor(editor, undefined, (sel) => {
-                sel.moveLines(moveLine)
-                moveLine += sel.linesCount - 2
                 return sel.normalize()
                     .replaceText(`\n>[!${calloutId}]\n${sel.getText().split("\n").map(p => "> " + p).join("\n")}\n`)
                     .moveLines(2)

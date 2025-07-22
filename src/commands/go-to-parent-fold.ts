@@ -1,6 +1,5 @@
 import KeyshotsCommand from "../model/KeyshotsCommand";
 import {Category} from "../constants/Category";
-import * as functions from "../functions";
 import {HotKey} from "../utils";
 import EditorPositionManipulator from "../classes/EditorPositionManipulator";
 

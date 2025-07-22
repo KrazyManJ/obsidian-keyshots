@@ -6,6 +6,7 @@ export default abstract class SelectionsProcessing {
 
     /**
      * Main processing function for selections, handling selections shifting
+     * 
      * @param editor Obsidian Markdown Editor instance
      * @param arrCallback callback to change array before iteration
      * @param fct function to run code for each selection in editor
@@ -18,16 +19,19 @@ export default abstract class SelectionsProcessing {
         const selections = EditorSelectionManipulator.listSelections(editor)
         const newSelections: EditorSelection[] = []
         let lastSelection: EditorSelectionManipulator | undefined = undefined
-        let shift = 0;
+        let characterShift = 0;
+        let totalLineShift = 0;
         (arrCallback ? arrCallback(selections) : selections).forEach((sel, index) => {
             if (lastSelection && lastSelection.isOnSameLine(sel) && sel.isOneLine()) {
-                shift += lastSelection.replaceSizeChange
-                sel.moveChars(shift)
+                characterShift += lastSelection.replaceSizeChange
+                sel.moveChars(characterShift)
             } else if (lastSelection && lastSelection.isOnSameLine(sel)) {
-                shift += lastSelection.replaceSizeChange
-                sel.moveChars(shift, 0)
-                shift = 0
-            } else shift = 0
+                characterShift += lastSelection.replaceSizeChange
+                sel.moveChars(characterShift, 0)
+                characterShift = 0
+            } else totalLineShift += lastSelection?.replaceLineDifference ?? 0;
+            sel.moveLines(totalLineShift)
+
             lastSelection = fct(sel.clone(), index)
             newSelections.push(lastSelection.toEditorSelection())
         })
