@@ -5,6 +5,12 @@ export default interface DoubleKeyCommand {
     maxDelay: number
 
     /**
+     * If command uses other commands to call, usually DoubleKeyRegistry would cancel them
+     * except those in this array
+     */
+    whitelistedCommands?: string[]
+
+    /**
      * Called when last key is pressed
      */
     lastPressedCallback?: () => void

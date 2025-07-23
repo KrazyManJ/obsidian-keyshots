@@ -1,14 +1,18 @@
 import KeyshotsPlugin from "../../plugin";
 import DoubleKeyCommand from "../../model/DoubleKeyCommand";
-import {MarkdownView, Notice} from "obsidian";
+import {MarkdownView} from "obsidian";
 import {runCommandById} from "../../utils";
 import {addCaretDown, addCaretUp} from "../add-caret";
 
-export const addCaretAndOpenCommandPalette: (plugin: KeyshotsPlugin) => DoubleKeyCommand = plugin => ({
-    id: "add-caret-and-open-command-palette",
-    name: "Add caret cursors and open Command-Palette",
-    key: "Control",
+export const addCaretDK: (plugin: KeyshotsPlugin) => DoubleKeyCommand = plugin => ({
+    id: "add-caret",
+    name: "Add caret",
+    key: "Alt",
     maxDelay: 400,
+    whitelistedCommands: [
+        'keyshots:'+addCaretUp.id,
+        'keyshots:'+addCaretDown.id,
+    ],
     anotherKeyPressedCallback:
         plugin.settings.carets_via_double_ctrl
             ? (ev) => {
@@ -20,12 +24,4 @@ export const addCaretAndOpenCommandPalette: (plugin: KeyshotsPlugin) => DoubleKe
             }
             : undefined
     ,
-    lastReleasedCallback:
-        plugin.settings.command_palette_via_double_ctrl
-            ? (interrupted) => {
-                if (!interrupted) runCommandById(plugin, "command-palette:open",
-                    () => new Notice("Command Pallete plugin is not enabled!")
-                )
-            }
-            : undefined
 })

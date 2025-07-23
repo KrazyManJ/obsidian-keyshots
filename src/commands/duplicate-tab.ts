@@ -23,7 +23,6 @@ const duplicateTab: KeyshotsCommand = {
             active: true,
         })
         app.workspace.revealLeaf(leaf)
-        console.log(view)
     }
 }
 
