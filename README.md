@@ -378,3 +378,10 @@ Current available commands are:
 
 - `Duplicate tab` #15
 - `Indent` and `Unindent` commands #12
+
+---
+
+### 2.5.1 - Quick hotfix for previous version
+
+- Fixed time difference calculation for double key commands #16
+- Fixed behavior of `Join Selected Lines` with one-line selection command #14
