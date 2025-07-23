@@ -1,9 +1,15 @@
 import SelectionsProcessing from "src/classes/SelectionsProcessing"
+import { Category } from "src/constants/Category"
 import KeyshotsCommand from "src/model/KeyshotsCommand"
+import { HotKey } from "src/utils"
 
 export const indent: KeyshotsCommand = {
+    category: Category.EDITOR_LINES_MANIPULATION,
     id: 'indent',
     name: "Indent",
+    hotkeys: {
+        keyshots: [HotKey("]","Alt")]
+    },
     editorCallback: (editor) => {
         const useTabs = app.vault.getConfig("useTabs")
 
@@ -24,8 +30,12 @@ export const indent: KeyshotsCommand = {
 
 
 export const unindent: KeyshotsCommand = {
+    category: Category.EDITOR_LINES_MANIPULATION,
     id: 'unindent',
     name: "Unindent",
+    hotkeys: {
+        keyshots: [HotKey("[","Alt")]
+    },
     editorCallback: (editor) => {
         const useTabs = app.vault.getConfig("useTabs")
 

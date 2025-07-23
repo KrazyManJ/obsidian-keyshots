@@ -7,14 +7,14 @@ import {addCaretDown, addCaretUp} from "../add-caret";
 export const addCaretDK: (plugin: KeyshotsPlugin) => DoubleKeyCommand = plugin => ({
     id: "add-carets",
     name: "Add carets",
-    key: "Control",
+    key: plugin.settings.key_carets_via_double_key_cmd,
     maxDelay: 400,
     whitelistedCommands: [
         'keyshots:'+addCaretUp.id,
         'keyshots:'+addCaretDown.id,
     ],
     anotherKeyPressedCallback:
-        plugin.settings.carets_via_double_ctrl
+        plugin.settings.enable_carets_via_double_key_cmd
             ? (ev) => {
                 if (!["ArrowUp", "ArrowDown"].includes(ev.key)) return
                 ev.preventDefault()

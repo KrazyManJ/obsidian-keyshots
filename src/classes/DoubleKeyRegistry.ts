@@ -49,7 +49,6 @@ export default class DoubleKeyRegistry extends Component {
         if (!this.hasAnyCommandRegistered) {
             return;
         }
-
         this.pressedKeys.add(ev.key);
         this.cancelAction = false
         if (this.activeCommands.length > 0 && ev.key == this.activeCommands[0].key && this.pressedKeys.has(ev.key)) {
@@ -59,10 +58,8 @@ export default class DoubleKeyRegistry extends Component {
         if (this.lastReleasedKey && this.activeCommands.length === 0 && this.lastReleasedKey.key === ev.key) {
             this.activeCommands = Object.values(this.cmds).filter(cmd => cmd.key === ev.key)
             
-            this.activeCommands.forEach((activeCommand,i) => {
-                if (this.lastReleasedKey && Math.abs(ev.timeStamp - this.lastReleasedKey.timeStamp) > activeCommand.maxDelay) {
-                    delete this.activeCommands[i]
-                }
+            this.activeCommands = this.activeCommands.filter(activeCommand => {
+                return this.lastReleasedKey && Math.abs(ev.timeStamp - this.lastReleasedKey.timeStamp) > activeCommand.maxDelay
             })
             const firstCommandWithAnotherKeyPressedCallback = this.activeCommands.find(activeCommand => {
                 return activeCommand.anotherKeyPressedCallback
@@ -102,7 +99,7 @@ export default class DoubleKeyRegistry extends Component {
         if (this.cancelAction) {
             return;
         }
-        if (this.lastPressedKey?.key != ev.key && !this.activeCommands) {
+        if (this.lastPressedKey?.key != ev.key && this.activeCommands.length > 0) {
             this.cancelCurrentCommand();
             return;
         }

@@ -50,7 +50,7 @@ import {toggleFocusMode} from "./commands/toggle-focus-mode";
 import {changeKeyshotsPreset} from "./commands/change-keyshots-preset";
 import {openKeyshotsSettingsTab} from "./commands/open-keyshots-settings-tab";
 import {switchKeyshotsCaseSensitivity} from "./commands/switch-keyshots-case-sensitivity";
-import {addCaretDK} from "./commands/double-key/add-caret";
+import {addCaretDK} from "./commands/double-key/add-carets";
 import {quickOpen} from "./commands/double-key/quick-open";
 import duplicateTab from './commands/duplicate-tab';
 import { indent, unindent } from './commands/indent';
@@ -153,11 +153,11 @@ export default class KeyshotsPlugin extends Plugin {
 
     loadDoubleKeyCommands() {
         this.doubleKeyRegistry.unregisterAllCommands()
-        if (this.settings.carets_via_double_ctrl) {
+        if (this.settings.enable_carets_via_double_key_cmd) {
             this.doubleKeyRegistry.registerCommand(addCaretDK(this))
             this.doubleKeyRegistry.registerCommand(openCommandPaletteDK(this))
         }
-        if (this.settings.quick_switch_via_double_shift) {
+        if (this.settings.enable_quick_switch_via_double_key_cmd) {
             this.doubleKeyRegistry.registerCommand(quickOpen(this))
         }
     }
