@@ -52,6 +52,7 @@ import {openKeyshotsSettingsTab} from "./commands/open-keyshots-settings-tab";
 import {switchKeyshotsCaseSensitivity} from "./commands/switch-keyshots-case-sensitivity";
 import {addCaretAndOpenCommandPalette} from "./commands/double-key/add-caret-and-open-command-palette";
 import {quickOpen} from "./commands/double-key/quick-open";
+import duplicateTab from './commands/duplicate-tab';
 
 export default class KeyshotsPlugin extends Plugin {
 
@@ -123,7 +124,8 @@ export default class KeyshotsPlugin extends Plugin {
             toggleFocusMode,
             changeKeyshotsPreset(this),
             openKeyshotsSettingsTab,
-            switchKeyshotsCaseSensitivity(this)
+            switchKeyshotsCaseSensitivity(this),
+            duplicateTab
         ]
     }
 
