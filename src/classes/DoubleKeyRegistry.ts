@@ -1,6 +1,6 @@
 import KeyshotsPlugin from "../plugin";
 import DoubleKeyCommand from "../model/DoubleKeyCommand";
-import { Command, Component } from "obsidian";
+import { Command, Component, setIcon } from "obsidian";
 
 
 declare interface KeyRecord {
@@ -12,6 +12,7 @@ export default class DoubleKeyRegistry extends Component {
 
     private readonly plugin: KeyshotsPlugin
     private readonly statusBarItem: HTMLElement
+    private readonly statusBarIcon: HTMLSpanElement
 
     private readonly cmds: Record<string, DoubleKeyCommand> = {}
     private app = app // To make app command code injection work
@@ -35,7 +36,7 @@ export default class DoubleKeyRegistry extends Component {
     }
 
     private setStatusBarState(commandName?: string) {
-        this.statusBarItem.setText(commandName ? "🟩" : "🟨")
+        this.statusBarItem.style.color = `var(--color-${commandName ? "green" : "orange"})`
         this.statusBarItem.setAttr("aria-label", "Keyshots: " + (commandName
                 ? `command "${commandName}" is active`
                 : `no double-key command active`
@@ -56,9 +57,7 @@ export default class DoubleKeyRegistry extends Component {
         }
         this.lastPressedKey = this.createKeyRecord(ev);
         if (this.lastReleasedKey && this.activeCommands.length === 0 && this.lastReleasedKey.key === ev.key) {
-            console.log("adds commands")
             this.activeCommands = Object.values(this.cmds).filter(cmd => cmd.key === ev.key)
-            console.log(this.activeCommands)
             
             this.activeCommands.forEach((activeCommand,i) => {
                 if (this.lastReleasedKey && Math.abs(ev.timeStamp - this.lastReleasedKey.timeStamp) > activeCommand.maxDelay) {
@@ -139,8 +138,13 @@ export default class DoubleKeyRegistry extends Component {
     constructor(plugin: KeyshotsPlugin) {
         super();
         this.plugin = plugin
+
         this.statusBarItem = this.plugin.addStatusBarItem()
-        this.statusBarItem.setAttr("aria-label-position", "top")
+        this.statusBarIcon = this.statusBarItem.createSpan({cls:"status-bar-item-icon"})
+        setIcon(this.statusBarIcon,"keyboard")
+        this.statusBarItem.setAttr("data-tooltip-position", "top")
+
+
         this.setStatusBarState()
         const elem = window
 
@@ -171,7 +175,6 @@ export default class DoubleKeyRegistry extends Component {
                     || (this.lastAction === 'lastReleased' && activeCommand.lastReleasedCallback)
 
                     if (actionMatchesCommand && !whitelist.includes(command.id)) {
-                        console.log("terminated")
                         return false;
                     }
                 }

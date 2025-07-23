@@ -5,8 +5,8 @@ import {runCommandById} from "../../utils";
 import {addCaretDown, addCaretUp} from "../add-caret";
 
 export const addCaretDK: (plugin: KeyshotsPlugin) => DoubleKeyCommand = plugin => ({
-    id: "add-caret",
-    name: "Add caret",
+    id: "add-carets",
+    name: "Add carets",
     key: "Control",
     maxDelay: 400,
     whitelistedCommands: [
