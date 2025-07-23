@@ -19,14 +19,14 @@ export const joinSelectedLines: KeyshotsCommand = {
                 if (sel.anchor.line === editor.lineCount()-1) {
                     return sel
                 }
-                const start = sel.anchor.ch
-                const length = sel.getText().length
                 const currentLineLength = editor.getLine(sel.anchor.line).length
 
                 const expandedSelection = sel.clone().moveLines(0,1).expand()
                 expandedSelection.replaceText(expandedSelection.getText().replace(/\n/g, " "))
 
-                if (sel.isOneLine()) return expandedSelection.moveLines(0,-1).moveChars(start,length-start)
+                if (sel.isOneLine() && !sel.isCaret()) {
+                    return sel.withLineDifference(-1)
+                }
 
                 return sel.clone().setChars(currentLineLength,currentLineLength)
             }
