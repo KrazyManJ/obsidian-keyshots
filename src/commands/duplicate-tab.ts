@@ -1,8 +1,10 @@
 import { View } from "obsidian";
+import { Category } from "src/constants/Category";
 import KeyshotsCommand from "src/model/KeyshotsCommand";
 import { HotKey } from "src/utils";
 
 const duplicateTab: KeyshotsCommand = {
+    category: Category.OTHER,
     id: 'duplicate-tab',
     name: "Duplicate tab",
     hotkeys: {

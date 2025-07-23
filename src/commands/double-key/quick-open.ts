@@ -6,7 +6,7 @@ import {runCommandById} from "../../utils";
 export const quickOpen: (plugin: KeyshotsPlugin) => DoubleKeyCommand = plugin => ({
     id: "quick-open",
     name: "Open Quick-Switcher",
-    key: "Shift",
+    key: plugin.settings.key_quick_switch_via_double_key_cmd,
     maxDelay: 400,
     whitelistedCommands: [
         plugin.settings.open_file_command
