@@ -7,6 +7,7 @@ declare module 'obsidian' {
         livePreview: boolean
         showInlineTitle: boolean
         tabSize: number
+        useTabs: boolean
     }
 
     interface Vault {
@@ -24,6 +25,8 @@ declare module 'obsidian' {
         removeCommand(...id: string[]): void;
 
         executeCommandById(id: string): boolean;
+
+        executeCommand(e: Command, t: unknown): boolean;
 
         commands: Record<string, ACommand>
     }

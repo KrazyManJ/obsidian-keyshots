@@ -66,63 +66,60 @@ Keyshots adds actions like move line up or down...
 Here is a full list of all Keyshots commands with mappings of hotkeys that are available. If any of hotkey for IDE action is missing, Keyshots mappings
 hotkey is used instead *(This behavior can be changed in settings)*.
 
-| Hotkeys                                          | Keyshots Default Mappings                                          | Visual Studio Code                                    | JetBrains IDEs                                                     | Microsoft Visual Studio                           |
-|--------------------------------------------------|--------------------------------------------------------------------|-------------------------------------------------------|--------------------------------------------------------------------|---------------------------------------------------|
-| `Duplicate line down (Visual Studio Code)`       | <kbd>Shift</kbd> + <kbd>Alt</kbd> + <kbd>↓</kbd>                   | <kbd>Shift</kbd> + <kbd>Alt</kbd> + <kbd>↓</kbd>      |                                                                    |                                                   |
-| `Duplicate line up (Visual Studio Code)`         | <kbd>Shift</kbd> + <kbd>Alt</kbd> + <kbd>↑</kbd>                   | <kbd>Shift</kbd> + <kbd>Alt</kbd> + <kbd>↑</kbd>      |                                                                    |                                                   |
-| `Duplicate selection or line (JetBrains IDEs)`   | <kbd>Ctrl</kbd> + <kbd>Alt</kbd> + <kbd>D</kbd>                    |                                                       | <kbd>Ctrl</kbd> + <kbd>D</kbd>                                     | <kbd>Ctrl</kbd> + <kbd>D</kbd>                    |
-| `Insert line above`                              | <kbd>Ctrl</kbd> + <kbd>Shift</kbd> + <kbd>Enter</kbd>              | <kbd>Ctrl</kbd> + <kbd>Shift</kbd> + <kbd>Enter</kbd> | <kbd>Ctrl</kbd> + <kbd>Alt</kbd> + <kbd>Enter</kbd>                | <kbd>Ctrl</kbd> + <kbd>Enter</kbd>                |
-| `Insert line below`                              | <kbd>Shift</kbd> + <kbd>Enter</kbd>                                | <kbd>Ctrl</kbd> + <kbd>Enter</kbd>                    | <kbd>Shift</kbd> + <kbd>Enter</kbd>                                | <kbd>Shift</kbd> + <kbd>Enter</kbd>               |
-| `Join selected lines`                            | <kbd>Ctrl</kbd> + <kbd>Shift</kbd> + <kbd>J</kbd>                  | <kbd>Ctrl</kbd> + <kbd>J</kbd>                        | <kbd>Ctrl</kbd> + <kbd>Shift</kbd> + <kbd>J</kbd>                  |                                                   |
-| `Move line down`                                 | <kbd>Alt</kbd> + <kbd>↓</kbd>                                      | <kbd>Alt</kbd> + <kbd>↓</kbd>                         | <kbd>Shift</kbd> + <kbd>Alt</kbd> + <kbd>↓</kbd>                   | <kbd>Alt</kbd> + <kbd>↓</kbd>                     |
-| `Move line up`                                   | <kbd>Alt</kbd> + <kbd>↑</kbd>                                      | <kbd>Alt</kbd> + <kbd>↑</kbd>                         | <kbd>Shift</kbd> + <kbd>Alt</kbd> + <kbd>↑</kbd>                   | <kbd>Alt</kbd> + <kbd>↑</kbd>                     |
-| `Reverse selected lines`                         | <kbd>Alt</kbd> + <kbd>R</kbd>                                      |                                                       |                                                                    |                                                   |
-| `Shuffle selected lines`                         | <kbd>Ctrl</kbd> + <kbd>Shift</kbd> + <kbd>Alt</kbd> + <kbd>S</kbd> |                                                       |                                                                    |                                                   |
-| `Sort selected lines`                            | <kbd>Ctrl</kbd> + <kbd>Shift</kbd> + <kbd>S</kbd>                  |                                                       |                                                                    |                                                   |
-| `Better insert callout`                          | <kbd>Shift</kbd> + <kbd>Alt</kbd> + <kbd>C</kbd>                   |                                                       |                                                                    |                                                   |
-| `Insert code block`                              | <kbd>Ctrl</kbd> + <kbd>Shift</kbd> + <kbd>`</kbd>                  |                                                       |                                                                    |                                                   |
-| `Insert ordinal numbering`                       | <kbd>Shift</kbd> + <kbd>Alt</kbd> + <kbd>N</kbd>                   |                                                       |                                                                    |                                                   |
-| `Insert Table`                                   | <kbd>Shift</kbd> + <kbd>Alt</kbd> + <kbd>T</kbd>                   |                                                       |                                                                    |                                                   |
-| `Close all foldable callouts`                    | <kbd>Shift</kbd> + <kbd>Alt</kbd> + <kbd>L</kbd>                   |                                                       |                                                                    |                                                   |
-| `Open all foldable callouts`                     | <kbd>Shift</kbd> + <kbd>Alt</kbd> + <kbd>O</kbd>                   |                                                       |                                                                    |                                                   |
-| `Toggle all callouts fold state`                 | <kbd>Shift</kbd> + <kbd>Alt</kbd> + <kbd>K</kbd>                   |                                                       |                                                                    |                                                   |
-| `Multi-toggle bold`                              | <kbd>Ctrl</kbd> + <kbd>Shift</kbd> + <kbd>B</kbd>                  |                                                       |                                                                    |                                                   |
-| `Multi-toggle code`                              | <kbd>Ctrl</kbd> + <kbd>Shift</kbd> + <kbd>C</kbd>                  |                                                       |                                                                    |                                                   |
-| `Multi-toggle comment`                           | <kbd>Ctrl</kbd> + <kbd>Shift</kbd> + <kbd>/</kbd>                  |                                                       |                                                                    |                                                   |
-| `Multi-toggle highlight`                         | <kbd>Ctrl</kbd> + <kbd>Shift</kbd> + <kbd>H</kbd>                  |                                                       |                                                                    |                                                   |
-| `Multi-toggle italic`                            | <kbd>Ctrl</kbd> + <kbd>Shift</kbd> + <kbd>I</kbd>                  |                                                       |                                                                    |                                                   |
-| `Multi-toggle strikethrough`                     | <kbd>Ctrl</kbd> + <kbd>Shift</kbd> + <kbd>M</kbd>                  |                                                       |                                                                    |                                                   |
-| `Replace by Regular Expression (Regex)`          | <kbd>Ctrl</kbd> + <kbd>Alt</kbd> + <kbd>H</kbd>                    |                                                       |                                                                    |                                                   |
-| `Toggle case (JetBrains)`                        | <kbd>Ctrl</kbd> + <kbd>Shift</kbd> + <kbd>U</kbd>                  |                                                       | <kbd>Ctrl</kbd> + <kbd>Shift</kbd> + <kbd>U</kbd>                  |                                                   |
-| `Toggle selections kebabcase`                    | <kbd>Alt</kbd> + <kbd>-</kbd>                                      |                                                       |                                                                    |                                                   |
-| `Toggle keyboard input (<kbd>)`                  | <kbd>Ctrl</kbd> + <kbd>Shift</kbd> + <kbd>K</kbd>                  |                                                       |                                                                    |                                                   |
-| `Toggle selections snakecase`                    | <kbd>Shift</kbd> + <kbd>Alt</kbd> + <kbd>-</kbd>                   |                                                       |                                                                    |                                                   |
-| `Toggle underline`                               | <kbd>Alt</kbd> + <kbd>N</kbd>                                      |                                                       |                                                                    |                                                   |
-| `Toggle selections URI encoded/decoded string`   | <kbd>Ctrl</kbd> + <kbd>Alt</kbd> + <kbd>U</kbd>                    |                                                       |                                                                    |                                                   |
-| `Transform selections to lowercase`              | <kbd>Alt</kbd> + <kbd>L</kbd>                                      |                                                       |                                                                    | <kbd>Ctrl</kbd> + <kbd>U</kbd>                    |
-| `Transform selections to titlecase (capitalize)` | <kbd>Alt</kbd> + <kbd>C</kbd>                                      |                                                       |                                                                    |                                                   |
-| `Transform selections to uppercase`              | <kbd>Alt</kbd> + <kbd>U</kbd>                                      |                                                       |                                                                    | <kbd>Ctrl</kbd> + <kbd>Shift</kbd> + <kbd>U</kbd> |
-| `Trim selections`                                | <kbd>Alt</kbd> + <kbd>T</kbd>                                      |                                                       |                                                                    |                                                   |
-| `Add caret cursor down`                          | <kbd>Ctrl</kbd> + <kbd>Alt</kbd> + <kbd>↓</kbd>                    | <kbd>Ctrl</kbd> + <kbd>Alt</kbd> + <kbd>↓</kbd>       |                                                                    | <kbd>Shift</kbd> + <kbd>Alt</kbd> + <kbd>↓</kbd>  |
-| `Add caret cursor up`                            | <kbd>Ctrl</kbd> + <kbd>Alt</kbd> + <kbd>↑</kbd>                    | <kbd>Ctrl</kbd> + <kbd>Alt</kbd> + <kbd>↑</kbd>       |                                                                    | <kbd>Shift</kbd> + <kbd>Alt</kbd> + <kbd>↑</kbd>  |
-| `Search by Regular Expression (Regex)`           | <kbd>Ctrl</kbd> + <kbd>Alt</kbd> + <kbd>S</kbd>                    |                                                       |                                                                    |                                                   |
-| `Select all word instances`                      | <kbd>Ctrl</kbd> + <kbd>Shift</kbd> + <kbd>L</kbd>                  | <kbd>Ctrl</kbd> + <kbd>Shift</kbd> + <kbd>L</kbd>     | <kbd>Ctrl</kbd> + <kbd>Shift</kbd> + <kbd>Alt</kbd> + <kbd>J</kbd> | <kbd>Shift</kbd> + <kbd>Alt</kbd> + <kbd>;</kbd>  |
-| `Select multiple word instances`                 | <kbd>Ctrl</kbd> + <kbd>D</kbd>                                     | <kbd>Ctrl</kbd> + <kbd>D</kbd>                        | <kbd>Alt</kbd> + <kbd>J</kbd>                                      | <kbd>Shift</kbd> + <kbd>Alt</kbd> + <kbd>.</kbd>  |
-| `Split selections by lines`                      | <kbd>Ctrl</kbd> + <kbd>Alt</kbd> + <kbd>L</kbd>                    |                                                       |                                                                    |                                                   |
-| `Expand line selections`                         | <kbd>Alt</kbd> + <kbd>E</kbd>                                      | <kbd>Ctrl</kbd> + <kbd>L</kbd>                        | <kbd>Ctrl</kbd> + <kbd>W</kbd>                                     | <kbd>Shift</kbd> + <kbd>Alt</kbd> + <kbd>=</kbd>  |
-| `Split selections on new line`                   | <kbd>Alt</kbd> + <kbd>S</kbd>                                      |                                                       |                                                                    |                                                   |
-| `Go to next fold`                                | <kbd>Ctrl</kbd> + <kbd>Alt</kbd> + <kbd>]</kbd>                    |                                                       |                                                                    |                                                   |
-| `Go to previous fold`                            | <kbd>Ctrl</kbd> + <kbd>Alt</kbd> + <kbd>[</kbd>                    |                                                       |                                                                    |                                                   |
-| `Go to parent fold`                              | <kbd>Ctrl</kbd> + <kbd>Alt</kbd> + <kbd>P</kbd>                    |                                                       |                                                                    |                                                   |
-| `Switch 'inline title' setting`                  | <kbd>Ctrl</kbd> + <kbd>Alt</kbd> + <kbd>T</kbd>                    |                                                       |                                                                    |                                                   |
-| `Switch 'line numbers' setting`                  | <kbd>Ctrl</kbd> + <kbd>Alt</kbd> + <kbd>N</kbd>                    |                                                       |                                                                    |                                                   |
-| `Switch 'readable line length' setting`          | <kbd>Ctrl</kbd> + <kbd>Alt</kbd> + <kbd>R</kbd>                    |                                                       |                                                                    |                                                   |
-| `Open developer tools`                           | <kbd>F12</kbd>                                                     |                                                       |                                                                    |                                                   |
-| `Reopen current note`                            | <kbd>Alt</kbd> + <kbd>Q</kbd>                                      |                                                       |                                                                    |                                                   |
-| `Toggle focus mode`                              | <kbd>Ctrl</kbd> + <kbd>Alt</kbd> + <kbd>F</kbd>                    |                                                       |                                                                    |                                                   |
-| `Change Keyshots preset`                         | <kbd>Ctrl</kbd> + <kbd>Shift</kbd> + <kbd>P</kbd>                  |                                                       |                                                                    |                                                   |
-| `Open Keyshots settings tab`                     | <kbd>Ctrl</kbd> + <kbd>Alt</kbd> + <kbd>,</kbd>                    |                                                       |                                                                    |                                                   |
-| `Switch Keyshots case sensitivity`               | <kbd>Ctrl</kbd> + <kbd>Alt</kbd> + <kbd>I</kbd>                    |                                                       |                                                                    |                                                   |
+| Hotkeys | Keyshots Default Mappings | Visual Studio Code | JetBrains IDEs | Microsoft Visual Studio |
+| --- | --- | --- | --- | --- |
+| `Duplicate line up (Visual Studio Code)` | <kbd>Shift</kbd> + <kbd>Alt</kbd> + <kbd>↑</kbd> | <kbd>Shift</kbd> + <kbd>Alt</kbd> + <kbd>↑</kbd> |  |  |
+| `Duplicate line down (Visual Studio Code)` | <kbd>Shift</kbd> + <kbd>Alt</kbd> + <kbd>↓</kbd> | <kbd>Shift</kbd> + <kbd>Alt</kbd> + <kbd>↓</kbd> |  |  |
+| `Duplicate selection or line (JetBrains IDEs)` | <kbd>Ctrl</kbd> + <kbd>Alt</kbd> + <kbd>D</kbd> |  | <kbd>Ctrl</kbd> + <kbd>D</kbd> | <kbd>Ctrl</kbd> + <kbd>D</kbd> |
+| `Insert line above` | <kbd>Ctrl</kbd> + <kbd>Shift</kbd> + <kbd>Enter</kbd> | <kbd>Ctrl</kbd> + <kbd>Shift</kbd> + <kbd>Enter</kbd> | <kbd>Ctrl</kbd> + <kbd>Alt</kbd> + <kbd>Enter</kbd> | <kbd>Ctrl</kbd> + <kbd>Enter</kbd> |
+| `Insert line below` | <kbd>Shift</kbd> + <kbd>Enter</kbd> | <kbd>Ctrl</kbd> + <kbd>Enter</kbd> | <kbd>Shift</kbd> + <kbd>Enter</kbd> | <kbd>Shift</kbd> + <kbd>Enter</kbd> |
+| `Join selected lines` | <kbd>Ctrl</kbd> + <kbd>Shift</kbd> + <kbd>J</kbd> | <kbd>Ctrl</kbd> + <kbd>J</kbd> | <kbd>Ctrl</kbd> + <kbd>Shift</kbd> + <kbd>J</kbd> |  |
+| `Move selected lines down` | <kbd>Alt</kbd> + <kbd>↓</kbd> | <kbd>Alt</kbd> + <kbd>↓</kbd> | <kbd>Shift</kbd> + <kbd>Alt</kbd> + <kbd>↓</kbd> | <kbd>Alt</kbd> + <kbd>↓</kbd> |
+| `Move selected lines up` | <kbd>Alt</kbd> + <kbd>↑</kbd> | <kbd>Alt</kbd> + <kbd>↑</kbd> | <kbd>Shift</kbd> + <kbd>Alt</kbd> + <kbd>↑</kbd> | <kbd>Alt</kbd> + <kbd>↑</kbd> |
+| `Reverse selected lines` | <kbd>Alt</kbd> + <kbd>R</kbd> |  |  |  |
+| `Shuffle selected lines` | <kbd>Ctrl</kbd> + <kbd>Shift</kbd> + <kbd>Alt</kbd> + <kbd>S</kbd> |  |  |  |
+| `Sort selected lines` | <kbd>Ctrl</kbd> + <kbd>Shift</kbd> + <kbd>S</kbd> |  |  |  |
+| `Indent` | <kbd>Alt</kbd> + <kbd>]</kbd> |  |  |  |
+| `Unindent` | <kbd>Alt</kbd> + <kbd>[</kbd> |  |  |  |
+| `Better insert callout` | <kbd>Shift</kbd> + <kbd>Alt</kbd> + <kbd>C</kbd> |  |  |  |
+| `Insert code block` | <kbd>Ctrl</kbd> + <kbd>Shift</kbd> + <kbd>`</kbd> |  |  |  |
+| `Insert ordinal numbering` | <kbd>Shift</kbd> + <kbd>Alt</kbd> + <kbd>N</kbd> |  |  |  |
+| `Insert Table` | <kbd>Shift</kbd> + <kbd>Alt</kbd> + <kbd>T</kbd> |  |  |  |
+| `Change Keyshots preset` | <kbd>Ctrl</kbd> + <kbd>Shift</kbd> + <kbd>P</kbd> |  |  |  |
+| `Open Keyshots settings tab` | <kbd>Ctrl</kbd> + <kbd>Alt</kbd> + <kbd>,</kbd> |  |  |  |
+| `Switch Keyshots case sensitivity` | <kbd>Ctrl</kbd> + <kbd>Alt</kbd> + <kbd>I</kbd> |  |  |  |
+| `Switch 'inline title' setting` | <kbd>Ctrl</kbd> + <kbd>Alt</kbd> + <kbd>T</kbd> |  |  |  |
+| `Switch 'line numbers' setting` | <kbd>Ctrl</kbd> + <kbd>Alt</kbd> + <kbd>N</kbd> |  |  |  |
+| `Switch 'readable line length' setting` | <kbd>Ctrl</kbd> + <kbd>Alt</kbd> + <kbd>R</kbd> |  |  |  |
+| `Reopen current note` | <kbd>Alt</kbd> + <kbd>Q</kbd> |  |  |  |
+| `Open developer tools` | <kbd>F12</kbd> |  |  |  |
+| `Toggle focus mode` | <kbd>Ctrl</kbd> + <kbd>Alt</kbd> + <kbd>F</kbd> |  |  |  |
+| `Duplicate tab` | <kbd>Ctrl</kbd> + <kbd>Alt</kbd> + <kbd>D</kbd> |  |  |  |
+| `Close all foldable callouts` | <kbd>Shift</kbd> + <kbd>Alt</kbd> + <kbd>L</kbd> |  |  |  |
+| `Open all foldable callouts` | <kbd>Shift</kbd> + <kbd>Alt</kbd> + <kbd>O</kbd> |  |  |  |
+| `Toggle all callouts fold state` | <kbd>Shift</kbd> + <kbd>Alt</kbd> + <kbd>K</kbd> |  |  |  |
+| `Toggle case (JetBrains)` | <kbd>Ctrl</kbd> + <kbd>Shift</kbd> + <kbd>U</kbd> |  | <kbd>Ctrl</kbd> + <kbd>Shift</kbd> + <kbd>U</kbd> |  |
+| `Transform selections to lowercase` | <kbd>Alt</kbd> + <kbd>U</kbd> |  |  | <kbd>Ctrl</kbd> + <kbd>Shift</kbd> + <kbd>U</kbd> |
+| `Replace by Regular Expression (Regex)` | <kbd>Ctrl</kbd> + <kbd>Alt</kbd> + <kbd>H</kbd> |  |  |  |
+| `Toggle selections kebabcase` | <kbd>Alt</kbd> + <kbd>-</kbd> |  |  |  |
+| `Toggle keyboard input (<kbd>)` | <kbd>Ctrl</kbd> + <kbd>Shift</kbd> + <kbd>K</kbd> |  |  |  |
+| `Toggle selections snakecase` | <kbd>Shift</kbd> + <kbd>Alt</kbd> + <kbd>-</kbd> |  |  |  |
+| `Toggle underline` | <kbd>Alt</kbd> + <kbd>N</kbd> |  |  |  |
+| `Toggle selections URI encoded/decoded string` | <kbd>Ctrl</kbd> + <kbd>Alt</kbd> + <kbd>U</kbd> |  |  |  |
+| `Transform selections to titlecase (capitalize)` | <kbd>Alt</kbd> + <kbd>C</kbd> |  |  |  |
+| `Trim selections` | <kbd>Alt</kbd> + <kbd>T</kbd> |  |  |  |
+| `Add caret cursor down` | <kbd>Ctrl</kbd> + <kbd>Alt</kbd> + <kbd>↓</kbd> | <kbd>Ctrl</kbd> + <kbd>Alt</kbd> + <kbd>↓</kbd> |  | <kbd>Shift</kbd> + <kbd>Alt</kbd> + <kbd>↓</kbd> |
+| `Add caret cursor up` | <kbd>Ctrl</kbd> + <kbd>Alt</kbd> + <kbd>↑</kbd> | <kbd>Ctrl</kbd> + <kbd>Alt</kbd> + <kbd>↑</kbd> |  | <kbd>Shift</kbd> + <kbd>Alt</kbd> + <kbd>↑</kbd> |
+| `Select all word instances` | <kbd>Ctrl</kbd> + <kbd>Shift</kbd> + <kbd>L</kbd> | <kbd>Ctrl</kbd> + <kbd>Shift</kbd> + <kbd>L</kbd> | <kbd>Ctrl</kbd> + <kbd>Shift</kbd> + <kbd>Alt</kbd> + <kbd>J</kbd> | <kbd>Shift</kbd> + <kbd>Alt</kbd> + <kbd>;</kbd> |
+| `Select multiple word instances` | <kbd>Ctrl</kbd> + <kbd>D</kbd> | <kbd>Ctrl</kbd> + <kbd>D</kbd> | <kbd>Alt</kbd> + <kbd>J</kbd> | <kbd>Shift</kbd> + <kbd>Alt</kbd> + <kbd>.</kbd> |
+| `Search by Regular Expression (Regex)` | <kbd>Ctrl</kbd> + <kbd>Alt</kbd> + <kbd>S</kbd> |  |  |  |
+| `Split selections by lines` | <kbd>Ctrl</kbd> + <kbd>Alt</kbd> + <kbd>L</kbd> |  |  |  |
+| `Expand line selections` | <kbd>Alt</kbd> + <kbd>E</kbd> | <kbd>Ctrl</kbd> + <kbd>L</kbd> | <kbd>Ctrl</kbd> + <kbd>W</kbd> | <kbd>Shift</kbd> + <kbd>Alt</kbd> + <kbd>=</kbd> |
+| `Split selections on new line` | <kbd>Alt</kbd> + <kbd>S</kbd> |  |  |  |
+| `Go to next fold` | <kbd>Ctrl</kbd> + <kbd>Alt</kbd> + <kbd>]</kbd> |  |  |  |
+| `Go to previous fold` | <kbd>Ctrl</kbd> + <kbd>Alt</kbd> + <kbd>[</kbd> |  |  |  |
+| `Go to parent fold` | <kbd>Ctrl</kbd> + <kbd>Alt</kbd> + <kbd>P</kbd> |  |  |  |
+
 ## ✌️⌨️ Double-Key commands
 
 Double key commands are feature used in JetBrains IDEs, that are 
@@ -130,9 +127,9 @@ doing certain actions after specific key is pressed twice.
 
 Now Keyshots has two double-key commands:
 
-- <kbd>Ctrl</kbd> - Pressing and holding last key and then press <kbd>↑</kbd> or <kbd>↓</kbd> will
+- Pressing and holding last key and then press <kbd>↑</kbd> or <kbd>↓</kbd> will
 add caret cursor just like `Add caret cursor up` or `Add caret cursor down` do
-- <kbd>Shift</kbd> - If you have internal plugin `Quick Switcher` enabled, then this shortcut will
+- If you have internal plugin `Quick Switcher` enabled, then this shortcut will
 open quick switcher window just like <kbd>Ctrl + O</kbd> does
 
 If you do not like them, then you can disable them in settings.
@@ -333,7 +330,7 @@ Current available commands are:
 
 ---
 
-### 2.3.0 - Few fixes and improvements (Latest Release)
+### 2.3.0
 
 #### New features
 
@@ -347,6 +344,8 @@ Current available commands are:
 
 - Fixed behavior of `Go to next/previous fold` commands (#5)
 
+---
+
 ### 2.4.0
 
 #### New commands
@@ -358,3 +357,24 @@ Current available commands are:
 - Fixed behavior of `Expand line selection` command (#11)
 - Fixed preview behavior of `excalidraw` for commands based on regex modal
 - Fixed coloring for `Insert table` command
+
+---
+
+### 2.5.0
+
+#### New features
+
+- Added settings of keybindings for all double key commands
+
+#### Improvements
+
+- Fixed behavior for all multi-line commands to work better with multiple selections/carets #14 #16
+- Fixed behavior of `Join Selected Lines` command #14
+- Refactored whole codebase
+- Fixed behavior of double-key registry
+- Redesigned status bar item for double key registry
+
+#### New commands
+
+- `Duplicate tab` #15
+- `Indent` and `Unindent` commands #12

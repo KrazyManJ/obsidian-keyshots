@@ -1,9 +1,9 @@
 import {App, PluginSettingTab, Setting, SliderComponent} from "obsidian";
 import KeyshotsPlugin from "../plugin";
-import {DocumentFragmentBuilder} from "../classes/document-fragment-builder";
-import {IDE_LABELS} from "../mappings/ide-info";
-import {DEFAULT_SETTINGS} from "../settings";
-import {KEYSHOTS_SVG} from "../svgs";
+import DocumentFragmentBuilder from "../classes/DocumentFragmentBuilder";
+import {KEYSHOTS_SVG} from "../constants/SVGs";
+import {Preset, PRESETS_INFO} from "../constants/Presets";
+import DEFAULT_KEYSHOTS_SETTINGS from "../constants/DefaultKeyshotsSettings";
 
 
 function getOpenCommands() {
@@ -15,6 +15,12 @@ function getOpenCommands() {
     })
     return cmds;
 }
+
+const DOUBLE_KEY_OPTIONS = {
+    "Control": "Control",
+    "Shift": "Shift",
+    "Alt": "Alt"
+} as const;
 
 export class KeyshotsSettingTab extends PluginSettingTab {
     plugin: KeyshotsPlugin;
@@ -42,13 +48,13 @@ export class KeyshotsSettingTab extends PluginSettingTab {
                 .toFragment()
             )
             .addDropdown(cb => cb
-                .addOptions(Object.entries(IDE_LABELS).reduce((acc: Record<string, string>, [key, ideInfo]) => {
-                    acc[key] = ideInfo.name;
+                .addOptions(Object.entries(PRESETS_INFO).reduce((acc: Record<string, string>, [id, presetInfo]) => {
+                    acc[id] = presetInfo.name;
                     return acc;
                 }, {}))
                 .setValue(this.plugin.settings.ide_mappings)
                 .onChange(async (value) => {
-                    await this.plugin.changePreset(value)
+                    await this.plugin.changePreset(value as Preset)
                 })
             )
         new Setting(containerEl)
@@ -107,8 +113,8 @@ export class KeyshotsSettingTab extends PluginSettingTab {
                 .setIcon("refresh-ccw")
                 .setTooltip("Reset to default")
                 .onClick(async () => {
-                    this.plugin.settings.shuffle_rounds_amount = DEFAULT_SETTINGS.shuffle_rounds_amount
-                    slider.setValue(DEFAULT_SETTINGS.shuffle_rounds_amount)
+                    this.plugin.settings.shuffle_rounds_amount = DEFAULT_KEYSHOTS_SETTINGS.shuffle_rounds_amount
+                    slider.setValue(DEFAULT_KEYSHOTS_SETTINGS.shuffle_rounds_amount)
                     await this.plugin.saveSettings()
                 })
             )
@@ -132,18 +138,18 @@ export class KeyshotsSettingTab extends PluginSettingTab {
                     await this.plugin.saveSettings()
                 })
             )
+
+
         containerEl.createEl('h2', {text: "🔧 JetBrains Features"})
+
+        let addCaretKeybinding: Setting | null = null 
         new Setting(containerEl)
             .setName(new DocumentFragmentBuilder()
-                .appendText("Double ")
-                .createElem("kbd", {text: "Ctrl"})
-                .appendText(" caret adding shortcut")
+                .appendText("Double key caret adding shortcut")
                 .toFragment()
             )
             .setDesc(new DocumentFragmentBuilder()
-                .appendText("Everytime when you press ")
-                .createElem("kbd", {text: "Ctrl"})
-                .appendText(" twice and second one you'll hold, then when you press ")
+                .appendText("Everytime when you press key twice and second one you'll hold, then when you press ")
                 .createElem("kbd", {text: "↓"})
                 .appendText(" or ")
                 .createElem("kbd", {text: "↑"})
@@ -153,41 +159,69 @@ export class KeyshotsSettingTab extends PluginSettingTab {
                 .toFragment()
             )
             .addToggle(cb => cb
-                .setValue(this.plugin.settings.carets_via_double_ctrl)
+                .setValue(this.plugin.settings.enable_carets_via_double_key_cmd)
                 .onChange(async (value) => {
-                    this.plugin.settings.carets_via_double_ctrl = value
+                    this.plugin.settings.enable_carets_via_double_key_cmd = value
+                    await this.plugin.saveSettings()
+                    addCaretKeybinding?.setDisabled(!value)
+                    this.plugin.loadDoubleKeyCommands()
+                })
+            )
+        addCaretKeybinding = new Setting(containerEl)
+            .setClass("indent")
+            .setName("Keybinding")
+            .setDesc("Sets the modifier key for triggering caret placement using a double keypress.")
+            .addDropdown(cb => cb
+                .addOptions(DOUBLE_KEY_OPTIONS)
+                .setValue(this.plugin.settings.key_carets_via_double_key_cmd)
+                .onChange(async (value) => {
+                    this.plugin.settings.key_carets_via_double_key_cmd = value
                     await this.plugin.saveSettings()
                     this.plugin.loadDoubleKeyCommands()
                 })
             )
+        if (!this.plugin.settings.enable_carets_via_double_key_cmd) {
+            addCaretKeybinding.setDisabled(true)
+        }
+
+
         let searchEngineEl : Setting | null = null;
+        let openSwitchKeybinding: Setting | null = null;
         new Setting(containerEl)
             .setName(new DocumentFragmentBuilder()
-                .appendText("Opening switch modal via double ")
-                .createElem("kbd", {text: "Shift"})
-                .appendText(" shortcut")
+                .appendText("Opening switch modal via double key shortcut")
                 .toFragment()
             )
             .setDesc(new DocumentFragmentBuilder()
-                .appendText("If you have any of switch engine selected, hitting ")
-                .createElem("kbd", {text: "Shift"})
-                .appendText(" twice will select open switch modal window.")
+                .appendText("If you have any of switch engine selected, hitting key twice will select open switch modal window.")
                 .toFragment()
             )
             .addToggle(cb => cb
-                .setValue(this.plugin.settings.quick_switch_via_double_shift)
+                .setValue(this.plugin.settings.enable_quick_switch_via_double_key_cmd)
                 .onChange(async (value) => {
-                    this.plugin.settings.quick_switch_via_double_shift = value
+                    this.plugin.settings.enable_quick_switch_via_double_key_cmd = value
                     await this.plugin.saveSettings()
                     searchEngineEl?.setDisabled(!value)
+                    openSwitchKeybinding?.setDisabled(!value)
+                    this.plugin.loadDoubleKeyCommands()
+                })
+            )
+        openSwitchKeybinding = new Setting(containerEl)
+            .setClass("indent")
+            .setName("Keybinding")
+            .setDesc("Sets the modifier key for opening the switch modal with a double keypress.")
+            .addDropdown(cb => cb
+                .addOptions(DOUBLE_KEY_OPTIONS)
+                .setValue(this.plugin.settings.key_quick_switch_via_double_key_cmd)
+                .onChange(async (value) => {
+                    this.plugin.settings.key_quick_switch_via_double_key_cmd = value
+                    await this.plugin.saveSettings()
                     this.plugin.loadDoubleKeyCommands()
                 })
             )
         searchEngineEl = new Setting(containerEl)
             .setName(new DocumentFragmentBuilder()
-                .appendText("Switch engine for double ")
-                .createElem("kbd", {text: "Shift"})
-                .appendText(" shortcut")
+                .appendText("Engine selection")
                 .toFragment()
             )
             .setDesc(new DocumentFragmentBuilder()
@@ -213,29 +247,45 @@ export class KeyshotsSettingTab extends PluginSettingTab {
                 })
             })
 
-        if (!this.plugin.settings.quick_switch_via_double_shift) {
+        if (!this.plugin.settings.enable_quick_switch_via_double_key_cmd) {
             searchEngineEl.setDisabled(true)
+            openSwitchKeybinding.setDisabled(true)
         }
+
+        let commandPaletteKeybinding: Setting | null = null;
         new Setting(containerEl)
             .setName(new DocumentFragmentBuilder()
-                .appendText("Opening Command-Palette via double ")
-                .createElem("kbd", {text: "Ctrl"})
-                .appendText(" shortcut")
+                .appendText("Opening Command-Palette via double key shortcut")
                 .toFragment()
             )
             .setDesc(new DocumentFragmentBuilder()
-                .appendText("If you have Command Palette plugin enabled, hitting ")
-                .createElem("kbd", {text: "Ctrl"})
-                .appendText(" twice will open command palette window.")
+                .appendText("If you have Command Palette plugin enabled, hitting twice will open command palette window.")
                 .toFragment()
             )
             .addToggle(cb => cb
-                .setValue(this.plugin.settings.command_palette_via_double_ctrl)
+                .setValue(this.plugin.settings.enable_command_palette_via_double_key_cmd)
                 .onChange(async (value) => {
-                    this.plugin.settings.command_palette_via_double_ctrl = value
+                    this.plugin.settings.enable_command_palette_via_double_key_cmd = value
+                    await this.plugin.saveSettings()
+                    commandPaletteKeybinding?.setDisabled(!value)
+                    this.plugin.loadDoubleKeyCommands()
+                })
+            )
+        commandPaletteKeybinding = new Setting(containerEl)
+            .setClass("indent")
+            .setName("Keybinding")
+            .setDesc("Sets the modifier key for opening the command palette with a double keypress.")
+            .addDropdown(cb => cb
+                .addOptions(DOUBLE_KEY_OPTIONS)
+                .setValue(this.plugin.settings.key_command_palette_via_double_key_cmd)
+                .onChange(async (value) => {
+                    this.plugin.settings.key_command_palette_via_double_key_cmd = value
                     await this.plugin.saveSettings()
                     this.plugin.loadDoubleKeyCommands()
                 })
             )
+        if (!this.plugin.settings.enable_command_palette_via_double_key_cmd) {
+            commandPaletteKeybinding.setDisabled(true)
+        }
     }
 }
