@@ -59,7 +59,7 @@ export default class DoubleKeyRegistry extends Component {
             this.activeCommands = Object.values(this.cmds).filter(cmd => cmd.key === ev.key)
             
             this.activeCommands = this.activeCommands.filter(activeCommand => {
-                return this.lastReleasedKey && Math.abs(ev.timeStamp - this.lastReleasedKey.timeStamp) > activeCommand.maxDelay
+                return this.lastReleasedKey && Math.abs(ev.timeStamp - this.lastReleasedKey.timeStamp) <= activeCommand.maxDelay
             })
             const firstCommandWithAnotherKeyPressedCallback = this.activeCommands.find(activeCommand => {
                 return activeCommand.anotherKeyPressedCallback
