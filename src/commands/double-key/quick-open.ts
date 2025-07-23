@@ -8,6 +8,9 @@ export const quickOpen: (plugin: KeyshotsPlugin) => DoubleKeyCommand = plugin =>
     name: "Open Quick-Switcher",
     key: "Shift",
     maxDelay: 400,
+    whitelistedCommands: [
+        plugin.settings.open_file_command
+    ],
     lastReleasedCallback: (interrupted) => {
         if (!interrupted) {
             if (plugin.settings.open_file_command === ""){

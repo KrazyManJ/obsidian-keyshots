@@ -7,7 +7,7 @@ import {addCaretDown, addCaretUp} from "../add-caret";
 export const addCaretDK: (plugin: KeyshotsPlugin) => DoubleKeyCommand = plugin => ({
     id: "add-caret",
     name: "Add caret",
-    key: "Alt",
+    key: "Control",
     maxDelay: 400,
     whitelistedCommands: [
         'keyshots:'+addCaretUp.id,

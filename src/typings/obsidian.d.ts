@@ -26,8 +26,7 @@ declare module 'obsidian' {
 
         executeCommandById(id: string): boolean;
 
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        executeCommand(e: Command, t: any): boolean;
+        executeCommand(e: Command, t: unknown): boolean;
 
         commands: Record<string, ACommand>
     }

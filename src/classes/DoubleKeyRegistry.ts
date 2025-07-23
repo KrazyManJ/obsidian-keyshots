@@ -20,8 +20,12 @@ export default class DoubleKeyRegistry extends Component {
 
     private lastReleasedKey?: KeyRecord = undefined
     private lastPressedKey?: KeyRecord = undefined
-    private activeCmd?: DoubleKeyCommand = undefined
+    private activeCommands: DoubleKeyCommand[] = []
+
     private pressedKeys: Set<string> = new Set()
+
+    private lastAction?: "lastPressed" | "anotherKeyPressed" | "lastReleased" = undefined
+
 
     private createKeyRecord(ev: KeyboardEvent): KeyRecord {
         return {
@@ -38,7 +42,7 @@ export default class DoubleKeyRegistry extends Component {
         ))
     }
 
-    private originalExecuteCommand: (e: Command, t: any) => boolean
+    private originalExecuteCommand: (e: Command, t: unknown) => boolean
 
     private onKeyPress(ev: KeyboardEvent) {
         if (!this.hasAnyCommandRegistered) {
@@ -47,27 +51,44 @@ export default class DoubleKeyRegistry extends Component {
 
         this.pressedKeys.add(ev.key);
         this.cancelAction = false
-
-        if (this.activeCmd && ev.key == this.activeCmd.key && this.pressedKeys.has(ev.key)) {
+        if (this.activeCommands.length > 0 && ev.key == this.activeCommands[0].key && this.pressedKeys.has(ev.key)) {
             return;
         }
         this.lastPressedKey = this.createKeyRecord(ev);
-        if (this.lastReleasedKey && !this.activeCmd && this.lastReleasedKey.key === ev.key) {
-            this.activeCmd = Object.values(this.cmds).filter(cmd => cmd.key === ev.key)[0]
+        if (this.lastReleasedKey && this.activeCommands.length === 0 && this.lastReleasedKey.key === ev.key) {
+            console.log("adds commands")
+            this.activeCommands = Object.values(this.cmds).filter(cmd => cmd.key === ev.key)
+            console.log(this.activeCommands)
             
-            if (Math.abs(ev.timeStamp - this.lastReleasedKey.timeStamp) > this.activeCmd.maxDelay) {
-                this.activeCmd = undefined
-                return
+            this.activeCommands.forEach((activeCommand,i) => {
+                if (this.lastReleasedKey && Math.abs(ev.timeStamp - this.lastReleasedKey.timeStamp) > activeCommand.maxDelay) {
+                    delete this.activeCommands[i]
+                }
+            })
+            const firstCommandWithAnotherKeyPressedCallback = this.activeCommands.find(activeCommand => {
+                return activeCommand.anotherKeyPressedCallback
+            })
+            if (firstCommandWithAnotherKeyPressedCallback) {
+                this.setStatusBarState(firstCommandWithAnotherKeyPressedCallback.name)
             }
-            if (this.activeCmd.anotherKeyPressedCallback) {
-                this.setStatusBarState(this.activeCmd.name)
+
+            const firstCommandWithLastPressedCallback = this.activeCommands.find(activeCommand => {
+                return activeCommand.lastPressedCallback
+            })
+            if (firstCommandWithLastPressedCallback && firstCommandWithLastPressedCallback.lastPressedCallback) {
+                this.lastAction = 'lastPressed'
+                firstCommandWithLastPressedCallback.lastPressedCallback()
+                this.lastAction = undefined
             }
-            if (this.activeCmd.lastPressedCallback) {
-                this.activeCmd.lastPressedCallback()
-            }
+            return;
         }
-        else if (this.activeCmd && ev.key !== this.activeCmd.key && this.activeCmd.anotherKeyPressedCallback){
-            this.activeCmd.anotherKeyPressedCallback(ev)
+        const firstCommandWithAnotherKeyPressedCallback = this.activeCommands.find(activeCommand => {
+            return activeCommand.anotherKeyPressedCallback
+        })
+        if (firstCommandWithAnotherKeyPressedCallback && firstCommandWithAnotherKeyPressedCallback.anotherKeyPressedCallback){
+            this.lastAction = 'anotherKeyPressed'
+            firstCommandWithAnotherKeyPressedCallback.anotherKeyPressedCallback(ev)
+            this.lastAction = undefined
         }
         else if (this.lastReleasedKey && this.lastReleasedKey.key !== ev.key) {
             this.cancelCurrentCommand()
@@ -82,20 +103,27 @@ export default class DoubleKeyRegistry extends Component {
         if (this.cancelAction) {
             return;
         }
-        if (this.lastPressedKey?.key != ev.key && !this.activeCmd) {
+        if (this.lastPressedKey?.key != ev.key && !this.activeCommands) {
             this.cancelCurrentCommand();
             return;
         }
-        if (!this.activeCmd && Object.values(this.cmds).map(c => c.key).includes(ev.key)) {
+        if (this.activeCommands.length === 0 && Object.values(this.cmds).map(c => c.key).includes(ev.key)) {
             this.lastReleasedKey = this.createKeyRecord(ev)
         }
-        else if (this.activeCmd && this.activeCmd.key === ev.key) {
+        else if (this.activeCommands.length > 0 && this.activeCommands[0].key === ev.key) {
+            const firstCommandWithLastReleasedCallback = this.activeCommands.find(activeCommand => {
+                return activeCommand.lastReleasedCallback
+            })
             if (
-                this.lastPressedKey
-                && Math.abs(ev.timeStamp - this.lastPressedKey.timeStamp) <= this.activeCmd.maxDelay
-                && this.activeCmd.lastReleasedCallback
-            )
-                this.activeCmd.lastReleasedCallback(this.lastPressedKey?.key != ev.key)
+                firstCommandWithLastReleasedCallback
+                && this.lastPressedKey
+                && Math.abs(ev.timeStamp - this.lastPressedKey.timeStamp) <= firstCommandWithLastReleasedCallback.maxDelay
+                && firstCommandWithLastReleasedCallback.lastReleasedCallback
+            ) {
+                this.lastAction = 'lastReleased'
+                firstCommandWithLastReleasedCallback.lastReleasedCallback(this.lastPressedKey?.key != ev.key)
+                this.lastAction = undefined
+            }
             this.cancelCurrentCommand(true)
         }
     }
@@ -103,8 +131,9 @@ export default class DoubleKeyRegistry extends Component {
     private cancelCurrentCommand(ingoreNextKeyUp = false) {
         this.setStatusBarState()
         this.cancelAction = ingoreNextKeyUp
-        this.activeCmd = undefined
+        this.activeCommands = []
         this.lastReleasedKey = undefined
+        this.lastAction = undefined
     }
 
     constructor(plugin: KeyshotsPlugin) {
@@ -134,11 +163,19 @@ export default class DoubleKeyRegistry extends Component {
         this.originalExecuteCommand = app.commands.executeCommand
         this.app.commands.executeCommand = (command,t) => {
             
-            if (this.activeCmd) {
-                const whitelist = this.activeCmd.whitelistedCommands ?? []
-                if (!whitelist.includes(command.id)) {
-                    return false;
+            if (this.activeCommands.length > 0) {
+                for (const activeCommand of this.activeCommands) {
+                    const whitelist = activeCommand.whitelistedCommands ?? []
+                    const actionMatchesCommand = (this.lastAction === 'anotherKeyPressed' && activeCommand.anotherKeyPressedCallback)
+                    || (this.lastAction === 'lastPressed' && activeCommand.lastPressedCallback)
+                    || (this.lastAction === 'lastReleased' && activeCommand.lastReleasedCallback)
+
+                    if (actionMatchesCommand && !whitelist.includes(command.id)) {
+                        console.log("terminated")
+                        return false;
+                    }
                 }
+
             }
 
             return this.originalExecuteCommand(command,t);

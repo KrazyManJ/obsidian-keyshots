@@ -155,7 +155,7 @@ export default class KeyshotsPlugin extends Plugin {
         this.doubleKeyRegistry.unregisterAllCommands()
         if (this.settings.carets_via_double_ctrl) {
             this.doubleKeyRegistry.registerCommand(addCaretDK(this))
-            // this.doubleKeyRegistry.registerCommand(openCommandPaletteDK(this))
+            this.doubleKeyRegistry.registerCommand(openCommandPaletteDK(this))
         }
         if (this.settings.quick_switch_via_double_shift) {
             this.doubleKeyRegistry.registerCommand(quickOpen(this))
