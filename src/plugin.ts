@@ -53,6 +53,7 @@ import {switchKeyshotsCaseSensitivity} from "./commands/switch-keyshots-case-sen
 import {addCaretAndOpenCommandPalette} from "./commands/double-key/add-caret-and-open-command-palette";
 import {quickOpen} from "./commands/double-key/quick-open";
 import duplicateTab from './commands/duplicate-tab';
+import { indent, unindent } from './commands/indent';
 
 export default class KeyshotsPlugin extends Plugin {
 
@@ -125,7 +126,9 @@ export default class KeyshotsPlugin extends Plugin {
             changeKeyshotsPreset(this),
             openKeyshotsSettingsTab,
             switchKeyshotsCaseSensitivity(this),
-            duplicateTab
+            duplicateTab,
+            indent,
+            unindent
         ]
     }
 
