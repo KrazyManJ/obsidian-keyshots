@@ -385,3 +385,9 @@ Current available commands are:
 
 - Fixed time difference calculation for double key commands #16
 - Fixed behavior of `Join Selected Lines` with one-line selection command #14
+
+---
+
+### 2.52 - Hotfix
+
+- Fixed behavior of `Join Selected Lines` command with multi single-caret and multi-line selections #14
