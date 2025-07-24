@@ -28,11 +28,15 @@ export const joinSelectedLines: KeyshotsCommand = {
                     return sel.withLineDifference(-1)
                 }
 
-                return sel.clone().setChars(currentLineLength,currentLineLength)
+                return sel.clone().setChars(currentLineLength,currentLineLength).withLineDifference(-1)
             }
 
-            const len = sel.getText().length
-            return sel.replaceText(sel.getText().replace(/\n/g," ")).setLines(sel.anchor.line).moveChars(0,len)
+            const startCharacter = sel.asNormalized().anchor.ch
+            const selectionLength = sel.getText().length
+            return sel
+                .replaceText(sel.getText().replace(/\n/g," "))
+                .setLines(sel.asNormalized().anchor.line)
+                .setChars(startCharacter,startCharacter+selectionLength)
         })
     }
 }
