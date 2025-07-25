@@ -10,6 +10,12 @@ declare module 'obsidian' {
         useTabs: boolean
     }
 
+    interface MarkdownView {
+        getState(): {
+            source: boolean
+        }
+    }
+
     interface Vault {
         getConfig<T extends keyof VaultConfig>(config: T): VaultConfig[T];
 
