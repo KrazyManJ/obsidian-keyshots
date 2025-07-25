@@ -1,4 +1,4 @@
-import {Editor, EditorPosition, EditorRange, EditorSelection} from "obsidian";
+import {Editor, EditorPosition, EditorRange, EditorRangeOrCaret, EditorSelection} from "obsidian";
 import EditorPositionManipulator from "./EditorPositionManipulator";
 
 export default class EditorSelectionManipulator implements EditorSelection {
@@ -85,6 +85,12 @@ export default class EditorSelectionManipulator implements EditorSelection {
         return this
     }
 
+    moveCharsWithoutOffset(anchor: number, head: number = anchor): this {
+        this.anchor.ch+= anchor
+        this.head.ch+= head
+        return this
+    }
+
     setLines(anchor: number, head?: number): this {
         this.anchor.line = anchor
         this.head.line = head ?? anchor
@@ -127,6 +133,14 @@ export default class EditorSelectionManipulator implements EditorSelection {
     withLineDifference(diff: number) {
         this.lineDifference += diff
         return this
+    }
+
+    toEditorRangeOrCaret(): EditorRangeOrCaret {
+        const [from,to] = this.asFromToPoints()
+        return {
+            from: from,
+            to: to,
+        }
     }
 
     get linesCount() {

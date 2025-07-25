@@ -14,29 +14,65 @@ export const joinSelectedLines: KeyshotsCommand = {
 
     },
     editorCallback: (editor) => {
-        SelectionsProcessing.selectionsProcessor(editor, undefined, sel => {
+
+        const joinLines = (text: string) => {
+            return text
+                .split("\n")
+                .map(line => line.trim())
+                .filter(line => line !== "")
+                .join(" ")
+        }
+
+        SelectionsProcessing.selectionsProcessorTransaction(editor, sel => {
             if (sel.isCaret() || sel.isOneLine()) {
                 if (sel.anchor.line === editor.lineCount()-1) {
-                    return sel
+                    return {
+                        finalSelection: sel,
+                        replaceSelection: sel,
+                        replaceText: sel.getText()
+                    }
                 }
-                const currentLineLength = editor.getLine(sel.anchor.line).length
-
-                const expandedSelection = sel.clone().moveLines(0,1).expand()
-                expandedSelection.replaceText(expandedSelection.getText().replace(/\n/g, " "))
-
                 if (sel.isOneLine() && !sel.isCaret()) {
-                    return sel.withLineDifference(-1)
+                    return {
+                        finalSelection: sel.clone(),
+                        replaceSelection: sel.moveLines(0,1).expand(),
+                        replaceText: joinLines(sel.getText())
+                    }
                 }
 
-                return sel.clone().setChars(currentLineLength,currentLineLength).withLineDifference(-1)
+                return {
+                    finalSelection: sel.clone().setChars(sel.anchor.getLine().length),
+                    replaceSelection: sel.moveLines(0,1).expand(),
+                    replaceText: joinLines(sel.getText()),
+                }
             }
 
-            const startCharacter = sel.asNormalized().anchor.ch
-            const selectionLength = sel.getText().length
-            return sel
-                .replaceText(sel.getText().replace(/\n/g," "))
-                .setLines(sel.asNormalized().anchor.line)
-                .setChars(startCharacter,startCharacter+selectionLength)
-        })
+            const anchor = sel.asNormalized().anchor
+            const length = sel.getText().length
+            return {
+                finalSelection: sel.asNormalized().collapse().setChars(anchor.ch, anchor.ch + length),
+                replaceText: sel.getText().split("\n").join(" "),
+                replaceSelection: sel
+            }
+        },
+        array => {
+            let lastIndex = -1;
+            return array
+                .sort((a,b) => a.anchor.line - b.anchor.line)
+                .filter((sel,i,arr) => {
+                if (i === 0) return true;
+                
+                const prev = arr[i-1];
+                
+                if (prev.anchor.line === sel.anchor.line - 1 && lastIndex !== i-1) {
+                    if (!prev.isCaret()) {
+                        prev.head = sel.head
+                    }
+                    lastIndex = i
+                    return false;
+                }
+                return true;
+            })
+        },false)
     }
 }
