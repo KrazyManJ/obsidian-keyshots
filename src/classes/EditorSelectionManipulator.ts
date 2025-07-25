@@ -6,8 +6,6 @@ export default class EditorSelectionManipulator implements EditorSelection {
     anchor: EditorPositionManipulator
     head: EditorPositionManipulator
     private readonly editor: Editor
-    private sizeChange = 0
-    private lineDifference = 0
 
     constructor(selection: EditorSelection, editor: Editor) {
         this.anchor = new EditorPositionManipulator(selection.anchor, editor)
@@ -107,14 +105,6 @@ export default class EditorSelectionManipulator implements EditorSelection {
         return this.editor.getRange(...this.asFromToPoints())
     }
 
-    replaceText(to: string, resize = false): this {
-        this.sizeChange = to.length - this.getText().length
-        this.lineDifference = to.split("\n").length - this.linesCount
-        this.editor.replaceRange(to, ...this.asFromToPoints())
-        if (resize) this.moveChars(0, this.sizeChange)
-        return this
-    }
-
     selectWord(): this {
         if (this.isCaret()) {
             const txt = this.anchor.getLine()
@@ -129,11 +119,6 @@ export default class EditorSelectionManipulator implements EditorSelection {
         if (!this.isCaret()) this.head = this.anchor.clone()
         return this;
     }
-    
-    withLineDifference(diff: number) {
-        this.lineDifference += diff
-        return this
-    }
 
     toEditorRangeOrCaret(): EditorRangeOrCaret {
         const [from,to] = this.asFromToPoints()
@@ -146,14 +131,6 @@ export default class EditorSelectionManipulator implements EditorSelection {
     get linesCount() {
         const norm = this.asNormalized()
         return norm.head.line - norm.anchor.line + 1
-    }
-
-    get replaceSizeChange() {
-        return this.sizeChange
-    }
-
-    get replaceLineDifference() {
-        return this.lineDifference
     }
 
     static listSelections(editor: Editor) {

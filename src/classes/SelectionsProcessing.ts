@@ -1,50 +1,12 @@
-import {Editor,  EditorChange,  EditorRangeOrCaret,  EditorSelection, EditorTransaction} from "obsidian";
+import {Editor,  EditorChange,  EditorRangeOrCaret,  EditorTransaction} from "obsidian";
 import EditorSelectionManipulator from "./EditorSelectionManipulator";
+import ExtendedEditorChange from "src/model/ExtendedEditorChange";
 
-interface ExtendedEditorChange {
-    replaceText?: string
-    replaceSelection?: EditorSelectionManipulator
-    finalSelection?: EditorSelectionManipulator
-}
 
 export default abstract class SelectionsProcessing {
 
     /**
-     * Main processing function for selections, handling selections shifting
-     * 
-     * @param editor Obsidian Markdown Editor instance
-     * @param arrCallback callback to change array before iteration
-     * @param fct function to run code for each selection in editor
-     */
-    static selectionsProcessor(
-        editor: Editor,
-        arrCallback: ((arr: EditorSelectionManipulator[]) => EditorSelectionManipulator[]) | undefined,
-        fct: (sel: EditorSelectionManipulator, index: number) => EditorSelectionManipulator
-    ): void {
-        const selections = EditorSelectionManipulator.listSelections(editor)
-        const newSelections: EditorSelection[] = []
-        let lastSelection: EditorSelectionManipulator | undefined = undefined
-        let characterShift = 0;
-        let totalLineShift = 0;
-        (arrCallback ? arrCallback(selections) : selections).forEach((sel, index) => {
-            if (lastSelection && lastSelection.isOnSameLine(sel) && sel.isOneLine()) {
-                characterShift += lastSelection.replaceSizeChange
-                sel.moveChars(characterShift)
-            } else if (lastSelection && lastSelection.isOnSameLine(sel)) {
-                characterShift += lastSelection.replaceSizeChange
-                sel.moveChars(characterShift, 0)
-                characterShift = 0
-            } else totalLineShift += lastSelection?.replaceLineDifference ?? 0;
-            sel.moveLines(totalLineShift)
-
-            lastSelection = fct(sel.clone(), index)
-            newSelections.push(lastSelection.toEditorSelection())
-        })
-        if (newSelections.length > 0) editor.setSelections(newSelections)
-    }
-
-    /**
-     * Similar selection handler to SelectionsProcessing.selectionsProcessor() with shift-handling,
+     * Main selection processor with shift-handling,
      * where all actions for multiple selections are processed as one transaction and can be
      * easily undone for all selections with one CTRL+Z
      * 
