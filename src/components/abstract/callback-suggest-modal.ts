@@ -19,8 +19,8 @@ export abstract class CallbackSuggestModal<T> extends SuggestModal<T> {
 export abstract class CallbackFuzzySuggestModal<T> extends FuzzySuggestModal<T> {
     private readonly onSelectCallback
 
-    protected constructor(app: KeyshotsPlugin, onSelectCallback: (item: T, evt: MouseEvent | KeyboardEvent) => void) {
-        super(app.app);
+    protected constructor(plugin: KeyshotsPlugin, onSelectCallback: (item: T, evt: MouseEvent | KeyboardEvent) => void) {
+        super(plugin.app);
         this.onSelectCallback = onSelectCallback
     }
 

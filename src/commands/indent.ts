@@ -1,9 +1,9 @@
 import SelectionsProcessing from "src/classes/SelectionsProcessing"
 import { Category } from "src/constants/Category"
-import KeyshotsCommand from "src/model/KeyshotsCommand"
+import { KeyshotsCommandPluginCallback } from "src/model/KeyshotsCommand"
 import { HotKey } from "src/utils"
 
-export const indent: KeyshotsCommand = {
+export const indent: KeyshotsCommandPluginCallback = (plugin) => ({
     category: Category.EDITOR_LINES_MANIPULATION,
     id: 'indent',
     name: "Indent",
@@ -11,7 +11,7 @@ export const indent: KeyshotsCommand = {
         keyshots: [HotKey("]","Alt")]
     },
     editorCallback: (editor) => {
-        const useTabs = app.vault.getConfig("useTabs")
+        const useTabs = plugin.app.vault.getConfig("useTabs")
         SelectionsProcessing.selectionsProcessorTransaction(editor, sel => {
             const expandedSelection = sel.clone().normalize().expand();
             if (sel.isCaret()) {
@@ -33,10 +33,10 @@ export const indent: KeyshotsCommand = {
             }
         })
     }
-}
+})
 
 
-export const unindent: KeyshotsCommand = {
+export const unindent: KeyshotsCommandPluginCallback = (plugin) => ({
     category: Category.EDITOR_LINES_MANIPULATION,
     id: 'unindent',
     name: "Unindent",
@@ -44,7 +44,7 @@ export const unindent: KeyshotsCommand = {
         keyshots: [HotKey("[","Alt")]
     },
     editorCallback: (editor) => {
-        const useTabs = app.vault.getConfig("useTabs")
+        const useTabs = plugin.app.vault.getConfig("useTabs")
 
         const unindentLine = (line: string) => {
             if (useTabs && line.startsWith("\t")) return line.substring(1)
@@ -68,4 +68,4 @@ export const unindent: KeyshotsCommand = {
             }
         })
     }
-}
+})

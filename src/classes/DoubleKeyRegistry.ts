@@ -165,7 +165,7 @@ export default class DoubleKeyRegistry extends Component {
     }
 
     onload(): void {
-        this.originalExecuteCommand = app.commands.executeCommand
+        this.originalExecuteCommand = this.plugin.app.commands.executeCommand
         this.app.commands.executeCommand = (command,t) => {
             
             if (this.activeCommands.length > 0) {

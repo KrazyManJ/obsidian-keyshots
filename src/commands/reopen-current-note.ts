@@ -1,9 +1,9 @@
-import KeyshotsCommand from "../model/KeyshotsCommand";
+import { KeyshotsCommandPluginCallback } from "../model/KeyshotsCommand";
 import {Category} from "../constants/Category";
 import {WorkspaceLeaf} from "obsidian";
 import {HotKey} from "../utils";
 
-export const reopenCurrentNote: KeyshotsCommand = {
+export const reopenCurrentNote: KeyshotsCommandPluginCallback = (plugin) => ({
     category: Category.OTHER,
     id: 'reopen-current-note',
     name: "Reopen current note",
@@ -11,13 +11,13 @@ export const reopenCurrentNote: KeyshotsCommand = {
         keyshots: [HotKey("Q", "Alt")]
     },
     checkCallback: (checking) => {
-        const file = app.workspace.getActiveFile();
+        const file = plugin.app.workspace.getActiveFile();
         if (file){
             if (!checking)
                 // @ts-ignore
-                (app.workspace.getLeaf(false) as WorkspaceLeaf & {rebuildView(): void}).rebuildView();
+                (plugin.app.workspace.getLeaf(false) as WorkspaceLeaf & {rebuildView(): void}).rebuildView();
             else return true;
         }
         return false
     }
-}
+})

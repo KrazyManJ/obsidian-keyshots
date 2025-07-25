@@ -1,11 +1,12 @@
 import {Category} from "../constants/Category";
 import VerticalDirection from "../constants/VerticalDirection";
-import KeyshotsCommand from "../model/KeyshotsCommand";
+import { KeyshotsCommandPluginCallback } from "../model/KeyshotsCommand";
 import {Editor} from "obsidian";
 import EditorPositionManipulator from "../classes/EditorPositionManipulator";
 import {HotKey} from "../utils";
+import KeyshotsPlugin from "src/plugin";
 
-function goToFolding(editor: Editor, direction: VerticalDirection) {
+function goToFolding(plugin: KeyshotsPlugin, editor: Editor, direction: VerticalDirection) {
     const cursor = EditorPositionManipulator.mainCursor(editor);
 
     const isDown = () => direction == VerticalDirection.DOWN
@@ -54,7 +55,7 @@ function goToFolding(editor: Editor, direction: VerticalDirection) {
             if (m[1].length < currLineMatch?.[1].length) return false;
             if (m[1] != currLineMatch?.[1]) return true;
             const possibleChild = arr[i+direction] ? arr[i+direction].match(LIST_REGEX) : undefined
-            const indentFactor = (currLineMatch[0].startsWith("\t") || (possibleChild && possibleChild[0].startsWith("\t"))) ? 1 : app.vault.getConfig("tabSize")
+            const indentFactor = (currLineMatch[0].startsWith("\t") || (possibleChild && possibleChild[0].startsWith("\t"))) ? 1 : plugin.app.vault.getConfig("tabSize")
             if (!(possibleChild && possibleChild[1].length == m[1].length+indentFactor)) return true;
             editor.setCursor(cursor.setPos(isDown() ? cursor.line + 1 + i : cursor.line - i, m?.[0].length).toEditorPosition());
             return false;
@@ -69,7 +70,7 @@ function goToFolding(editor: Editor, direction: VerticalDirection) {
         const indent = m[1] ? m[1] : m[2]
         if (v.match(LIST_REGEX)) {
             const possibleChild = arr[i+direction] ? arr[i+direction].match(LIST_REGEX) : undefined
-            const indentFactor = possibleChild && possibleChild[0].startsWith("\t") ? 1 : app.vault.getConfig("tabSize")
+            const indentFactor = possibleChild && possibleChild[0].startsWith("\t") ? 1 : plugin.app.vault.getConfig("tabSize")
             if (!(possibleChild && possibleChild[1].length == indent.length+indentFactor)) return true;
         }
         editor.setCursor(cursor.setPos(isDown() ? cursor.line + 1 + i : cursor.line - i, m?.[0].length).toEditorPosition());
@@ -77,22 +78,22 @@ function goToFolding(editor: Editor, direction: VerticalDirection) {
     })
 }
 
-export const goToNextFold: KeyshotsCommand = {
+export const goToNextFold: KeyshotsCommandPluginCallback = (plugin) => ({
     category: Category.TRANSFORM_SELECTIONS,
         id: 'go-to-next-fold',
     name: "Go to next fold",
     hotkeys: {
         keyshots: [HotKey("]", "Mod", "Alt")]
     },
-    editorCallback: (editor) => goToFolding(editor, VerticalDirection.DOWN)
-}
+    editorCallback: (editor) => goToFolding(plugin ,editor, VerticalDirection.DOWN)
+})
 
-export const goToPreviousFold: KeyshotsCommand ={
+export const goToPreviousFold: KeyshotsCommandPluginCallback = (plugin) => ({
     category: Category.TRANSFORM_SELECTIONS,
         id: 'go-to-previous-fold',
     name: "Go to previous fold",
     hotkeys: {
         keyshots: [HotKey("[", "Mod", "Alt")]
     },
-    editorCallback: (editor) => goToFolding(editor, VerticalDirection.UP)
-}
+    editorCallback: (editor) => goToFolding(plugin ,editor, VerticalDirection.UP)
+})

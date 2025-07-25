@@ -1,6 +1,7 @@
 import {Command, Hotkey} from "obsidian";
 import {ClearPreset, Preset} from "../constants/Presets";
 import {Category} from "../constants/Category";
+import KeyshotsPlugin from "src/plugin";
 
 /**
  * The same implementation as {@link Command} with addition of hotkey selection based on preset and category
@@ -20,3 +21,8 @@ export default interface KeyshotsCommand extends Omit<Command, "hotkeys"> {
      */
     hotkeys?: Partial<Record<Preset, Hotkey[] | null>> & Partial<Record<ClearPreset, never>>
 }
+
+/**
+ * Used to register command that require instance of {@link KeyshotsPlugin}
+ */
+export type KeyshotsCommandPluginCallback = (plugin: KeyshotsPlugin) => KeyshotsCommand

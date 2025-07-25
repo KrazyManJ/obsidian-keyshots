@@ -99,7 +99,7 @@ export default class KeyshotsPlugin extends Plugin {
             toggleCaseJetbrains,
             transformSelectionsToLowercase,
             transformSelectionsToUppercase,
-            reopenCurrentNote,
+            reopenCurrentNote(this),
             insertCodeBlock(this),
             insertOrdinalNumbering,
             insertTable(this),
@@ -117,20 +117,20 @@ export default class KeyshotsPlugin extends Plugin {
             searchByRegex(this),
             splitSelectionsByLines,
             splitSelectionsOnNewLine,
-            goToNextFold,
-            goToPreviousFold,
+            goToNextFold(this),
+            goToPreviousFold(this),
             goToParentFold,
             switchInlineTitleSetting(this),
             switchLineNumbersSetting(this),
             switchReadableLineLength(this),
             openDevTools,
-            toggleFocusMode,
+            toggleFocusMode(this),
             changeKeyshotsPreset(this),
-            openKeyshotsSettingsTab,
+            openKeyshotsSettingsTab(this),
             switchKeyshotsCaseSensitivity(this),
-            duplicateTab,
-            indent,
-            unindent
+            duplicateTab(this),
+            indent(this),
+            unindent(this)
         ]
     }
 
@@ -147,7 +147,7 @@ export default class KeyshotsPlugin extends Plugin {
         const preset = this.settings.ide_mappings
         this._events = this._events.filter(e => !e.toString().contains(".removeCommand("))
         this.getCommands().forEach(c => {
-            app.commands.removeCommand("keyshots:"+c.id)
+            this.app.commands.removeCommand("keyshots:"+c.id)
             this.addCommand(this.keyshotsCommandToObsidianCommand(c,preset,this.settings.keyshot_mappings))
         })
     }

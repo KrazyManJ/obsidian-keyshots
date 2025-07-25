@@ -6,10 +6,10 @@ import {Preset, PRESETS_INFO} from "../constants/Presets";
 import DEFAULT_KEYSHOTS_SETTINGS from "../constants/DefaultKeyshotsSettings";
 
 
-function getOpenCommands() {
+function getOpenCommands(plugin: KeyshotsPlugin) {
     const cmds: Record<string, string> = {}
     Array.of("switcher", "omnisearch", "darlal-switcher-plus").forEach((pluginId) => {
-        Object.values(app.commands.commands)
+        Object.values(plugin.app.commands.commands)
             .filter((v) => v.id.startsWith(pluginId))
             .forEach((v) => cmds[v.id] = v.name)
     })
@@ -236,7 +236,7 @@ export class KeyshotsSettingTab extends PluginSettingTab {
             )
             .setClass("indent")
             .addDropdown(cb => {
-                const cmds = getOpenCommands()
+                const cmds = getOpenCommands(this.plugin)
                 const currSetting = this.plugin.settings.open_file_command
                 cb.addOption("","-- No engine selected --")
                 cb.addOptions(cmds)
