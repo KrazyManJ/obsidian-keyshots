@@ -391,3 +391,18 @@ Current available commands are:
 ### 2.52 - Hotfix
 
 - Fixed behavior of `Join Selected Lines` command with multi single-caret and multi-line selections #14
+
+---
+
+### 2.6.0 - Better multi-cursor/selection undo operations
+
+### Improvements
+
+- **Improved undo-ing operations experience while using multiple cursors/selections** #14
+- Improved experience for `Select all/multiple word instances` while in live-preview mode, to ignore property block #18
+- Status bar icon is showing only if user has any double key command enabled
+
+### Fixes
+
+- Fixed behavior of `Join Selected Lines` while multiple cursors beneath themselves #14
+- Fixed bug of missing double key command when registering (command palette double key command) #19
