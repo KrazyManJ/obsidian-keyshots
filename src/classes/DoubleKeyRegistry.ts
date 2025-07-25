@@ -27,7 +27,6 @@ export default class DoubleKeyRegistry extends Component {
 
     private lastAction?: "lastPressed" | "anotherKeyPressed" | "lastReleased" = undefined
 
-
     private createKeyRecord(ev: KeyboardEvent): KeyRecord {
         return {
             key: ev.key,
@@ -41,6 +40,10 @@ export default class DoubleKeyRegistry extends Component {
                 ? `command "${commandName}" is active`
                 : `no double-key command active`
         ))
+    }
+
+    private setStatusBarVisibility(state: boolean) {
+        this.statusBarItem.style.display = state ? "inline-flex" : "none";
     }
 
     private originalExecuteCommand: (e: Command, t: unknown) => boolean
@@ -135,12 +138,13 @@ export default class DoubleKeyRegistry extends Component {
     constructor(plugin: KeyshotsPlugin) {
         super();
         this.plugin = plugin
-
+        
         this.statusBarItem = this.plugin.addStatusBarItem()
+        this.statusBarItem.style.padding = "0 var(--size-2-2)"
         this.statusBarIcon = this.statusBarItem.createSpan({cls:"status-bar-item-icon"})
         setIcon(this.statusBarIcon,"keyboard")
         this.statusBarItem.setAttr("data-tooltip-position", "top")
-
+        this.setStatusBarVisibility(false)
 
         this.setStatusBarState()
         const elem = window
@@ -187,12 +191,14 @@ export default class DoubleKeyRegistry extends Component {
     }
 
     public registerCommand(cmd: DoubleKeyCommand) {
+        this.setStatusBarVisibility(true)
         this.cmds[cmd.id] = cmd
         this.cancelCurrentCommand()
     }
 
     public unregisterAllCommands() {
         this.cancelCurrentCommand(true)
+        this.setStatusBarVisibility(false)
         Object.keys(this.cmds).forEach((i) => delete this.cmds[i])
     }
 

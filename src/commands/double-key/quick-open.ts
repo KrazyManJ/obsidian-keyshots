@@ -3,7 +3,7 @@ import {Notice} from "obsidian";
 import DoubleKeyCommand from "../../model/DoubleKeyCommand";
 import {runCommandById} from "../../utils";
 
-export const quickOpen: (plugin: KeyshotsPlugin) => DoubleKeyCommand = plugin => ({
+export const quickOpenDK: (plugin: KeyshotsPlugin) => DoubleKeyCommand = plugin => ({
     id: "quick-open",
     name: "Open Quick-Switcher",
     key: plugin.settings.key_quick_switch_via_double_key_cmd,

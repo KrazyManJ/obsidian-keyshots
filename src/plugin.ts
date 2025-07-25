@@ -51,10 +51,11 @@ import {changeKeyshotsPreset} from "./commands/change-keyshots-preset";
 import {openKeyshotsSettingsTab} from "./commands/open-keyshots-settings-tab";
 import {switchKeyshotsCaseSensitivity} from "./commands/switch-keyshots-case-sensitivity";
 import {addCaretDK} from "./commands/double-key/add-carets";
-import {quickOpen} from "./commands/double-key/quick-open";
+import {quickOpenDK} from "./commands/double-key/quick-open";
 import duplicateTab from './commands/duplicate-tab';
 import { indent, unindent } from './commands/indent';
 import { openCommandPaletteDK } from './commands/double-key/open-command-palette';
+import DoubleKeyCommand from './model/DoubleKeyCommand';
 
 export default class KeyshotsPlugin extends Plugin {
 
@@ -152,14 +153,25 @@ export default class KeyshotsPlugin extends Plugin {
     }
 
     loadDoubleKeyCommands() {
+        const {
+            enable_carets_via_double_key_cmd,
+            enable_command_palette_via_double_key_cmd,
+            enable_quick_switch_via_double_key_cmd
+        } = this.settings
+        
+        const DOUBLE_KEY_COMMANDS_MULTI_MAP: [boolean, (plugin: KeyshotsPlugin) => DoubleKeyCommand][] = [
+            [enable_carets_via_double_key_cmd,addCaretDK],
+            [enable_command_palette_via_double_key_cmd,openCommandPaletteDK],
+            [enable_quick_switch_via_double_key_cmd, quickOpenDK]
+        ]
+
         this.doubleKeyRegistry.unregisterAllCommands()
-        if (this.settings.enable_carets_via_double_key_cmd) {
-            this.doubleKeyRegistry.registerCommand(addCaretDK(this))
-            this.doubleKeyRegistry.registerCommand(openCommandPaletteDK(this))
-        }
-        if (this.settings.enable_quick_switch_via_double_key_cmd) {
-            this.doubleKeyRegistry.registerCommand(quickOpen(this))
-        }
+
+        DOUBLE_KEY_COMMANDS_MULTI_MAP.forEach(([isCommandEnabled, commandFunction]) => {
+            if (!isCommandEnabled) return;
+
+            this.doubleKeyRegistry.registerCommand(commandFunction(this))
+        })
     }
 
     public async changePreset(presetId: Preset) {
