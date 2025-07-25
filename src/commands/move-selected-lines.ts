@@ -6,23 +6,39 @@ import KeyshotsCommand from "../model/KeyshotsCommand";
 import {HotKey} from "../utils";
 
 function moveLine(editor: Editor, direction: VerticalDirection, border: number) {
-    SelectionsProcessing.selectionsProcessor(editor, undefined, (sel) => {
-        if (direction === 1 ? sel.asNormalized().head.line === border : sel.asNormalized().anchor.line === border) return sel
-        const replaceSel = sel.asNormalized().moveLines(
-            direction === -1 ? direction : 0,
-            direction === 1 ? direction : 0
-        ).expand()
-        const tx = replaceSel.getText()
-        if (sel.isCaret()) replaceSel.replaceText(tx.split("\n").reverse().join("\n"))
-        else {
-            const pieces = [
-                tx.split("\n").slice(...(direction === 1 ? [-1] : [0, 1]))[0],
-                tx.split("\n").slice(...(direction === 1 ? [undefined, -1] : [1])).join("\n")
-            ]
-            if (direction === -1) pieces.reverse()
-            replaceSel.replaceText(pieces.join("\n"))
+    SelectionsProcessing.selectionsProcessorTransaction(editor, sel => {
+        if (direction === 1 ? sel.asNormalized().head.line === border : sel.asNormalized().anchor.line === border) {
+            return {
+                finalSelection: sel
+            }
         }
-        return sel.moveLines(direction)
+        const replaceSel = sel.asNormalized().moveLines(
+            direction === VerticalDirection.UP ? direction : 0,
+            direction === VerticalDirection.DOWN ? direction : 0
+        ).expand()
+        
+        let replaceText = replaceSel.getText()
+        if (sel.isCaret()) {
+            replaceText = replaceText.split("\n").reverse().join("\n")
+        }
+        else {
+            const lines = replaceText.split("\n")
+            if (direction === VerticalDirection.DOWN) {
+                // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+                lines.unshift(lines.pop()!)
+            }
+            else {
+                // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+                lines.push(lines.shift()!)
+            }
+            replaceText = lines.join("\n")
+        }
+
+        return {
+            replaceSelection: replaceSel,
+            replaceText: replaceText,
+            finalSelection: sel.clone().moveLines(direction)
+        }
     })
 }
 

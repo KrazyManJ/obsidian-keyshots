@@ -10,7 +10,12 @@ export const insertOrdinalNumbering: KeyshotsCommand = {
     hotkeys: {
         keyshots: [HotKey("N", "Shift", "Alt")]
     },
-    editorCallback: (editor) => SelectionsProcessing.selectionsProcessor(editor, undefined, (sel, index) => {
-        return sel.replaceText((index + 1).toString(), true)
-    })
+    editorCallback: (editor) => {
+        SelectionsProcessing.selectionsProcessorTransaction(editor, (sel, index) => {
+            return {
+                replaceSelection: sel,
+                replaceText: (index + 1).toString()
+            }
+        })
+    }
 }

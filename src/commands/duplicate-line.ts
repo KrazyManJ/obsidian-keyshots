@@ -6,18 +6,13 @@ import {HotKey} from "../utils";
 import {Category} from "../constants/Category";
 
 export function vscodeDuplicate(editor: Editor, direction: VerticalDirection) {
-    SelectionsProcessing.selectionsProcessor(editor, undefined, (sel) => {
-        if (sel.isCaret()) {
-            const tx = sel.anchor.getLine()
-            sel.anchor.setLine(tx + "\n" + tx)
-            if (direction > 0) return sel.moveLines(1).withLineDifference(1);
-        } else {
-            const replaceSel = sel.asNormalized().expand()
-            const tx = replaceSel.getText()
-            replaceSel.replaceText(tx + "\n" + tx)
-            if (direction > 0) return sel.moveLines(sel.linesCount).withLineDifference(sel.linesCount)
+    SelectionsProcessing.selectionsProcessorTransaction(editor, sel => {
+        const finalSel = sel.clone()
+        return {
+            finalSelection: direction > 0 ? finalSel.moveLines(finalSel.linesCount) : finalSel,
+            replaceSelection: sel.normalize().expand(),
+            replaceText: sel.getText() + "\n" + sel.getText()
         }
-        return sel.withLineDifference(sel.linesCount)
     })
 }
 

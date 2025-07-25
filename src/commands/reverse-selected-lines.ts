@@ -10,9 +10,12 @@ export const reverseSelectedLines: KeyshotsCommand = {
     hotkeys: {
         keyshots: [HotKey("R", "Alt")]
     },
-    editorCallback: (editor) => SelectionsProcessing.selectionsProcessor(editor, arr => arr.filter(s => !s.isCaret()), sel => {
-        const replaceSel = sel.asNormalized().expand()
-        replaceSel.replaceText(replaceSel.getText().split("\n").reverse().join("\n"))
-        return sel
-    })
+    editorCallback: (editor) => {
+        SelectionsProcessing.selectionsProcessorTransaction(editor, sel => {
+            return {
+                replaceSelection: sel.clone().expand(),
+                replaceText: sel.clone().expand().getText().split("\n").reverse().join("\n")
+            }
+        }, arr => arr.filter(sel => !sel.isCaret()))
+    }
 }

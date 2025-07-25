@@ -10,13 +10,15 @@ export const sortSelectedLines: KeyshotsCommand = {
     hotkeys: {
         keyshots: [HotKey("S", "Mod", "Shift")]
     },
-    editorCallback: (editor) => SelectionsProcessing.selectionsProcessor(editor, arr => arr.filter(s => !s.isCaret()), sel => {
-        const replaceSel = sel.asNormalized().expand()
-        replaceSel.replaceText(replaceSel.getText()
-            .split("\n")
-            .sort((a: string, b: string) => a.localeCompare(b, undefined, {numeric: true, sensitivity: "base"}))
-            .join("\n")
-        )
-        return sel
-    })
+    editorCallback: (editor) => {
+        SelectionsProcessing.selectionsProcessorTransaction(editor, sel => {
+            return {
+                replaceSelection: sel.expand(),
+                replaceText: sel.getText()
+                    .split("\n")
+                    .sort((a: string, b: string) => a.localeCompare(b, undefined, {numeric: true, sensitivity: "base"}))
+                    .join("\n")
+            }
+        }, arr => arr.filter(s => !s.isCaret()))
+    }
 }

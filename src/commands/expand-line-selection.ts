@@ -13,5 +13,7 @@ export const expandLineSelection: KeyshotsCommand = {
         jetbrains: [HotKey("W", "Mod")],
         visual_studio: [HotKey("=", "Shift", "Alt")]
     },
-    editorCallback: (editor) => SelectionsProcessing.selectionsProcessor(editor, undefined, sel => sel.expand(true))
+    editorCallback: (editor) => SelectionsProcessing.selectionsProcessorTransaction(editor, sel => ({
+        finalSelection: sel.expand(true)
+    }))
 }

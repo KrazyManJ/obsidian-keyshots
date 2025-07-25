@@ -11,15 +11,16 @@ export const splitSelectionsOnNewLine: KeyshotsCommand = {
         keyshots: [HotKey("S", "Alt")]
     },
     editorCallback: (editor) => {
-        let index = 0
-        SelectionsProcessing.selectionsProcessor(editor, arr => arr.sort((a, b) => a.anchor.line - b.anchor.line), sel => {
-            if (sel.isCaret()) return sel
-            else {
-                const replaceSel = sel.moveLines(index).normalize()
-                const tx = replaceSel.getText()
-                replaceSel.replaceText("\n" + tx + "\n")
-                index += (tx.split("\n") || []).length + 1
-                return sel.moveLines(1).expand()
+        SelectionsProcessing.selectionsProcessorTransaction(editor, sel => {
+            if (sel.isCaret()) {
+                return {
+                    finalSelection: sel
+                }
+            }
+            return {
+                replaceSelection: sel,
+                replaceText: "\n" + sel.getText() + "\n",
+                finalSelection: sel.moveCharsWithoutOffset(1,0)
             }
         })
     }

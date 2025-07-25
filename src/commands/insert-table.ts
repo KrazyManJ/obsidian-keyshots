@@ -16,14 +16,15 @@ export const insertTable: (plugin: KeyshotsPlugin) => KeyshotsCommand = (plugin)
         plugin,
         (data) => {
             const {rows, columns} = data
-            SelectionsProcessing.selectionsProcessor(editor, undefined, (sel) =>
-                sel.normalize()
-                    .replaceText(
-                        `\n|${"     |".repeat(columns)}\n|${" --- |".repeat(columns)}${("\n|" + "     |".repeat(columns)).repeat(rows)}\n`
-                    )
-                    .moveLines(1)
-                    .moveChars(2)
-            )
+            
+            SelectionsProcessing.selectionsProcessorTransaction(editor, sel => {
+                return {
+                    replaceSelection: sel,
+                    replaceText: `\n|${"     |".repeat(columns)}\n|${" --- |".repeat(columns)}${("\n|" + "     |".repeat(columns)).repeat(rows)}\n`,
+                    finalSelection: sel.clone().moveLines(1).moveCharsWithoutOffset(2)
+                }
+            })
+            
             editor.focus()
         }
     ).open()

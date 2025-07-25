@@ -11,12 +11,21 @@ export const shuffleSelectedLines: (plugin: KeyshotsPlugin) => KeyshotsCommand =
     hotkeys: {
         keyshots: [HotKey("S", "Mod", "Shift", "Alt")]
     },
-    editorCallback: (editor) => SelectionsProcessing.selectionsProcessor(editor, arr => arr.filter(s => !s.isCaret()), sel => {
-        const replaceSel = sel.asNormalized().expand()
-        let txt = replaceSel.getText()
-        const rounds = plugin.settings.shuffle_rounds_amount
-        for (let i = 0; i < rounds; i++) txt = txt.split("\n").sort(() => Math.random() - 0.5).join("\n")
-        replaceSel.replaceText(txt)
-        return sel
-    })
+    editorCallback: (editor) => {
+        const shuffleLines = (text: string, rounds: number) => {
+            for (let i = 0; i < rounds; i++) {
+                text = text.split("\n").sort(() => Math.random() - 0.5).join("\n")
+            }
+            return text
+        }
+        
+        SelectionsProcessing.selectionsProcessorTransaction(editor, sel => {
+            const shuffledText = shuffleLines(sel.clone().expand().getText(), plugin.settings.shuffle_rounds_amount)
+
+            return {
+                replaceSelection: sel.clone().expand(),
+                replaceText: shuffledText
+            }
+        }, arr => arr.filter(s => !s.isCaret()), false)
+    }
 })

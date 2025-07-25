@@ -4,22 +4,29 @@ import KeyshotsCommand from "../model/KeyshotsCommand";
 import {HotKey} from "../utils";
 import {Editor} from "obsidian";
 import SelectionsProcessing from "../classes/SelectionsProcessing";
-import EditorSelectionManipulator from "../classes/EditorSelectionManipulator";
 
 export function insertLine(editor: Editor, direction: VerticalDirection) {
-    SelectionsProcessing.selectionsProcessor(editor, (s) => s.sort((a, b) => a.anchor.line - b.anchor.line), (sel, index) => {
-        const a = (ln: number) => {
-            const tx = [editor.getLine(ln), "\n"]
-            if (direction < 0) tx.reverse()
-            editor.setLine(ln, tx.join(""))
-            return EditorSelectionManipulator.documentStart(editor).setLines(ln + (direction > 0 ? direction : 0))
-        }
-        if (sel.isCaret()) return a(sel.anchor.line + index)
-        else {
-            const normSel = sel.asNormalized()
-            return a((direction > 0 ? normSel.anchor.line : normSel.head.line) + index)
-        }
-    })
+    SelectionsProcessing.selectionsProcessorTransaction(
+        editor, 
+        sel => {
+            const expandedSelection = sel.clone().expand()
+            let replaceText = expandedSelection.getText()
+            
+            if (direction > 0) {
+                replaceText = replaceText + "\n"
+            }
+            else {
+                replaceText = "\n" + replaceText
+            }
+
+            return {
+                replaceSelection: expandedSelection,
+                replaceText: replaceText,
+                finalSelection: sel.collapse().setChars(0).moveLines(direction > 0 ? expandedSelection.linesCount : 0)
+            }
+        },
+        array => array.sort((a, b) => a.anchor.line - b.anchor.line)
+    )
 }
 
 export const insertLineAbove: KeyshotsCommand = {

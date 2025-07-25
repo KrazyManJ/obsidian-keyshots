@@ -15,14 +15,20 @@ export const duplicateSelectionOrLine: KeyshotsCommand = {
         visual_studio: [HotKey("D", "Mod")],
     },
     editorCallback: (editor) => {
-        SelectionsProcessing.selectionsProcessor(editor, undefined, (sel) => {
+        SelectionsProcessing.selectionsProcessorTransaction(editor, sel => {
             if (sel.isCaret()) {
-                const tx = sel.anchor.getLine()
-                sel.anchor.setLine(tx + "\n" + tx)
-                return sel.moveLines(1).withLineDifference(1)
-            } else {
-                const tx = sel.asNormalized().getText()
-                return sel.asNormalized().replaceText(tx + tx).moveChars(tx.length)
+                return {
+                    replaceSelection: sel.clone().expand(),
+                    replaceText: sel.anchor.getLine() + "\n" + sel.anchor.getLine(),
+                    finalSelection: sel.moveLines(1),
+                }
+            }
+            else {
+                return {
+                    replaceSelection: sel,
+                    replaceText: sel.getText() + sel.getText(),
+                    finalSelection: sel.clone().moveCharsWithoutOffset(sel.getText().length)
+                }
             }
         })
     }

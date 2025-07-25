@@ -14,12 +14,12 @@ export const insertCodeBlock: (plugin: KeyshotsPlugin) => KeyshotsCommand = (plu
     },
     editorCallback: (editor) => new CodeBlockModal(plugin,
         (lang) => {
-            SelectionsProcessing.selectionsProcessor(editor, undefined, (sel) => {
-                return sel.normalize()
-                    .replaceText(`\n\`\`\`${lang.id}\n${sel.getText()}\n\`\`\`\n`)
-                    .moveLines(2)
-                    .setChars(0)
-                    .expand()
+            SelectionsProcessing.selectionsProcessorTransaction(editor, sel => {
+                return {
+                    replaceSelection: sel,
+                    replaceText: `\n\`\`\`${lang.id}\n${sel.getText()}\n\`\`\`\n`,
+                    finalSelection: sel.clone().moveLines(2)
+                }
             })
             editor.focus()
         }

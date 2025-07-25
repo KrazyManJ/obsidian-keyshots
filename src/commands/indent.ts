@@ -12,18 +12,25 @@ export const indent: KeyshotsCommand = {
     },
     editorCallback: (editor) => {
         const useTabs = app.vault.getConfig("useTabs")
-
-        SelectionsProcessing.selectionsProcessor(editor, undefined, sel => {
+        SelectionsProcessing.selectionsProcessorTransaction(editor, sel => {
             const expandedSelection = sel.clone().normalize().expand();
             if (sel.isCaret()) {
-                expandedSelection.replaceText((useTabs ?? false ? '\t' : '    ')+expandedSelection.getText());
-                return sel.moveChars(useTabs ?? false ? 1 : 4);
+                return {
+                    replaceSelection: expandedSelection,
+                    replaceText: (useTabs ?? false ? '\t' : '    ')+expandedSelection.getText(),
+                    finalSelection: sel.moveCharsWithoutOffset(useTabs ?? false ? 1 : 4)
+                }
             }
-            
-            expandedSelection.replaceText(expandedSelection.getText().split("\n").map(line => {
+
+            const indentedLines = expandedSelection.getText().split("\n").map(line => {
                 return (useTabs ?? false ? '\t' : '    ')+line
-            }).join("\n"))
-            return sel.expand()
+            })
+
+            return {
+                replaceSelection: expandedSelection,
+                replaceText: indentedLines.join("\n"),
+                finalSelection: sel.moveCharsWithoutOffset((useTabs ?? false ? 1 : 4))
+            }
         })
     }
 }
@@ -44,15 +51,21 @@ export const unindent: KeyshotsCommand = {
             else if (!useTabs && line.startsWith("    ")) return line.substring(4)
             return line
         }
-
-        SelectionsProcessing.selectionsProcessor(editor, undefined, sel => {
+        
+        SelectionsProcessing.selectionsProcessorTransaction(editor, sel => {
             const expandedSelection = sel.clone().normalize().expand();
             if (sel.isCaret()) {
-                expandedSelection.replaceText(unindentLine(expandedSelection.getText()));
-                return sel.moveChars(useTabs ?? false ? -1 : -4);
+                return {
+                    replaceSelection: expandedSelection,
+                    replaceText: unindentLine(expandedSelection.getText()),
+                    finalSelection: sel.moveCharsWithoutOffset(useTabs ?? false ? -1 : -4)
+                }
             }
-            expandedSelection.replaceText(expandedSelection.getText().split("\n").map(line => unindentLine(line)).join("\n"))
-            return sel.expand()
+            return {
+                replaceSelection: expandedSelection,
+                replaceText: expandedSelection.getText().split("\n").map(line => unindentLine(line)).join("\n"),
+                finalSelection: sel.moveCharsWithoutOffset(useTabs ?? false ? -1 : -4)
+            }
         })
     }
 }
