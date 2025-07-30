@@ -56,6 +56,7 @@ import duplicateTab from './commands/duplicate-tab';
 import { indent, unindent } from './commands/indent';
 import { openCommandPaletteDK } from './commands/double-key/open-command-palette';
 import DoubleKeyCommand from './model/DoubleKeyCommand';
+import { demoteHeading, promoteHeading } from './commands/promote-demote-headings';
 
 export default class KeyshotsPlugin extends Plugin {
 
@@ -130,7 +131,9 @@ export default class KeyshotsPlugin extends Plugin {
             switchKeyshotsCaseSensitivity(this),
             duplicateTab(this),
             indent(this),
-            unindent(this)
+            unindent(this),
+            promoteHeading,
+            demoteHeading
         ]
     }
 
