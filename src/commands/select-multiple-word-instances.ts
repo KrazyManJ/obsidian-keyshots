@@ -4,7 +4,7 @@ import {Category} from "../constants/Category";
 import EditorSelectionManipulator from "../classes/EditorSelectionManipulator";
 import {EditorRange, MarkdownView} from "obsidian";
 import SelectionsProcessing from "../classes/SelectionsProcessing";
-import {getEditorValueWithoutFrontmatter, HotKey} from "../utils";
+import {escapeRegExp, getEditorValueWithoutFrontmatter, HotKey} from "../utils";
 
 export const selectMultipleWordInstances: (plugin: KeyshotsPlugin) => KeyshotsCommand = (plugin) => ({
     category: Category.SELECTION_ADD_OR_REMOVE,
@@ -37,7 +37,9 @@ export const selectMultipleWordInstances: (plugin: KeyshotsPlugin) => KeyshotsCo
             const sel = SelectionsProcessing.lowestSelection(selections).normalize()
             const tx = !case_sensitive ? sel.getText().toLowerCase() : sel.getText()
 
-            const match = (!case_sensitive ? noteContent.toLowerCase() : noteContent).substring(sel.head.toOffset()-frontmatterShift).match(tx)
+            const match = (!case_sensitive ? noteContent.toLowerCase() : noteContent)
+                .substring(sel.head.toOffset()-frontmatterShift)
+                .match(escapeRegExp(tx))
             if (match !== null) {
                 const matchSel = EditorSelectionManipulator.documentStart(editor)
                     .setChars(sel.head.toOffset()-frontmatterShift)
@@ -48,7 +50,7 @@ export const selectMultipleWordInstances: (plugin: KeyshotsPlugin) => KeyshotsCo
             } else {
                 let editorSearchText = !case_sensitive ? noteContent.toLowerCase() : noteContent
                 let shift = 0
-                let match = editorSearchText.match(tx)
+                let match = editorSearchText.match(escapeRegExp(tx))
                 while (match !== null) {
                     const prevTx = (!case_sensitive ? noteContent.toLowerCase() : noteContent).substring(0, shift + (match?.index || 0))
                     const sel = EditorSelectionManipulator.documentStart(editor)
@@ -62,7 +64,7 @@ export const selectMultipleWordInstances: (plugin: KeyshotsPlugin) => KeyshotsCo
                         shift += (match?.index || 0) + tx.length
                         editorSearchText = editorSearchText.substring((match?.index || 0) + tx.length)
                     }
-                    match = editorSearchText.match(tx)
+                    match = editorSearchText.match(escapeRegExp(tx))
                 }
             }
         } else return;

@@ -3,7 +3,7 @@ import {Category} from "../constants/Category";
 import EditorSelectionManipulator from "../classes/EditorSelectionManipulator";
 import SelectionsProcessing from "../classes/SelectionsProcessing";
 import KeyshotsPlugin from "../plugin";
-import {getEditorValueWithoutFrontmatter, HotKey} from "../utils";
+import {escapeRegExp, getEditorValueWithoutFrontmatter, HotKey} from "../utils";
 import { MarkdownView } from "obsidian";
 
 export const selectAllWordInstances: (plugin: KeyshotsPlugin) => KeyshotsCommand = (plugin) => ({
@@ -33,7 +33,7 @@ export const selectAllWordInstances: (plugin: KeyshotsPlugin) => KeyshotsCommand
         selections.filter(s => s.isCaret()).forEach((sel, i) => selections[i] = sel.selectWord())
         if (selections.filter(s => !s.isCaret()).length === selections.length && SelectionsProcessing.selectionValuesEqual(selections, case_sensitive)) {
             const tx = selections[0].getText()
-            Array.from(noteContent.matchAll(new RegExp(tx, "g" + (case_sensitive ? "" : "i"))), v => v.index || 0)
+            Array.from(noteContent.matchAll(new RegExp(escapeRegExp(tx), "g" + (case_sensitive ? "" : "i"))), v => v.index || 0)
                 .forEach(v => {
                     selections.push(
                         EditorSelectionManipulator.documentStart(editor)

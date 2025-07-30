@@ -10,7 +10,7 @@ export function flipBooleanSetting(
     app: App,
     setting: { [k in keyof VaultConfig]: VaultConfig[k] extends boolean ? k : never }[keyof VaultConfig]
 ) {
-    app.vault.setConfig(setting, !app.vault.getConfig(setting))
+    app.vault.setConfig(setting, !(app.vault.getConfig(setting) ?? false))
 }
 
 export function runCommandById(keyshotsPlugin: KeyshotsPlugin, id: string, notAvailableCallback: () => void) {
@@ -33,4 +33,8 @@ export function getEditorValueWithoutFrontmatter(editor: Editor) {
         }
     }
     return lines.join("\n")
+}
+
+export function escapeRegExp(string: string){
+    return string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
 }
