@@ -19,9 +19,26 @@ export default class CalloutPickerModal extends CallbackSuggestModal<string> {
         ["quote", "cite"]
     ]
 
-    constructor(plugin: KeyshotsPlugin, onSelectCallback: (item: string) => void) {
+    private selectCurrentSuggestion(evt: KeyboardEvent) {
+        this.selectSuggestion(this.chooser.values[this.chooser.selectedItem], evt);
+        return false;
+    }
+
+    constructor(plugin: KeyshotsPlugin, onSelectCallback: (item: string, evt: MouseEvent | KeyboardEvent) => void) {
         super(plugin, onSelectCallback);
-        this.setPlaceholder("Select one of the callouts... (callouts are searchable by it's id or aliases)")
+        this.setPlaceholder("Select one of the callouts... (callouts are searchable by it's id or aliases)");
+        this.setInstructions([
+            {
+                command: "Shift ↵",
+                purpose: "to insert callout as fold-open"
+            },
+            {
+                command: "Ctrl ↵",
+                purpose: "to insert callout as fold-closed"
+            }
+        ])
+        this.scope.register(["Shift"], "Enter", (evt) => this.selectCurrentSuggestion(evt))
+        this.scope.register(["Mod"], "Enter", (evt) => this.selectCurrentSuggestion(evt))
     }
 
     getSuggestions(query: string): string[] | Promise<string[]> {

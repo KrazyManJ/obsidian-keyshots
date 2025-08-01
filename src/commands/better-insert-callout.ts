@@ -12,12 +12,22 @@ export const betterInsertCallout: (plugin: KeyshotsPlugin) => KeyshotsCommand = 
     hotkeys: {
         keyshots: [HotKey("C", "Shift", "Alt")],
     },
-    editorCallback: (editor) => new CalloutPickerModal(plugin,
-        (calloutId) => {
+    editorCallback: (editor) => new CalloutPickerModal(
+        plugin,
+        (calloutId,evt) => {
+            let foldingState = "";
+            if (evt instanceof KeyboardEvent) {
+                if (evt.shiftKey) {
+                    foldingState = "+"
+                }
+                else if (evt.ctrlKey) {
+                    foldingState = "-"
+                }
+            } 
             SelectionsProcessing.selectionsProcessorTransaction(editor, sel => {
                 return {
                     replaceSelection: sel,
-                    replaceText: `\n>[!${calloutId}]\n${sel.getText().split("\n").map(p => "> " + p).join("\n")}\n`,
+                    replaceText: `\n>[!${calloutId}]${foldingState}\n${sel.getText().split("\n").map(p => "> " + p).join("\n")}\n`,
                     finalSelection: sel.clone().expand().moveLines(2).moveCharsWithoutOffset(2)
                 }
             })

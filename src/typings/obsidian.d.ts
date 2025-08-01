@@ -69,5 +69,12 @@ declare module 'obsidian' {
     interface Plugin {
         _events: (() => void)[]
     }
+
+    interface SuggestModal<T> {
+        chooser: {
+            values: T[],
+            selectedItem: number
+        }
+    }
 }
 
