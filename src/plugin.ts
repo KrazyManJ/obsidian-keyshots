@@ -57,6 +57,7 @@ import { indent, unindent } from './commands/indent';
 import { openCommandPaletteDK } from './commands/double-key/open-command-palette';
 import DoubleKeyCommand from './model/DoubleKeyCommand';
 import { demoteHeading, promoteHeading } from './commands/promote-demote-headings';
+import { switchDefaultEditingModeSetting } from './commands/switch-default-editing-mode-setting';
 
 export default class KeyshotsPlugin extends Plugin {
 
@@ -133,7 +134,8 @@ export default class KeyshotsPlugin extends Plugin {
             indent(this),
             unindent(this),
             promoteHeading,
-            demoteHeading
+            demoteHeading,
+            switchDefaultEditingModeSetting(this),
         ]
     }
 
