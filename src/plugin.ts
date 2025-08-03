@@ -72,7 +72,9 @@ export default class KeyshotsPlugin extends Plugin {
         let hotkeys: Hotkey[] | null | undefined = undefined
         if (cmd.hotkeys) {
             hotkeys = cmd.hotkeys[preset]
-            if (includeKeyshots && hotkeys === undefined) hotkeys = cmd.hotkeys["keyshots"]
+            if (includeKeyshots && hotkeys === undefined && preset !== "clear") {
+                hotkeys = cmd.hotkeys["keyshots"]
+            }
         }
         if (hotkeys === null)
             hotkeys = undefined
