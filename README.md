@@ -406,3 +406,25 @@ Current available commands are:
 
 - Fixed behavior of `Join Selected Lines` while multiple cursors beneath themselves #14
 - Fixed bug of missing double key command when registering (command palette double key command) #19
+
+---
+
+### 2.7.0 - Few new commands, improvements and fixes
+
+#### New commands
+
+- `Promote heading` & `Demote heading` - Commands that will add/remove one hashtag for:
+  - Multiple headings in each multi-line selections
+  - Heading in one-line selection or caret
+- `Switch 'Default editing mode' settings` - Switches between source or live-preview default editing mode and current editing mode state in place
+
+#### Improvements
+
+- Refactored code so it satisfies "no direct app instance access" plugin convention
+- Improved `Better insert callout` modal to insert callout in desired folding state #20
+
+#### Fixes
+
+- Fixed regular expressions escaping for `select multiple/all word instances`
+- Fixed clear preset so it won't apply Keyshots hotkeys #21
+- Changed keybinding for `Duplicate selection or line` in keyshots preset
