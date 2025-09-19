@@ -3,6 +3,25 @@ import { Category } from "src/constants/Category"
 import { KeyshotsCommandPluginCallback } from "src/model/KeyshotsCommand"
 import { HotKey } from "src/utils"
 
+export const unindentLine = (line: string): string => {
+    if (line.startsWith("\t")) return line.slice(1)
+    const leadingSpaces = (line.match(/^ */)?.[0] ?? "")
+    const spacesToRemove = Math.min(leadingSpaces.length, 4)
+    return line.slice(spacesToRemove)
+}
+
+export const computeUnindent = (text: string, isCaret: boolean) => {
+    if (isCaret) {
+        const un = unindentLine(text)
+        const removed = text.length - un.length
+        return { replaceText: un, offset: -removed }
+    }
+    const lines = text.split("\n")
+    const un = lines.map(unindentLine)
+    const removedFirst = lines[0].length - un[0].length
+    return { replaceText: un.join("\n"), offset: -removedFirst }
+}
+
 export const indent: KeyshotsCommandPluginCallback = (plugin) => ({
     category: Category.EDITOR_LINES_MANIPULATION,
     id: 'indent',
@@ -46,25 +65,31 @@ export const unindent: KeyshotsCommandPluginCallback = (plugin) => ({
     editorCallback: (editor) => {
         const useTabs = plugin.app.vault.getConfig("useTabs")
 
-        const unindentLine = (line: string) => {
-            if (useTabs && line.startsWith("\t")) return line.substring(1)
-            else if (!useTabs && line.startsWith("    ")) return line.substring(4)
-            return line
-        }
-        
         SelectionsProcessing.selectionsProcessorTransaction(editor, sel => {
             const expandedSelection = sel.clone().normalize().expand();
+            const originalText = expandedSelection.getText()
+
             if (sel.isCaret()) {
+                const unindentedText = unindentLine(originalText)
+                const removedChars = originalText.length - unindentedText.length
                 return {
                     replaceSelection: expandedSelection,
-                    replaceText: unindentLine(expandedSelection.getText()),
-                    finalSelection: sel.moveCharsWithoutOffset(useTabs ?? false ? -1 : -4)
+                    replaceText: unindentedText,
+                    finalSelection: sel.moveCharsWithoutOffset(-removedChars)
                 }
             }
+
+            const lines = originalText.split("\n")
+            const unindentedLines = lines.map(line => unindentLine(line))
+            const unindentedText = unindentedLines.join("\n")
+
+            // Calculate how many characters were removed from the first line for cursor positioning
+            const firstLineRemovedChars = lines[0].length - unindentedLines[0].length
+
             return {
                 replaceSelection: expandedSelection,
-                replaceText: expandedSelection.getText().split("\n").map(line => unindentLine(line)).join("\n"),
-                finalSelection: sel.moveCharsWithoutOffset(useTabs ?? false ? -1 : -4)
+                replaceText: unindentedText,
+                finalSelection: sel.moveCharsWithoutOffset(-firstLineRemovedChars)
             }
         })
     }
