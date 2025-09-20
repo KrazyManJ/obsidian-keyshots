@@ -2,7 +2,6 @@ import SelectionsProcessing from "src/classes/SelectionsProcessing"
 import { Category } from "src/constants/Category"
 import { KeyshotsCommandPluginCallback } from "src/model/KeyshotsCommand"
 import { HotKey } from "src/utils"
-
 export const unindentLine = (line: string): string => {
     if (line.startsWith("\t")) return line.slice(1)
     const leadingSpaces = (line.match(/^ */)?.[0] ?? "")
@@ -10,16 +9,29 @@ export const unindentLine = (line: string): string => {
     return line.slice(spacesToRemove)
 }
 
+export const unindentBlock = (text: string) => {
+    const lines = text.split("\n")
+    const unindentedLines = lines.map(unindentLine)
+    const removedPerLine = lines.map((l, i) => l.length - unindentedLines[i].length)
+    const removedFirst = removedPerLine[0] ?? 0
+    return { text: unindentedLines.join("\n"), removedPerLine, removedFirst }
+}
+
+export const indentBlock = (text: string, indentUnit: string) => {
+    const lines = text.split("\n")
+    return { text: lines.map(l => indentUnit + l).join("\n") }
+}
+
+
+
 export const computeUnindent = (text: string, isCaret: boolean) => {
     if (isCaret) {
         const un = unindentLine(text)
         const removed = text.length - un.length
         return { replaceText: un, offset: -removed }
     }
-    const lines = text.split("\n")
-    const un = lines.map(unindentLine)
-    const removedFirst = lines[0].length - un[0].length
-    return { replaceText: un.join("\n"), offset: -removedFirst }
+    const { text: replaced, removedFirst } = unindentBlock(text)
+    return { replaceText: replaced, offset: -removedFirst }
 }
 
 export const indent: KeyshotsCommandPluginCallback = (plugin) => ({
@@ -55,13 +67,11 @@ export const indent: KeyshotsCommandPluginCallback = (plugin) => ({
                 }
             }
 
-            const indentedLines = expandedSelection.getText().split("\n").map(line => {
-                return indentUnit + line
-            })
+            const { text: replaced } = indentBlock(expandedSelection.getText(), indentUnit)
 
             return {
                 replaceSelection: expandedSelection,
-                replaceText: indentedLines.join("\n"),
+                replaceText: replaced,
                 finalSelection: sel.moveCharsWithoutOffset(addedChars)
             }
         })
@@ -77,7 +87,6 @@ export const unindent: KeyshotsCommandPluginCallback = (plugin) => ({
         keyshots: [HotKey("[","Alt")]
     },
     editorCallback: (editor) => {
-        const useTabs = plugin.app.vault.getConfig("useTabs")
         // Track processed lines to avoid performing unindent multiple times on the same line when multiple carets exist.
         const processedLines = new Set<number>()
         const removedByLine = new Map<number, number>()
@@ -101,18 +110,12 @@ export const unindent: KeyshotsCommandPluginCallback = (plugin) => ({
                 } else {
                     const removedChars = removedByLine.get(lineIdx) ?? (originalText.length - unindentLine(originalText).length)
                     return {
-                        // No text replacement; only move caret to account for removed indentation
                         finalSelection: sel.moveCharsWithoutOffset(-removedChars)
                     }
                 }
             }
 
-            const lines = originalText.split("\n")
-            const unindentedLines = lines.map(line => unindentLine(line))
-            const unindentedText = unindentedLines.join("\n")
-
-            // Calculate removed chars per line to adjust both ends of the selection safely
-            const removedPerLine = lines.map((l, i) => l.length - unindentedLines[i].length)
+            const { text: unindentedText, removedPerLine } = unindentBlock(originalText)
             const startLine = expandedSelection.asNormalized().anchor.line
             const anchorIdx = sel.anchor.line - startLine
             const headIdx = sel.head.line - startLine

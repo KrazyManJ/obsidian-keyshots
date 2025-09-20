@@ -1,4 +1,4 @@
-import {unindent} from '../../src/commands/indent'
+import {indent, unindent} from '../../src/commands/indent'
 
 // Minimal Editor/Selection shapes matching only what's needed
 interface Pos {
@@ -11,7 +11,7 @@ interface Sel {
     head: Pos
 }
 
-class MockEditor {
+class TestEditor {
     private lines: string[]
     private selections: Sel[]
 
@@ -40,7 +40,6 @@ class MockEditor {
         return parts.join('\n')
     }
 
-    // Apply changes; supports multi-line replace
     transaction(tx: { changes?: { from: Pos; to: Pos; text: string }[]; selections?: { from: Pos; to: Pos }[] }) {
         if (tx.changes && tx.changes.length) {
             for (const ch of tx.changes) {
@@ -72,14 +71,58 @@ class MockEditor {
     getText(): string {
         return this.lines.join('\n')
     }
+
+    getSelections(): Sel[] {
+        return this.selections
+    }
 }
 
 // Minimal plugin stub supplying useTabs config (spaces by default)
-const plugin: any = {
-    app: {vault: {getConfig: (k: string) => (k === 'useTabs' ? false : undefined)}},
-}
+const plugin: any = {app: {vault: {getConfig: (k: string) => (k === 'useTabs' ? false : undefined)}}}
 
-function buildSample(): { input: string; expected: string } {
+describe('indent/unindent with multiple carets on the same line', () => {
+    test('indent does not duplicate line and shifts carets', () => {
+        const input = 'line with text.'
+        const carets = [6, 12]
+        const selections: Sel[] = carets.map(ch => ({anchor: {line: 0, ch}, head: {line: 0, ch}}))
+        const editor = new TestEditor(input, selections)
+
+        indent(plugin).editorCallback!(editor as unknown as any)
+
+        // Content is indented once (4 spaces)
+        expect(editor.getText()).toBe('    line with text.')
+
+        // All carets shift by +4
+        const final = editor.getSelections()
+        expect(final).toHaveLength(carets.length)
+        final.forEach((sel, i) => {
+            expect(sel.anchor).toMatchObject({line: 0, ch: carets[i] + 4})
+            expect(sel.head).toMatchObject({line: 0, ch: carets[i] + 4})
+        })
+    })
+
+    test('unindent does not duplicate line and shifts carets', () => {
+        const input = '    line with text.'
+        const carets = [10, 16]
+        const selections: Sel[] = carets.map(ch => ({anchor: {line: 0, ch}, head: {line: 0, ch}}))
+        const editor = new TestEditor(input, selections)
+
+        unindent(plugin).editorCallback!(editor as unknown as any)
+
+        // Content is unindented once
+        expect(editor.getText()).toBe('line with text.')
+
+        // All carets shift by -4
+        const final = editor.getSelections()
+        expect(final).toHaveLength(carets.length)
+        final.forEach((sel, i) => {
+            expect(sel.anchor).toMatchObject({line: 0, ch: carets[i] - 4})
+            expect(sel.head).toMatchObject({line: 0, ch: carets[i] - 4})
+        })
+    })
+})
+
+describe('unindent: multi-line selection behaves like single-line unindent per line', () => {
     const input = [
         'line',
         '- no space before -',
@@ -126,16 +169,12 @@ function buildSample(): { input: string; expected: string } {
         '              - 18',
     ].join('\n')
 
-    return {input, expected}
-}
 
-describe('unindent: multi-line selection behaves like single-line unindent per line', () => {
     test('Ctrl+A style selection unindents all lines by one indent unit', () => {
-        const {input, expected} = buildSample()
         const lines = input.split('\n')
         const lastIdx = lines.length - 1
         const selections: Sel[] = [{anchor: {line: 0, ch: 0}, head: {line: lastIdx, ch: lines[lastIdx].length}}]
-        const editor = new MockEditor(input, selections)
+        const editor = new TestEditor(input, selections)
 
         unindent(plugin).editorCallback!(editor as unknown as any)
 
