@@ -111,13 +111,20 @@ export const unindent: KeyshotsCommandPluginCallback = (plugin) => ({
             const unindentedLines = lines.map(line => unindentLine(line))
             const unindentedText = unindentedLines.join("\n")
 
-            // Calculate how many characters were removed from the first line for cursor positioning
-            const firstLineRemovedChars = lines[0].length - unindentedLines[0].length
+            // Calculate removed chars per line to adjust both ends of the selection safely
+            const removedPerLine = lines.map((l, i) => l.length - unindentedLines[i].length)
+            const startLine = expandedSelection.asNormalized().anchor.line
+            const anchorIdx = sel.anchor.line - startLine
+            const headIdx = sel.head.line - startLine
+            const anchorRemoved = removedPerLine[anchorIdx] ?? 0
+            const headRemoved = removedPerLine[headIdx] ?? 0
+            const deltaAnchor = -Math.min(sel.anchor.ch, anchorRemoved)
+            const deltaHead = -Math.min(sel.head.ch, headRemoved)
 
             return {
                 replaceSelection: expandedSelection,
                 replaceText: unindentedText,
-                finalSelection: sel.moveCharsWithoutOffset(-firstLineRemovedChars)
+                finalSelection: sel.moveCharsWithoutOffset(deltaAnchor, deltaHead)
             }
         })
     }
