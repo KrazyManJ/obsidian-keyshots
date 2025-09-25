@@ -428,3 +428,10 @@ Current available commands are:
 - Fixed regular expressions escaping for `select multiple/all word instances`
 - Fixed clear preset so it won't apply Keyshots hotkeys #21
 - Changed keybinding for `Duplicate selection or line` in keyshots preset
+
+### 2.7.1 - Hotfix
+
+#### Fixes
+
+- Fixed identifiers collision for `Transform selections to uppercase` and `Transform selections to lowercase`
+- Fixed `indent`/`unindent` command to use native tab provided by editor #24
