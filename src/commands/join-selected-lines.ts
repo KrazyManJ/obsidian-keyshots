@@ -1,7 +1,7 @@
 import {Category} from "../constants/Category";
 import KeyshotsCommand from "../model/KeyshotsCommand";
 import SelectionsProcessing from "../classes/SelectionsProcessing";
-import {HotKey} from "../utils";
+import {HotKey, joinLinesMarkdownAware} from "../utils";
 
 export const joinSelectedLines: KeyshotsCommand = {
     category: Category.EDITOR_LINES_MANIPULATION,
@@ -14,14 +14,6 @@ export const joinSelectedLines: KeyshotsCommand = {
 
     },
     editorCallback: (editor) => {
-
-        const joinLines = (text: string) => {
-            return text
-                .split("\n")
-                .map(line => line.trim())
-                .filter(line => line !== "")
-                .join(" ")
-        }
 
         SelectionsProcessing.selectionsProcessorTransaction(editor, sel => {
             if (sel.isCaret() || sel.isOneLine()) {
@@ -36,14 +28,14 @@ export const joinSelectedLines: KeyshotsCommand = {
                     return {
                         finalSelection: sel.clone(),
                         replaceSelection: sel.moveLines(0,1).expand(),
-                        replaceText: joinLines(sel.getText())
+                        replaceText: joinLinesMarkdownAware(sel.getText())
                     }
                 }
 
                 return {
                     finalSelection: sel.clone().setChars(sel.anchor.getLine().length),
                     replaceSelection: sel.moveLines(0,1).expand(),
-                    replaceText: joinLines(sel.getText()),
+                    replaceText: joinLinesMarkdownAware(sel.getText()),
                 }
             }
 
@@ -51,7 +43,7 @@ export const joinSelectedLines: KeyshotsCommand = {
             const length = sel.getText().length
             return {
                 finalSelection: sel.asNormalized().collapse().setChars(anchor.ch, anchor.ch + length),
-                replaceText: sel.getText().split("\n").join(" "),
+                replaceText: joinLinesMarkdownAware(sel.getText()),
                 replaceSelection: sel
             }
         },
