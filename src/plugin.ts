@@ -58,6 +58,8 @@ import { openCommandPaletteDK } from './commands/double-key/open-command-palette
 import DoubleKeyCommand from './model/DoubleKeyCommand';
 import { demoteHeading, promoteHeading } from './commands/promote-demote-headings';
 import { switchDefaultEditingModeSetting } from './commands/switch-default-editing-mode-setting';
+import { goToStartOfNote } from './commands/go-to-start-of-note';
+import { goToEndOfNote } from './commands/go-to-end-of-note';
 
 export default class KeyshotsPlugin extends Plugin {
 
@@ -138,6 +140,8 @@ export default class KeyshotsPlugin extends Plugin {
             promoteHeading,
             demoteHeading,
             switchDefaultEditingModeSetting(this),
+            goToStartOfNote,
+            goToEndOfNote,
         ]
     }
 
