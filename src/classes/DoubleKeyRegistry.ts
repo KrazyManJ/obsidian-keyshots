@@ -191,7 +191,9 @@ export default class DoubleKeyRegistry extends Component {
     }
 
     public registerCommand(cmd: DoubleKeyCommand) {
-        this.setStatusBarVisibility(true)
+        if (this.plugin.settings.show_double_key_status_bar_item) {
+            this.setStatusBarVisibility(true)
+        }
         this.cmds[cmd.id] = cmd
         this.cancelCurrentCommand()
     }

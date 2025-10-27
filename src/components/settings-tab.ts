@@ -142,6 +142,18 @@ export class KeyshotsSettingTab extends PluginSettingTab {
 
         containerEl.createEl('h2', {text: "🔧 JetBrains Features"})
 
+        new Setting(containerEl)
+            .setName("Show double key command activity in status bar")
+            .setDesc("When toggled on, status bar icon will show up when any of double key command is enabled. It displays status of currently active double key command.")
+            .addToggle(cb => cb
+                .setValue(this.plugin.settings.show_double_key_status_bar_item)
+                .onChange((newValue) => {
+                    this.plugin.settings.show_double_key_status_bar_item = newValue
+                    this.plugin.saveSettings()
+                    this.plugin.loadDoubleKeyCommands()
+                })
+            )
+
         let addCaretKeybinding: Setting | null = null 
         new Setting(containerEl)
             .setName(new DocumentFragmentBuilder()
