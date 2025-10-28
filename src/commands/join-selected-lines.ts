@@ -69,7 +69,7 @@ export const joinSelectedLines: KeyshotsCommand = {
     }
 }
 
-function joinLinesMarkdownAware(text: string): string {
+export function joinLinesMarkdownAware(text: string): string {
     const bulletMarkers = ['-', '+', '*'];
     const stripNumbered = true;
     const stripCheckbox = true;

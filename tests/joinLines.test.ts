@@ -1,4 +1,4 @@
-import {joinLinesMarkdownAware} from "../src/utils";
+import {joinLinesMarkdownAware} from "../src/commands/join-selected-lines";
 
 describe("joinLinesMarkdownAware", () => {
     test("removes leading '>' from joined quote lines", () => {
