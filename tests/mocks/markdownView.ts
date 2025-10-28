@@ -3,9 +3,9 @@ import type { MarkdownView } from "obsidian";
 export const emptyMarkdownMock = {} as MarkdownView;
 
 export function createMockMarkdownView(
-    state: Partial<ReturnType<MarkdownView["getState"]>> = {}
+    isLivePreview = true
 ): MarkdownView {
     return {
-        getState: jest.fn(() => ({ ...{ source: false }, ...state })),
+        getState: jest.fn(() => ({ source: !isLivePreview })),
     } as Partial<MarkdownView> as MarkdownView;
 }
