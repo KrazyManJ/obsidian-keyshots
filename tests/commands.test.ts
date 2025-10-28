@@ -3,12 +3,12 @@
 import { createMockEditor } from "./mocks/editor";
 import { insertLineAbove, insertLineBelow } from "../src/commands/insert-line";
 import { addCaretDown, addCaretUp } from "../src/commands/add-caret";
-import { MarkdownView } from "obsidian";
+import { emptyMarkdownMock as emptyMarkdownViewMock } from "./mocks/markdownView";
 
 describe("Commands", () => {
     it(addCaretDown.id, () => {
         const editor = createMockEditor("Line one\nLine two");
-        addCaretDown.editorCallback!(editor, {} as MarkdownView);
+        addCaretDown.editorCallback!(editor, emptyMarkdownViewMock);
 
         expect(editor.listSelections().length).toBe(2);
     });
@@ -19,22 +19,21 @@ describe("Commands", () => {
                 ch: 0,
             },
         });
-        addCaretUp.editorCallback!(editor, {} as MarkdownView);
-
+        addCaretUp.editorCallback!(editor, emptyMarkdownViewMock);
         expect(editor.listSelections().length).toBe(2);
     });
 
     it(insertLineBelow.id, () => {
         const editor = createMockEditor("Test note text");
 
-        insertLineBelow.editorCallback!(editor, {} as MarkdownView);
+        insertLineBelow.editorCallback!(editor, emptyMarkdownViewMock);
         expect(editor.getValue()).toBe("Test note text\n");
     });
 
     it(insertLineAbove.id, () => {
         const editor = createMockEditor("Test note text");
 
-        insertLineAbove.editorCallback!(editor, {} as MarkdownView);
+        insertLineAbove.editorCallback!(editor, emptyMarkdownViewMock);
         expect(editor.getValue()).toBe("\nTest note text");
     });
 });
