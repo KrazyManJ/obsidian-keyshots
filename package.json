@@ -4,6 +4,7 @@
 	"description": "",
 	"main": "main.js",
 	"scripts": {
+		"test": "jest",
 		"dev": "node esbuild.config.mjs",
 		"build": "tsc -noEmit -skipLibCheck && node esbuild.config.mjs production && node scripts/build_release.mjs",
 		"test": "jest",
