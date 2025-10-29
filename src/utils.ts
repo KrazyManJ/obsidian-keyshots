@@ -4,7 +4,7 @@ import KeyshotsPlugin from "./plugin";
 
 export const HotKey = (key: string, ...mods: Modifier[]): Hotkey => ({key: key, modifiers: mods})
 
-export const satisfies = <T,>() => <U extends T>(u: U) => u;
+export const satisfies = <T, >() => <U extends T>(u: U) => u;
 
 export function flipBooleanSetting(
     app: App,
@@ -29,12 +29,12 @@ export function getEditorValueWithoutFrontmatter(editor: Editor) {
         }
         if (start !== lines.length) {
             start++;
-            lines.splice(0,start)
+            lines.splice(0, start)
         }
     }
     return lines.join("\n")
 }
 
-export function escapeRegExp(string: string){
+export function escapeRegExp(string: string) {
     return string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
 }
