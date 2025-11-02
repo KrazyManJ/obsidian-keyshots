@@ -1,6 +1,6 @@
 import KeyshotsPlugin from "../plugin";
 import DoubleKeyCommand from "../model/DoubleKeyCommand";
-import { Command, Component, setIcon } from "obsidian";
+import { App, Command, Component, setIcon } from "obsidian";
 
 
 declare interface KeyRecord {
@@ -15,7 +15,7 @@ export default class DoubleKeyRegistry extends Component {
     private readonly statusBarIcon: HTMLSpanElement
 
     private readonly cmds: Record<string, DoubleKeyCommand> = {}
-    private app = app // To make app command code injection work
+    private app: App;
 
     private cancelAction = false
 
@@ -138,6 +138,7 @@ export default class DoubleKeyRegistry extends Component {
     constructor(plugin: KeyshotsPlugin) {
         super();
         this.plugin = plugin
+        this.app = plugin.app
         
         this.statusBarItem = this.plugin.addStatusBarItem()
         this.statusBarItem.style.padding = "0 var(--size-2-2)"
