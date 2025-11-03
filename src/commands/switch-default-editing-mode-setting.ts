@@ -26,6 +26,9 @@ export const switchDefaultEditingModeSetting: (plugin: KeyshotsPlugin) => Keysho
             return;
         }
 
-        view.setState({mode: 'source',source: isSetToLivePreview}, {})
+        view.setState(
+            { mode: 'source', source: isSetToLivePreview },
+            { history: false }
+        )
     }
 })
