@@ -1,5 +1,5 @@
-import { Category } from "src/constants/Category";
-import KeyshotsCommand from "src/model/KeyshotsCommand";
+import { Category } from "@/constants/Category";
+import KeyshotsCommand from "@/model/KeyshotsCommand";
 
 export const goToEndOfNote: KeyshotsCommand = {
     category: Category.TRANSFORM_SELECTIONS,
