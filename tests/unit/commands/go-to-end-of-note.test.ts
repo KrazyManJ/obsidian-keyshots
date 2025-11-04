@@ -3,8 +3,8 @@ import { createMockEditor } from "@test/mocks/editor";
 import { emptyMarkdownViewMock } from "@test/mocks/markdown-view";
 import { EditorCommandName } from "obsidian";
 
-describe(goToEndOfNote.id, () => {
-    test(`Command uses native exec with parameter "goEnd"`, () => {
+describe(`Command: ${goToEndOfNote.id}`, () => {
+    test(`uses native exec editor method with parameter "goEnd"`, () => {
         const editor = createMockEditor();
 
         goToEndOfNote.editorCallback?.(editor, emptyMarkdownViewMock);
