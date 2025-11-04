@@ -1,6 +1,7 @@
 import esbuild from "esbuild";
 import process from "process";
-import builtins from 'builtin-modules'
+import builtins from 'builtin-modules';
+import { sassPlugin } from 'esbuild-sass-plugin';
 
 
 const banner =
@@ -12,9 +13,7 @@ if you want to view the source, please visit the github repository of this plugi
 
 const prod = (process.argv[2] === 'production');
 
-/**
- * @type {esbuild.SameShape<esbuild.BuildOptions, esbuild.BuildOptions>}
-*/
+/** @type {esbuild.SameShape<esbuild.BuildOptions, esbuild.BuildOptions>} */
 const options = {
 	banner: {
 		js: banner,
@@ -47,10 +46,28 @@ const options = {
     minify: prod
 }
 
+/** @type {esbuild.SameShape<esbuild.BuildOptions, esbuild.BuildOptions>} */
+const styleOptions = {
+    banner: {
+        css: banner
+    },
+	entryPoints: ['src/styles.scss'],
+	bundle: true,
+	outfile: 'styles.css',
+	logLevel: "info",
+	minify: prod,
+	plugins: [sassPlugin()],
+};
+
 if (prod) {
-	await esbuild.build(options)
+	await esbuild.build(options);
+    await esbuild.build(styleOptions);
 	process.exit(0);
 } else {
-    const context = await esbuild.context(options)
-	await context.watch()
+    const context = await esbuild.context(options);
+	const styleContext = await esbuild.context(styleOptions);
+	await Promise.all([
+		context.watch(),
+		styleContext.watch()
+	]);
 }

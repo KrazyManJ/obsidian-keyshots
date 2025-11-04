@@ -1,0 +1,18 @@
+@import url("./styles/table-modal.scss");
+@import url("./styles/regex-modal.scss");
+
+
+body.keyshots-focus-mode {
+    div.side-dock-ribbon, div.sidebar-toggle-button {
+        display: none;
+    }
+}
+
+div.keyshots-settings {
+    .is-disabled {
+        opacity: 0.5;
+    }
+    .indent {
+        padding-left: 2em;
+    }
+}
