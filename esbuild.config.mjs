@@ -12,7 +12,10 @@ if you want to view the source, please visit the github repository of this plugi
 
 const prod = (process.argv[2] === 'production');
 
-esbuild.build({
+/**
+ * @type {esbuild.SameShape<esbuild.BuildOptions, esbuild.BuildOptions>}
+*/
+const options = {
 	banner: {
 		js: banner,
 	},
@@ -32,12 +35,22 @@ esbuild.build({
 		'@lezer/common',
 		'@lezer/highlight',
 		'@lezer/lr',
+		'@jest/*',
+		'jest',
 		...builtins],
 	format: 'cjs',
-	watch: !prod,
 	target: 'es2018',
 	logLevel: "info",
 	sourcemap: prod ? false : 'inline',
 	treeShaking: true,
 	outfile: 'main.js',
-}).catch(() => process.exit(1));
+    minify: prod
+}
+
+if (prod) {
+	await esbuild.build(options)
+	process.exit(0);
+} else {
+    const context = await esbuild.context(options)
+	await context.watch()
+}
