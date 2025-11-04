@@ -1,6 +1,6 @@
-import { Category } from "src/constants/Category"
-import KeyshotsCommand from "src/model/KeyshotsCommand"
-import { HotKey } from "src/utils"
+import { Category } from "../constants/Category"
+import KeyshotsCommand from "../model/KeyshotsCommand"
+import { HotKey } from "../utils"
 
 export const indent: KeyshotsCommand = {
     category: Category.EDITOR_LINES_MANIPULATION,
@@ -9,7 +9,7 @@ export const indent: KeyshotsCommand = {
     hotkeys: {
         keyshots: [HotKey("]","Alt")]
     },
-    editorCallback: (editor) => editor.exec("indentMore")   
+    editorCallback: (editor) => editor.exec("indentMore")
 }
 
 

@@ -8,7 +8,7 @@ interface MockEditorOptions {
 export function createMockEditor(
     initialContent = "",
     options: MockEditorOptions = {}
-): Editor {
+): jest.Mocked<Editor> {
     let content = initialContent;
     const cursorSelection: EditorPosition = options.initialCursor ?? {
         line: 0,
@@ -26,8 +26,9 @@ export function createMockEditor(
 
     return {
         getValue: jest.fn(() => content),
-        setValue: jest.fn((newValue) => (content = newValue)),
-
+        setValue: jest.fn((newValue) => {
+            content = newValue
+        }),
         listSelections: jest.fn(() => selections),
         setSelections: jest.fn((ranges) => {
             selections = ranges.map<EditorSelection>((range) => ({
@@ -100,5 +101,6 @@ export function createMockEditor(
                 ];
             }
         }),
-    } as Partial<Editor> as Editor;
+        exec: jest.fn()
+    } as Partial<jest.Mocked<Editor>> as jest.Mocked<Editor>;
 }
