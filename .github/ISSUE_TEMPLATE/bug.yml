@@ -34,7 +34,7 @@ body:
   id: os
   attributes:
     label: Operating system
-    description: What operating system are you using (can confirm this bug on)
+    description: What operating system are you using (can confirm this bug on)? You can select multiple values.
     multiple: true
     options:
       - Windows
