@@ -29,8 +29,8 @@ body:
       Write down a hotkey for this command. It should not conflict all commands.
       See [wiki page](https://github.com/KrazyManJ/obsidian-keyshots/wiki/Preset#full-preset-table) for list of all keybinds.
       placeholder: Ctrl + Alt + K
-    validations:
-      required: true
+  validations:
+    required: true
 
 - type: textarea
   id: additional-context

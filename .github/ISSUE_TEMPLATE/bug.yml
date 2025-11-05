@@ -40,8 +40,8 @@ body:
       - Windows
       - MacOS
       - Linux
-    validations:
-      required: true
+  validations:
+    required: true
 
 - type: textarea
   id: additional-context
