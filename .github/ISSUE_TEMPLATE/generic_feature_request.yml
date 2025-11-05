@@ -3,34 +3,33 @@ description: Feature request for anything else, that is not related with creatin
 title: "[FR]: "
 labels: ["feature-request"]
 assignees:
-    - KrazyManJ
-type: feature-request
+- KrazyManJ
 body:
-    - type: markdown
-      attributes:
-          value: |
-              Thanks for taking the time to fill out this feature request!
+- type: markdown
+  attributes:
+    value: |
+      Thanks for taking the time to fill out this feature request!
 
-    - type: textarea
-      id: problem
-      attributes:
-          label: Problem or use case
-          description: Describe a problem, that this feature should solve.
-      validations:
-          required: true
+- type: textarea
+  id: problem
+  attributes:
+    label: Problem or use case
+    description: Describe a problem, that this feature should solve.
+  validations:
+    required: true
 
-    - type: textarea
-      id: solution
-      attributes:
-          label: Solution
-          description: Describe how this feature will work. Be as specific as possible
-      validations:
-          required: true
+- type: textarea
+  id: solution
+  attributes:
+    label: Solution
+    description: Describe how this feature will work. Be as specific as possible
+  validations:
+    required: true
 
-    - type: textarea
-      id: additional-context
-      attributes:
-          label: Additional context
-          description: Tell me aditional context to proposed feature request (every detail would help me)
-      validations:
-          required: false
+- type: textarea
+  id: additional-context
+  attributes:
+    label: Additional context
+    description: Tell me aditional context to proposed feature request (every detail would help me)
+  validations:
+    required: false
