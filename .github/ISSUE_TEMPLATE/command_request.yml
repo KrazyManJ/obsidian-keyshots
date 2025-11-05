@@ -1,0 +1,42 @@
+name: Request a new command
+description: Feature request to create a new command.
+title: "[FR]: "
+labels: ["command-request"]
+assignees:
+    - KrazyManJ
+type: feature-request
+body:
+    - type: markdown
+      attributes:
+          value: |
+              Thanks for taking the time to fill out this feature request!
+
+              > [!warning] 
+              > This request form is for one command only. To request multiple commands, create multiple request posts.
+
+    - type: textarea
+      id: new-command-behavior
+      attributes:
+          label: New command behavior
+          description: Describe command behavior, what should it do in all cases you can think of
+      validations:
+          required: true
+
+    - type: input
+      id: hotkey
+      attributes:
+          label: Command hotkey
+          description: |
+              Write down a hotkey for this command. It should not conflict all commands.
+              See [wiki page](https://github.com/KrazyManJ/obsidian-keyshots/wiki/Preset#full-preset-table) for list of all keybinds.
+          placeholder: Ctrl + Alt + K
+      validations:
+          required: true
+
+    - type: textarea
+      id: additional-context
+      attributes:
+          label: Additional context
+          description: Tell me aditional context to proposed command (every detail would help me)
+      validations:
+          required: false
