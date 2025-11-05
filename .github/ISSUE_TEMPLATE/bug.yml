@@ -20,8 +20,8 @@ body:
 - type: textarea
   id: steps-to-reproduce
   attributes:
-  label: Steps to reproduce
-  description: What are the steps to reproduce
+    label: Steps to reproduce
+    description: What are the steps to reproduce
   placeholder: |
     1. Go to '...'
     2. Click on '....'
@@ -41,7 +41,7 @@ body:
       - MacOS
       - Linux
     validations:
-        required: true
+      required: true
 
 - type: textarea
   id: additional-context
