@@ -22,11 +22,11 @@ body:
   attributes:
     label: Steps to reproduce
     description: What are the steps to reproduce
-  placeholder: |
-    1. Go to '...'
-    2. Click on '....'
-    3. Scroll down to '....'
-    4. See error
+    placeholder: |
+      1. Go to '...'
+      2. Click on '....'
+      3. Scroll down to '....'
+      4. See error
   validations:
     required: true
 
