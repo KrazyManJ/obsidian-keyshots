@@ -20,6 +20,11 @@ const manifestPath = join(root, "manifest.json");
 const mainPath = join(root, "main.js");
 const stylePath = join(root, "styles.css");
 
+if (!existsSync(mainPath) || !existsSync(manifestPath) || !existsSync(stylePath)) {
+    console.error("[build_release] One of build files is not present. Aborting bundling...")
+    process.exit(1)
+}
+
 if (!existsSync(releaseFolder)) mkdirSync(releaseFolder);
 
 readdirSync(releaseFolder).forEach((file) => {
@@ -56,3 +61,5 @@ const filesToCopy = [mainPath, manifestPath, stylePath];
 filesToCopy.forEach((f) =>
     copyFileSync(f, join(releaseFolder + `/${basename(f)}`))
 );
+
+console.log("[build_release] Release bundled successfully.")
