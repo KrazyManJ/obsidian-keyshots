@@ -20,6 +20,42 @@ describe(`Command: ${joinSelectedLines.id}`, () => {
             expect(selections[0].head.line).toBe(0);
             expect(selections[0].head.ch).toBe(9);
         });
+
+        /*
+        the caret line should be trimmed at end (which in this test means it is trimmed completely)
+        the next line should be trimmed at start (which in this test means it is trimmed completely as well)
+        the caret line should be joined with the next line
+        the caret position should be moved on the first line, right after the trim (which in this test means position 0 as the whole line is has no characters)
+
+        Test data (in case git/intellij fucks with the whitespace):
+        
+        Before:
+        - Line 1: `a`
+        - Line 2: whitespace `|` whitespace
+        - Line 3: whitespace
+        - Line 4: whitespace
+        - Line 5: `text`
+        
+        Expected:
+        - Line 1: `a`
+        - Line 2: `|` (empty line with caret at position 0)
+        - Line 3: whitespace
+        - Line 4: `text`
+         */
+        it("join on blank lines", () => {
+            const editor = createMockEditorFromTextWithCaret(`a
+                                |                       
+                      
+                          
+text
+`);
+            joinSelectedLines.editorCallback?.(editor, emptyMarkdownViewMock);
+            expect(editor.getValueWithCaret()).toBe(`a
+|
+                          
+text
+`);
+        })
     });
 
     it("removes leading '>' from joined quote lines", () => {
@@ -120,4 +156,12 @@ describe(`Command: ${joinSelectedLines.id}`, () => {
         const after = `text`;
         expect(joinLinesMarkdownAware(before)).toBe(after);
     });
+
+    it("join on blank lines", () => {
+        const before = `                                                                    
+                            `;
+        const after = ``;
+        expect(joinLinesMarkdownAware(before)).toBe(after);
+    })
+
 });
