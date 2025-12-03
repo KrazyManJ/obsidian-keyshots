@@ -5,6 +5,11 @@ interface MockEditorOptions {
     initialSelections?: EditorSelection;
 }
 
+export interface MockEditor extends Editor {
+    /** Returns the editor content with `|` inserted at the current cursor position */
+    getValueWithCaret(): string;
+}
+
 /**
  * Parses text containing a `|` caret marker and returns the EditorPosition.
  * @throws Error if no `|` is found in the text
@@ -26,7 +31,7 @@ export function parseCaretPosition(textWithCaret: string): EditorPosition {
  */
 export function createMockEditorFromTextWithCaret(
     textWithCaret: string
-): jest.Mocked<Editor> {
+): jest.Mocked<MockEditor> {
     const position = parseCaretPosition(textWithCaret);
     const text = textWithCaret.replace("|", "");
     return createMockEditor(text, { initialCursor: position });
@@ -35,7 +40,7 @@ export function createMockEditorFromTextWithCaret(
 export function createMockEditor(
     initialContent = "",
     options: MockEditorOptions = {}
-): jest.Mocked<Editor> {
+): jest.Mocked<MockEditor> {
     let content = initialContent;
     const cursorSelection: EditorPosition = options.initialCursor ?? {
         line: 0,
@@ -45,7 +50,7 @@ export function createMockEditor(
         { anchor: cursorSelection, head: cursorSelection },
     ];
 
-    const posToOffset = jest.fn((pos) => {
+    const posToOffset = jest.fn((pos: EditorPosition) => {
         const lines = content.split("\n");
         let offset = 0;
         for (let i = 0; i < pos.line; i++) {
@@ -57,6 +62,11 @@ export function createMockEditor(
 
     return {
         getValue: jest.fn(() => content),
+        getValueWithCaret: jest.fn(() => {
+            const cursor = selections[0].anchor;
+            const offset = posToOffset(cursor);
+            return content.slice(0, offset) + "|" + content.slice(offset);
+        }),
         setValue: jest.fn((newValue) => {
             content = newValue
         }),
@@ -148,5 +158,5 @@ export function createMockEditor(
             }
         }),
         exec: jest.fn()
-    } as Partial<jest.Mocked<Editor>> as jest.Mocked<Editor>;
+    } as Partial<jest.Mocked<MockEditor>> as jest.Mocked<MockEditor>;
 }
