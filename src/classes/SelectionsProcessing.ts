@@ -33,7 +33,7 @@ export default abstract class SelectionsProcessing {
         const transactionObject: EditorTransaction = {}
 
         const editorChanges: EditorChange[] = changes
-            .filter(change => change.replaceSelection && change.replaceText)    
+            .filter(change => change.replaceSelection && change.replaceText !== undefined)
             .map(v => {
                 // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
                 const [from,to] = v.replaceSelection!.asFromToPoints()
