@@ -33,7 +33,7 @@ export const joinSelectedLines: KeyshotsCommand = {
                     }
 
                     return {
-                        finalSelection: sel.clone().setChars(sel.anchor.getLine().length),
+                        finalSelection: sel.clone().setChars(sel.anchor.getLine().trimEnd().length),
                         replaceSelection: sel.moveLines(0, 1).expand(),
                         replaceText: joinLinesMarkdownAware(sel.getText()),
                     }
