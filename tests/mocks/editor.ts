@@ -5,6 +5,33 @@ interface MockEditorOptions {
     initialSelections?: EditorSelection;
 }
 
+/**
+ * Parses text containing a `|` caret marker and returns the EditorPosition.
+ * @throws Error if no `|` is found in the text
+ */
+export function parseCaretPosition(textWithCaret: string): EditorPosition {
+    const lines = textWithCaret.split("\n");
+    for (let line = 0; line < lines.length; line++) {
+        const ch = lines[line].indexOf("|");
+        if (ch !== -1) {
+            return { line, ch };
+        }
+    }
+    throw new Error("No caret marker '|' found in text");
+}
+
+/**
+ * Creates a mock editor from text containing a `|` caret marker.
+ * @throws Error if no `|` is found in the text
+ */
+export function createMockEditorFromTextWithCaret(
+    textWithCaret: string
+): jest.Mocked<Editor> {
+    const position = parseCaretPosition(textWithCaret);
+    const text = textWithCaret.replace("|", "");
+    return createMockEditor(text, { initialCursor: position });
+}
+
 export function createMockEditor(
     initialContent = "",
     options: MockEditorOptions = {}
