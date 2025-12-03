@@ -53,7 +53,28 @@ describe(`Command: ${joinSelectedLines.id}`, () => {
         const after = `- [x] task one task two`;
         expect(joinLinesMarkdownAware(before)).toBe(after);
     });
+    
+    it("line with checkbox and no other content on next line 1", () => {
+        const before = `- [ ] ttt
+- [ ] `;
+        const after = `- [ ] ttt`;
+        expect(joinLinesMarkdownAware(before)).toBe(after);
+    });
 
+    it("line with checkbox and no other content on next line 2", () => {
+        const before = `- [ ] ttt
+- [x] `;
+        const after = `- [ ] ttt`;
+        expect(joinLinesMarkdownAware(before)).toBe(after);
+    });
+
+    it("line with checkbox and no other content on next line 3", () => {
+        const before = `- [x] ttt
+- [x] `;
+        const after = `- [x] ttt`;
+        expect(joinLinesMarkdownAware(before)).toBe(after);
+    });
+    
     it("removes both '>' and list marker when quote contains list", () => {
         const before = `> - item one
 > - item two`;
@@ -74,16 +95,4 @@ describe(`Command: ${joinSelectedLines.id}`, () => {
         const after = `    col1 == 'a' AND col2 == 'b'`;
         expect(joinLinesMarkdownAware(before)).toBe(after);
     });
-
-    it("line with empty checkbox and no other content", () => {
-        const before = `- [ ] ttt    
-- [ ]
-- [ ] ➕ 2025-11-21 
-`;
-        const after = `- [ ] ttt 
-- [ ] ➕ 2025-11-21
-`;
-        expect(joinLinesMarkdownAware(before)).toBe(after);
-    });
-
 });

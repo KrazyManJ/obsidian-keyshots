@@ -84,7 +84,7 @@ export function joinLinesMarkdownAware(text: string): string {
     const rest = lines.slice(1).map((line) => {
         let s = (line ?? "").trim();
         if (stripQuote) s = s.replace(/^(?:>\s*)+/, "");
-        if (stripCheckbox && bulletClass) s = s.replace(new RegExp(`^${bulletClass}[\t ]*\\[[xX ]\\][\t ]+`), "");
+        if (stripCheckbox && bulletClass) s = s.replace(new RegExp(`^${bulletClass}[\t ]*\\[[xX ]\\][\t ]*`), "");
         if (bulletClass) s = s.replace(new RegExp(`^${bulletClass}[\t ]+`), "");
         if (stripNumbered) s = s.replace(/^\d+\.[\t ]+/, "");
         return s.trim();
