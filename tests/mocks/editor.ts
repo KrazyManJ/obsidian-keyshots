@@ -109,13 +109,13 @@ export function createMockEditor(
             for (let line = 0; line < lines.length; line++) {
                 const lineLength = lines[line].length;
                 if (remaining <= lineLength) {
-                    return {line, ch: remaining};
+                    return { line, ch: remaining };
                 }
                 remaining -= lineLength + 1; // +1 for newline
             }
             // If offset is beyond content, return end of document
             const lastLine = lines.length - 1;
-            return {line: lastLine, ch: lines[lastLine].length};
+            return { line: lastLine, ch: lines[lastLine].length };
         }),
 
         getLine: jest.fn((line) => content.split("\n")[line]),
