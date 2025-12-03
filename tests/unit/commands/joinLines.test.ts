@@ -1,9 +1,63 @@
-import {
-    joinLinesMarkdownAware,
-    joinSelectedLines,
-} from "@/commands/join-selected-lines";
+import {joinLinesMarkdownAware, joinSelectedLines,} from "@/commands/join-selected-lines";
+import {createMockEditorFromTextWithCaret} from "@test/mocks/editor";
+import {emptyMarkdownViewMock} from "@test/mocks/markdown-view";
 
 describe(`Command: ${joinSelectedLines.id}`, () => {
+    describe("caret position after join without text selection should be at the end of the first line AND first line is trimmed at end", () => {
+        it("line with checkbox and no other content on next line 1", () => {
+            const editor = createMockEditorFromTextWithCaret(`- [ ] ttt   |   
+- [ ]   
+- [ ] ➕ 2025-11-21`);
+
+            joinSelectedLines.editorCallback?.(editor, emptyMarkdownViewMock);
+
+            expect(editor.getValueWithCaret()).toBe(`- [ ] ttt|
+- [ ] ➕ 2025-11-21`);
+
+            const selections = editor.listSelections();
+            expect(selections[0].anchor.line).toBe(0);
+            expect(selections[0].anchor.ch).toBe(9);
+            expect(selections[0].head.line).toBe(0);
+            expect(selections[0].head.ch).toBe(9);
+        });
+
+        /*
+        the caret line should be trimmed at end (which in this test means it is trimmed completely)
+        the next line should be trimmed at start (which in this test means it is trimmed completely as well)
+        the caret line should be joined with the next line
+        the caret position should be moved on the first line, right after the trim (which in this test means position 0 as the whole line is has no characters)
+
+        Test data (in case git/intellij fucks with the whitespace):
+        
+        Before:
+        - Line 1: `a`
+        - Line 2: whitespace `|` whitespace
+        - Line 3: whitespace
+        - Line 4: whitespace
+        - Line 5: `text`
+        
+        Expected:
+        - Line 1: `a`
+        - Line 2: `|` (empty line with caret at position 0)
+        - Line 3: whitespace
+        - Line 4: `text`
+         */
+        it("join on blank lines", () => {
+            const editor = createMockEditorFromTextWithCaret(`a
+                                |                       
+                      
+                          
+text
+`);
+            joinSelectedLines.editorCallback?.(editor, emptyMarkdownViewMock);
+            expect(editor.getValueWithCaret()).toBe(`a
+|
+                          
+text
+`);
+        })
+    });
+
     it("removes leading '>' from joined quote lines", () => {
         const before = `> quote line 2
 >quote line 3`;
@@ -54,6 +108,27 @@ describe(`Command: ${joinSelectedLines.id}`, () => {
         expect(joinLinesMarkdownAware(before)).toBe(after);
     });
 
+    it("line with checkbox and no other content on next line 1", () => {
+        const before = `- [ ] ttt
+- [ ] `;
+        const after = `- [ ] ttt`;
+        expect(joinLinesMarkdownAware(before)).toBe(after);
+    });
+
+    it("line with checkbox and no other content on next line 2", () => {
+        const before = `- [ ] ttt
+- [x] `;
+        const after = `- [ ] ttt`;
+        expect(joinLinesMarkdownAware(before)).toBe(after);
+    });
+
+    it("line with checkbox and no other content on next line 3", () => {
+        const before = `- [x] ttt
+- [x] `;
+        const after = `- [x] ttt`;
+        expect(joinLinesMarkdownAware(before)).toBe(after);
+    });
+
     it("removes both '>' and list marker when quote contains list", () => {
         const before = `> - item one
 > - item two`;
@@ -74,4 +149,19 @@ describe(`Command: ${joinSelectedLines.id}`, () => {
         const after = `    col1 == 'a' AND col2 == 'b'`;
         expect(joinLinesMarkdownAware(before)).toBe(after);
     });
+
+    it("join on empty line", () => {
+        const before = `
+            text`;
+        const after = `text`;
+        expect(joinLinesMarkdownAware(before)).toBe(after);
+    });
+
+    it("join on blank lines", () => {
+        const before = `                                                                    
+                            `;
+        const after = ``;
+        expect(joinLinesMarkdownAware(before)).toBe(after);
+    })
+
 });

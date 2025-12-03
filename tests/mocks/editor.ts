@@ -1,31 +1,72 @@
-import type { Editor, EditorPosition, EditorSelection } from "obsidian";
+import type {Editor, EditorPosition, EditorSelection} from "obsidian";
 
 interface MockEditorOptions {
     initialCursor?: EditorPosition;
     initialSelections?: EditorSelection;
 }
 
+export interface MockEditor extends Editor {
+    /** Returns the editor content with `|` inserted at the current cursor position */
+    getValueWithCaret(): string;
+}
+
+/**
+ * Parses text containing a `|` caret marker and returns the EditorPosition.
+ * @throws Error if no `|` is found in the text
+ */
+export function parseCaretPosition(textWithCaret: string): EditorPosition {
+    const lines = textWithCaret.split("\n");
+    for (let line = 0; line < lines.length; line++) {
+        const ch = lines[line].indexOf("|");
+        if (ch !== -1) {
+            return {line, ch};
+        }
+    }
+    throw new Error("No caret marker '|' found in text");
+}
+
+/**
+ * Creates a mock editor from text containing a `|` caret marker.
+ * @throws Error if no `|` is found in the text
+ */
+export function createMockEditorFromTextWithCaret(
+    textWithCaret: string
+): jest.Mocked<MockEditor> {
+    const position = parseCaretPosition(textWithCaret);
+    const text = textWithCaret.replace("|", "");
+    return createMockEditor(text, {initialCursor: position});
+}
+
 export function createMockEditor(
     initialContent = "",
     options: MockEditorOptions = {}
-): jest.Mocked<Editor> {
+): jest.Mocked<MockEditor> {
     let content = initialContent;
     const cursorSelection: EditorPosition = options.initialCursor ?? {
         line: 0,
         ch: 0,
     };
     let selections: EditorSelection[] = [
-        { anchor: cursorSelection, head: cursorSelection },
+        {anchor: cursorSelection, head: cursorSelection},
     ];
 
-    const posToOffset = jest.fn((pos) => {
-        const lines = content.split("\n").slice(0, pos.line + 1);
-        lines[lines.length - 1] = lines[lines.length - 1].substring(0, pos.ch);
-        return lines.reduce((acc, curr) => acc + curr.length, 0);
+    const posToOffset = jest.fn((pos: EditorPosition) => {
+        const lines = content.split("\n");
+        let offset = 0;
+        for (let i = 0; i < pos.line; i++) {
+            offset += lines[i].length + 1; // +1 for newline
+        }
+        offset += pos.ch;
+        return offset;
     });
 
     return {
         getValue: jest.fn(() => content),
+        getValueWithCaret: jest.fn(() => {
+            const cursor = selections[0].anchor;
+            const offset = posToOffset(cursor);
+            return content.slice(0, offset) + "|" + content.slice(offset);
+        }),
         setValue: jest.fn((newValue) => {
             content = newValue
         }),
@@ -41,7 +82,7 @@ export function createMockEditor(
             if (string === "head") {
                 return selections[0].head;
             }
-            const { anchor, head } = selections[0];
+            const {anchor, head} = selections[0];
             const [anchorOffset, headOffset] = [
                 posToOffset(anchor),
                 posToOffset(head),
@@ -56,11 +97,26 @@ export function createMockEditor(
         }),
         setCursor: jest.fn((pos, ch) => {
             const cursor =
-                typeof pos === "number" ? { line: pos, ch: ch ?? pos } : pos;
-            selections[0] = { anchor: cursor, head: cursor };
+                typeof pos === "number" ? {line: pos, ch: ch ?? pos} : pos;
+            selections[0] = {anchor: cursor, head: cursor};
         }),
 
         posToOffset: posToOffset,
+
+        offsetToPos: jest.fn((offset) => {
+            const lines = content.split("\n");
+            let remaining = offset;
+            for (let line = 0; line < lines.length; line++) {
+                const lineLength = lines[line].length;
+                if (remaining <= lineLength) {
+                    return {line, ch: remaining};
+                }
+                remaining -= lineLength + 1; // +1 for newline
+            }
+            // If offset is beyond content, return end of document
+            const lastLine = lines.length - 1;
+            return {line: lastLine, ch: lines[lastLine].length};
+        }),
 
         getLine: jest.fn((line) => content.split("\n")[line]),
         getRange: jest.fn((from, to) =>
@@ -78,7 +134,7 @@ export function createMockEditor(
                     content =
                         content.substring(0, posToOffset(change.from)) +
                         change.text +
-                        content.substring(posToOffset(to) + change.text.length);
+                        content.substring(posToOffset(to));
                 });
             }
             if (tx.selections) {
@@ -102,5 +158,5 @@ export function createMockEditor(
             }
         }),
         exec: jest.fn()
-    } as Partial<jest.Mocked<Editor>> as jest.Mocked<Editor>;
+    } as Partial<jest.Mocked<MockEditor>> as jest.Mocked<MockEditor>;
 }
