@@ -74,4 +74,16 @@ describe(`Command: ${joinSelectedLines.id}`, () => {
         const after = `    col1 == 'a' AND col2 == 'b'`;
         expect(joinLinesMarkdownAware(before)).toBe(after);
     });
+
+    it("line with empty checkbox and no other content", () => {
+        const before = `- [ ] ttt    
+- [ ]
+- [ ] ➕ 2025-11-21 
+`;
+        const after = `- [ ] ttt 
+- [ ] ➕ 2025-11-21
+`;
+        expect(joinLinesMarkdownAware(before)).toBe(after);
+    });
+
 });
