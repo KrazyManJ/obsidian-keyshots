@@ -1,7 +1,7 @@
 import {Category} from "../constants/Category";
 import KeyshotsCommand from "../model/KeyshotsCommand";
 import SelectionsProcessing from "../classes/SelectionsProcessing";
-import {escapeRegExp, HotKey} from "../utils";
+import {HotKey} from "../utils";
 
 export const joinSelectedLines: KeyshotsCommand = {
     category: Category.EDITOR_LINES_MANIPULATION,
@@ -70,27 +70,21 @@ export const joinSelectedLines: KeyshotsCommand = {
 }
 
 export function joinLinesMarkdownAware(text: string): string {
-    const bulletMarkers = ['-', '+', '*'];
-    const stripNumbered = true;
-    const stripCheckbox = true;
-    const stripQuote = true;
-
     const lines = text.split("\n");
     if (lines.length === 0) return "";
-    const firstLine = (lines[0] ?? "").trimEnd();
 
-    const bulletClass = `[${bulletMarkers.map(escapeRegExp).join("")}]`;
+    const firstLine = (lines[0] ?? "").trimEnd();
 
     const rest = lines.slice(1).map((line) => {
         let s = (line ?? "").trim();
-        if (stripQuote) s = s.replace(/^(?:>\s*)+/, "");
-        if (stripCheckbox && bulletClass) s = s.replace(new RegExp(`^${bulletClass}[\t ]*\\[[xX ]\\][\t ]*`), "");
-        if (bulletClass) s = s.replace(new RegExp(`^${bulletClass}[\t ]+`), "");
-        if (stripNumbered) s = s.replace(/^\d+\.[\t ]+/, "");
+        s = s.replace(/^(?:>\s*)+/, "");                    // strip quotes
+        s = s.replace(/^[-+*][\t ]*\[[xX ]\][\t ]*/, "");   // strip checkbox
+        s = s.replace(/^[-+*][\t ]+/, "");                  // strip bullet
+        s = s.replace(/^\d+\.[\t ]+/, "");                  // strip numbered
         return s.trim();
     });
 
-    let joinedLines = rest.filter((s) => s.length > 0);
+    const joinedLines = rest.filter((s) => s.length > 0);
     if (firstLine.length === 0) {
         return joinedLines.join(" ");
     }
