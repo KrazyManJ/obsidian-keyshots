@@ -19,9 +19,13 @@ export function createMockEditor(
     ];
 
     const posToOffset = jest.fn((pos) => {
-        const lines = content.split("\n").slice(0, pos.line + 1);
-        lines[lines.length - 1] = lines[lines.length - 1].substring(0, pos.ch);
-        return lines.reduce((acc, curr) => acc + curr.length, 0);
+        const lines = content.split("\n");
+        let offset = 0;
+        for (let i = 0; i < pos.line; i++) {
+            offset += lines[i].length + 1; // +1 for newline
+        }
+        offset += pos.ch;
+        return offset;
     });
 
     return {
@@ -62,6 +66,21 @@ export function createMockEditor(
 
         posToOffset: posToOffset,
 
+        offsetToPos: jest.fn((offset) => {
+            const lines = content.split("\n");
+            let remaining = offset;
+            for (let line = 0; line < lines.length; line++) {
+                const lineLength = lines[line].length;
+                if (remaining <= lineLength) {
+                    return { line, ch: remaining };
+                }
+                remaining -= lineLength + 1; // +1 for newline
+            }
+            // If offset is beyond content, return end of document
+            const lastLine = lines.length - 1;
+            return { line: lastLine, ch: lines[lastLine].length };
+        }),
+
         getLine: jest.fn((line) => content.split("\n")[line]),
         getRange: jest.fn((from, to) =>
             content.substring(posToOffset(from), posToOffset(to))
@@ -78,7 +97,7 @@ export function createMockEditor(
                     content =
                         content.substring(0, posToOffset(change.from)) +
                         change.text +
-                        content.substring(posToOffset(to) + change.text.length);
+                        content.substring(posToOffset(to));
                 });
             }
             if (tx.selections) {
