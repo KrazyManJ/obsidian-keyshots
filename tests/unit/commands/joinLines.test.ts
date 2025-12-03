@@ -8,7 +8,7 @@ describe(`Command: ${joinSelectedLines.id}`, () => {
             const editor = createMockEditorFromTextWithCaret(`- [ ] ttt   |   
 - [ ]   
 - [ ] ➕ 2025-11-21`);
-            
+
             joinSelectedLines.editorCallback?.(editor, emptyMarkdownViewMock);
 
             expect(editor.getValueWithCaret()).toBe(`- [ ] ttt|
@@ -71,7 +71,7 @@ describe(`Command: ${joinSelectedLines.id}`, () => {
         const after = `- [x] task one task two`;
         expect(joinLinesMarkdownAware(before)).toBe(after);
     });
-    
+
     it("line with checkbox and no other content on next line 1", () => {
         const before = `- [ ] ttt
 - [ ] `;
@@ -92,7 +92,7 @@ describe(`Command: ${joinSelectedLines.id}`, () => {
         const after = `- [x] ttt`;
         expect(joinLinesMarkdownAware(before)).toBe(after);
     });
-    
+
     it("removes both '>' and list marker when quote contains list", () => {
         const before = `> - item one
 > - item two`;
