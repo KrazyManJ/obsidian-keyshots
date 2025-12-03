@@ -95,4 +95,11 @@ describe(`Command: ${joinSelectedLines.id}`, () => {
         const after = `    col1 == 'a' AND col2 == 'b'`;
         expect(joinLinesMarkdownAware(before)).toBe(after);
     });
+
+    it("join on empty line", () => {
+        const before = `
+            text`;
+        const after = `text`;
+        expect(joinLinesMarkdownAware(before)).toBe(after);
+    });
 });

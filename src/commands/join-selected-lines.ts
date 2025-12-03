@@ -91,5 +91,8 @@ export function joinLinesMarkdownAware(text: string): string {
     });
 
     let joinedLines = rest.filter((s) => s.length > 0);
+    if (firstLine.length === 0) {
+        return joinedLines.join(" ");
+    }
     return [firstLine, ...joinedLines].join(" ");
 }
