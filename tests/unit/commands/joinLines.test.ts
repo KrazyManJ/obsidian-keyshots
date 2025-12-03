@@ -3,7 +3,7 @@ import {createMockEditorFromTextWithCaret} from "@test/mocks/editor";
 import {emptyMarkdownViewMock} from "@test/mocks/markdown-view";
 
 describe(`Command: ${joinSelectedLines.id}`, () => {
-    describe("caret position after join without text selection should be at the end of the first line, first line being trimmed", () => {
+    describe("caret position after join without text selection should be at the end of the first line AND first line is trimmed at end", () => {
         it("line with checkbox and no other content on next line 1", () => {
             const editor = createMockEditorFromTextWithCaret(`- [ ] ttt   |   
 - [ ]   
