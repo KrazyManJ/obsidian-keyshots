@@ -1,34 +1,17 @@
-import {
-    joinLinesMarkdownAware,
-    joinSelectedLines,
-} from "@/commands/join-selected-lines";
-import { createMockEditor } from "@test/mocks/editor";
-import { emptyMarkdownViewMock } from "@test/mocks/markdown-view";
+import {joinLinesMarkdownAware, joinSelectedLines,} from "@/commands/join-selected-lines";
+import {createMockEditorFromTextWithCaret} from "@test/mocks/editor";
+import {emptyMarkdownViewMock} from "@test/mocks/markdown-view";
 
 describe(`Command: ${joinSelectedLines.id}`, () => {
     describe("caret position after join without text selection should be at the end of the first line, first line being trimmed", () => {
-        it("test", () => {
-            /*
-             Initial: 
-             """
-             - [ ] ttt   |
-             - [ ] 
-             """
-             Expected: 
-             """
-             - [ ] ttt|
-             """
-            */
-            const initialContent = `- [ ] ttt   
-- [ ] 
-- [ ] ➕ 2025-11-21`;
-            const editor = createMockEditor(initialContent, {
-                initialCursor: { line: 0, ch: 12 },
-            });
-
+        it("line with checkbox and no other content on next line 1", () => {
+            const editor = createMockEditorFromTextWithCaret(`- [ ] ttt   |   
+- [ ]   
+- [ ] ➕ 2025-11-21`);
+            
             joinSelectedLines.editorCallback?.(editor, emptyMarkdownViewMock);
 
-            expect(editor.getValue()).toBe(`- [ ] ttt
+            expect(editor.getValueWithCaret()).toBe(`- [ ] ttt|
 - [ ] ➕ 2025-11-21`);
 
             const selections = editor.listSelections();
