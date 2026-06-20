@@ -1,6 +1,6 @@
 import {Editor,  EditorChange,  EditorRangeOrCaret,  EditorTransaction} from "obsidian";
 import EditorSelectionManipulator from "./EditorSelectionManipulator";
-import ExtendedEditorChange from "src/model/ExtendedEditorChange";
+import ExtendedEditorChange from "@/model/ExtendedEditorChange";
 
 
 export default abstract class SelectionsProcessing {

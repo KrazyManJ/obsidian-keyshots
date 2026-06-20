@@ -1,4 +1,4 @@
-import KeyshotsPlugin from "src/plugin";
+import KeyshotsPlugin from "@/plugin";
 import {Category} from "../constants/Category";
 import KeyshotsCommand from "../model/KeyshotsCommand";
 import {HotKey} from "../utils";

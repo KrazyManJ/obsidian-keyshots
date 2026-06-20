@@ -1,8 +1,8 @@
 import { View } from "obsidian";
-import { Category } from "src/constants/Category";
-import KeyshotsCommand from "src/model/KeyshotsCommand";
-import KeyshotsPlugin from "src/plugin";
-import { HotKey } from "src/utils";
+import { Category } from "@/constants/Category";
+import KeyshotsCommand from "@/model/KeyshotsCommand";
+import KeyshotsPlugin from "@/plugin";
+import { HotKey } from "@/utils";
 
 const duplicateTab: (plugin: KeyshotsPlugin) => KeyshotsCommand = (plugin) => ({
     category: Category.OTHER,

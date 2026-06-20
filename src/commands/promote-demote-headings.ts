@@ -1,13 +1,13 @@
 import { Editor } from "obsidian";
-import SelectionsProcessing from "src/classes/SelectionsProcessing";
-import KeyshotsCommand from "src/model/KeyshotsCommand";
-import { HotKey } from "src/utils";
+import SelectionsProcessing from "@/classes/SelectionsProcessing";
+import KeyshotsCommand from "@/model/KeyshotsCommand";
+import { HotKey } from "@/utils";
 
 
 const CONTAINS_HEADING_REGEX = /^(#{1,6})(.*)$/gm;
 
 function getHeadingLevelFromLine(line: string): number {
-    const match: string[] = line.matchAll(CONTAINS_HEADING_REGEX).next().value
+    const match = line.matchAll(CONTAINS_HEADING_REGEX).next().value
     if (!match) {
         return 0;
     }

@@ -1,4 +1,4 @@
-import EditorSelectionManipulator from "src/classes/EditorSelectionManipulator"
+import EditorSelectionManipulator from "@/classes/EditorSelectionManipulator"
 
 /**
  * Variant of EditorChange for Keyshots SelectionProcessing class.

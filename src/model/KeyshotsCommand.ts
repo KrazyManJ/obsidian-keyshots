@@ -1,7 +1,7 @@
 import {Command, Hotkey} from "obsidian";
 import {ClearPreset, Preset} from "../constants/Presets";
 import {Category} from "../constants/Category";
-import KeyshotsPlugin from "src/plugin";
+import KeyshotsPlugin from "@/plugin";
 
 /**
  * The same implementation as {@link Command} with addition of hotkey selection based on preset and category

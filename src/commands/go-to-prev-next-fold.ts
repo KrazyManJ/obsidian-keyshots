@@ -4,7 +4,7 @@ import { KeyshotsCommandPluginCallback } from "../model/KeyshotsCommand";
 import {Editor} from "obsidian";
 import EditorPositionManipulator from "../classes/EditorPositionManipulator";
 import {HotKey} from "../utils";
-import KeyshotsPlugin from "src/plugin";
+import KeyshotsPlugin from "@/plugin";
 
 function goToFolding(plugin: KeyshotsPlugin, editor: Editor, direction: VerticalDirection) {
     const cursor = EditorPositionManipulator.mainCursor(editor);
