@@ -1,6 +1,6 @@
 {
 	"name": "obsidian-keyshots",
-	"version": "2.8.1",
+	"version": "2.8.2",
 	"description": "Obsidian Plugin, that adds classic hotkey/shortcuts commands from popular IDEs like Visual Studio Code or JetBrains Family.",
 	"main": "main.js",
     "type": "module",
