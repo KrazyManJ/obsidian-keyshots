@@ -17,7 +17,7 @@ export default class TableModal extends CallbackModal<TableData> {
     private columns: number
     private root: Root | null = null;
 
-    private actionButton: ButtonComponent
+    private actionButton!: ButtonComponent
 
     constructor(plugin: KeyshotsPlugin, confirmCallback: (data: TableData) => void) {
         super(plugin, "Insert Table", confirmCallback);
@@ -62,8 +62,8 @@ export default class TableModal extends CallbackModal<TableData> {
         </>
     }
 
-    onOpen() {
-        super.onOpen()
+    async onOpen() {
+        await super.onOpen()
         const {contentEl, containerEl} = this;
         containerEl.classList.add("keyshots-table-modal");
         contentEl.createEl("p", {

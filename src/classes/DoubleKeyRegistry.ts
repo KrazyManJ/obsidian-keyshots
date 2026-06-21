@@ -46,7 +46,7 @@ export default class DoubleKeyRegistry extends Component {
         this.statusBarItem.style.display = state ? "inline-flex" : "none";
     }
 
-    private originalExecuteCommand: (e: Command, t: unknown) => boolean
+    private originalExecuteCommand!: (e: Command, t: unknown) => boolean
 
     private onKeyPress(ev: KeyboardEvent) {
         if (!this.hasAnyCommandRegistered) {
@@ -141,7 +141,9 @@ export default class DoubleKeyRegistry extends Component {
         this.app = plugin.app
         
         this.statusBarItem = this.plugin.addStatusBarItem()
-        this.statusBarItem.style.padding = "0 var(--size-2-2)"
+        this.statusBarItem.setCssStyles({
+            padding: "0 var(--size-2-2)"
+        })
         this.statusBarIcon = this.statusBarItem.createSpan({cls:"status-bar-item-icon"})
         setIcon(this.statusBarIcon,"keyboard")
         this.statusBarItem.setAttr("data-tooltip-position", "top")
@@ -166,6 +168,7 @@ export default class DoubleKeyRegistry extends Component {
     }
 
     onload(): void {
+        // eslint-disable-next-line @typescript-eslint/unbound-method
         this.originalExecuteCommand = this.plugin.app.commands.executeCommand
         this.app.commands.executeCommand = (command,t) => {
             

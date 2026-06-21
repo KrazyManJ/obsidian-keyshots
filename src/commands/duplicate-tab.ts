@@ -20,12 +20,12 @@ const duplicateTab: (plugin: KeyshotsPlugin) => KeyshotsCommand = (plugin) => ({
             return;
         }
         const leaf = plugin.app.workspace.getLeaf(true)
-        leaf.setViewState({
+        void leaf.setViewState({
             type: view.getViewType(),
             state: view.getState(),
             active: true,
         })
-        plugin.app.workspace.revealLeaf(leaf)
+        void plugin.app.workspace.revealLeaf(leaf)
     }
 })
 

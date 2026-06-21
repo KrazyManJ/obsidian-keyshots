@@ -41,23 +41,23 @@ export default class RegexReplaceModal extends RegexModal<ReplaceRegexData> {
         }
     }
 
-    onOpen() {
-        super.onOpen();
+    async onOpen() {
+        await super.onOpen();
         this.addPatternInput();
         new Setting(this.optionsCtrEl)
             .setName("Replacer")
-            .setDesc("Text for replacement, can capture groups made by Pattern.")
+            .setDesc("Text for replacement, can capture groups made by pattern.")
             .addText(cb => cb
                 .setValue(this.replacer)
                 .setPlaceholder("$1")
-                .onChange(v => {
+                .onChange(async v => {
                     this.replacer = v
                     this.plugin.setSetting("modal_regex_last_used_replacer", v)
-                    this.updatePreview()
+                    await this.updatePreview()
                 })
             )
         this.addCaseSensitiveSetting();
         this.addSelectionOnlySetting();
-        this.updateModalValidState()
+        await this.updateModalValidState()
     }
 }

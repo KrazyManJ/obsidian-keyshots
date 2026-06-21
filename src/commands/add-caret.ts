@@ -12,7 +12,7 @@ function addCarets(editor: Editor, direction: VerticalDirection, border: number)
     if (selections.filter(s => !s.isCaret()).length > 0) return
     const main = selections.filter(s => s.anchor.line === editor.getCursor().line && s.anchor.ch === editor.getCursor().ch)[0]
     let mainIndex = selections.indexOf(main)
-    const newSel = selections[direction > 0 ? selections.length - 1 : 0].clone()
+    const newSel = selections[direction === VerticalDirection.DOWN ? selections.length - 1 : 0].clone()
     if (newSel.anchor.line === border) return
     newSel.moveLines(direction).setChars(Math.min(editor.getLine(newSel.anchor.line).length, main.anchor.ch))
     if (direction === VerticalDirection.DOWN && mainIndex !== 0) selections.shift()

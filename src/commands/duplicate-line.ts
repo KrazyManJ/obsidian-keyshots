@@ -9,7 +9,7 @@ export function vscodeDuplicate(editor: Editor, direction: VerticalDirection) {
     SelectionsProcessing.selectionsProcessorTransaction(editor, sel => {
         const finalSel = sel.clone()
         return {
-            finalSelection: direction > 0 ? finalSel.moveLines(finalSel.linesCount) : finalSel,
+            finalSelection: direction === VerticalDirection.DOWN ? finalSel.moveLines(finalSel.linesCount) : finalSel,
             replaceSelection: sel.normalize().expand(),
             replaceText: sel.getText() + "\n" + sel.getText()
         }

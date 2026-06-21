@@ -1,4 +1,5 @@
 import "obsidian";
+import { Command } from "obsidian"
 
 declare module 'obsidian' {
     interface VaultConfig {

@@ -26,11 +26,11 @@ export default class RegexSearchModal extends RegexModal<BaseRegexData> {
         }
     }
 
-    onOpen() {
-        super.onOpen();
+    async onOpen() {
+        await super.onOpen();
         this.addPatternInput();
         this.addCaseSensitiveSetting();
         this.addSelectionOnlySetting();
-        this.updateModalValidState()
+        await this.updateModalValidState()
     }
 }

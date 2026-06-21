@@ -13,7 +13,7 @@ export const openCommandPaletteDK: (plugin: KeyshotsPlugin) => DoubleKeyCommand 
         plugin.settings.enable_command_palette_via_double_key_cmd
             ? (interrupted) => {
                 if (!interrupted) runCommandById(plugin, "command-palette:open",
-                    () => new Notice("Command Pallete plugin is not enabled!")
+                    () => new Notice("Command pallete plugin is not enabled!")
                 )
             }
             : undefined

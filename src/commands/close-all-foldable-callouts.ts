@@ -11,7 +11,7 @@ export const closeAllFoldableCallouts: KeyshotsCommand = {
         keyshots: [HotKey("L", "Shift", "Alt")]
     },
     callback: () =>
-        document
+        activeDocument
             .querySelectorAll("div.callout.is-collapsible:not(.is-collapsed) div.callout-title")
             .forEach(c => (c as HTMLDivElement).click())
 }

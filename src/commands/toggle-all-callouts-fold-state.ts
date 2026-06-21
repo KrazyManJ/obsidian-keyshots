@@ -10,5 +10,5 @@ export const toggleAllCalloutsFoldState: KeyshotsCommand =  {
     hotkeys: {
         keyshots: [HotKey("K", "Shift", "Alt")]
     },
-    callback: () => document.querySelectorAll("div.callout div.callout-title").forEach(c => (c as HTMLDivElement).click())
+    callback: () => activeDocument.querySelectorAll("div.callout div.callout-title").forEach(c => (c as HTMLDivElement).click())
 }

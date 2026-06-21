@@ -35,12 +35,10 @@ export default abstract class SelectionsProcessing {
         const editorChanges: EditorChange[] = changes
             .filter(change => change.replaceSelection && change.replaceText !== undefined)
             .map(v => {
-                // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
                 const [from,to] = v.replaceSelection!.asFromToPoints()
                 return {
                     from: from,
                     to: to,
-                    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
                     text: v.replaceText!
                 }
             })
@@ -56,7 +54,6 @@ export default abstract class SelectionsProcessing {
             .filter(change => change.finalSelection)
             .map(change => {
                 
-                // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
                 const finalSelection = change.finalSelection!
 
                 if (!change.replaceSelection || !change.replaceText) {

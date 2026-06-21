@@ -1,4 +1,4 @@
-import {Component, MarkdownRenderer} from "obsidian";
+import {MarkdownRenderer} from "obsidian";
 import KeyshotsPlugin from "../plugin";
 import {CallbackSuggestModal} from "./abstract/callback-suggest-modal";
 
@@ -26,7 +26,7 @@ export default class CalloutPickerModal extends CallbackSuggestModal<string> {
 
     constructor(plugin: KeyshotsPlugin, onSelectCallback: (item: string, evt: MouseEvent | KeyboardEvent) => void) {
         super(plugin, onSelectCallback);
-        this.setPlaceholder("Select one of the callouts... (callouts are searchable by it's id or aliases)");
+        this.setPlaceholder("Select one of the callouts... (Callouts are searchable by it's ID or aliases)");
         this.setInstructions([
             {
                 command: "Shift ↵",
@@ -42,20 +42,20 @@ export default class CalloutPickerModal extends CallbackSuggestModal<string> {
     }
 
     getSuggestions(query: string): string[] | Promise<string[]> {
+        const customCallouts = this.plugin.settings.callouts_list
+            .filter(v => v.length > 0 && v.replace(/\s/g,'').length != 0)
+            .map(v => v.split(","));
+
         return CalloutPickerModal.ROOT_CALLOUTS
-            .concat(
-                this.plugin.settings.callouts_list
-                    .filter(v => v.length > 0 && v.replace(/\s/g,'').length != 0)
-                    .map(v => v.split(","))
-            )
+            .concat(customCallouts)
             .filter(ids => ids.filter(id => id.includes(query.toLowerCase())).length > 0)
             .map(ids => ids[0]);
     }
 
     renderSuggestion(value: string, el: HTMLElement) {
-        MarkdownRenderer.renderMarkdown(`>[!${value}]`, el, "", new Component()).then(() => {
+        void MarkdownRenderer.render(this.app,`>[!${value}]`, el, "", this.component).then(() => {
             const callout = el.childNodes.item(0) as HTMLElement
-            callout.setCssProps({"margin": "0"})
+            callout.setCssStyles({margin: "0"})
         })
     }
 }

@@ -1,6 +1,6 @@
 import esbuild from "esbuild";
 import process from "process";
-import builtins from 'builtin-modules';
+import { builtinModules } from 'node:module';
 import { sassPlugin } from 'esbuild-sass-plugin';
 
 
@@ -36,7 +36,7 @@ const options = {
 		'@lezer/lr',
 		'@jest/*',
 		'jest',
-		...builtins],
+		...builtinModules],
 	format: 'cjs',
 	target: 'es2018',
 	logLevel: "info",

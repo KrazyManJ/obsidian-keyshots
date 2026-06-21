@@ -7,7 +7,7 @@ import { HotKey } from "@/utils";
 const CONTAINS_HEADING_REGEX = /^(#{1,6})(.*)$/gm;
 
 function getHeadingLevelFromLine(line: string): number {
-    const match = line.matchAll(CONTAINS_HEADING_REGEX).next().value
+    const match = line.matchAll(CONTAINS_HEADING_REGEX).next().value as unknown as string
     if (!match) {
         return 0;
     }

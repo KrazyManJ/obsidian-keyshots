@@ -20,8 +20,8 @@ export default class IDEPresetModal extends SuggestModal<PresetInfo> {
         return Object.values(PRESETS_INFO).filter(v => v.name.toLowerCase().includes(query.toLowerCase()));
     }
 
-    async onChooseSuggestion(item: PresetInfo) {
-        await this.plugin.changePreset((Object.keys(PRESETS_INFO) as Preset[]).filter(f => PRESETS_INFO[f] === item)[0])
+    onChooseSuggestion(item: PresetInfo) {
+        void this.plugin.changePreset((Object.keys(PRESETS_INFO) as Preset[]).filter(f => PRESETS_INFO[f] === item)[0])
         new Notice(`✅ Preset successfully changed to "${item.name}"!`)
     }
 

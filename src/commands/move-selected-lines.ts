@@ -7,7 +7,7 @@ import {HotKey} from "../utils";
 
 function moveLine(editor: Editor, direction: VerticalDirection, border: number) {
     SelectionsProcessing.selectionsProcessorTransaction(editor, sel => {
-        if (direction === 1 ? sel.asNormalized().head.line === border : sel.asNormalized().anchor.line === border) {
+        if (direction === VerticalDirection.DOWN ? sel.asNormalized().head.line === border : sel.asNormalized().anchor.line === border) {
             return {
                 finalSelection: sel
             }
@@ -24,11 +24,9 @@ function moveLine(editor: Editor, direction: VerticalDirection, border: number) 
         else {
             const lines = replaceText.split("\n")
             if (direction === VerticalDirection.DOWN) {
-                // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
                 lines.unshift(lines.pop()!)
             }
             else {
-                // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
                 lines.push(lines.shift()!)
             }
             replaceText = lines.join("\n")

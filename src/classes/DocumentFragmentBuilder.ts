@@ -2,7 +2,7 @@ export default class DocumentFragmentBuilder {
     readonly #fragment: DocumentFragment
 
     constructor() {
-        this.#fragment = document.createDocumentFragment()
+        this.#fragment = activeDocument.createDocumentFragment()
     }
 
     appendText(text: string) {

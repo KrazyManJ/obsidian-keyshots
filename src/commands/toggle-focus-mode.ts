@@ -13,7 +13,7 @@ export const toggleFocusMode: KeyshotsCommandPluginCallback = (plugin) => ({
         const isFocus = window.document.body.classList.contains("keyshots-focus-mode");
         electron.remote.BrowserWindow.getAllWindows().forEach(w => w.setFullScreen(!isFocus))
         Array.of("left", "right").forEach(side => {
-            const sideBar = document.querySelector(`div.mod-${side}-split`)
+            const sideBar = activeDocument.querySelector(`div.mod-${side}-split`)
             if (sideBar && !sideBar.classList.contains(`is-sidedock-collapsed`) && !isFocus)
                 plugin.app.commands.executeCommandById(`app:toggle-${side}-sidebar`)
         })

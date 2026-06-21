@@ -1,5 +1,5 @@
 import CallbackModal from "./callback-modal";
-import {ButtonComponent, Component, MarkdownRenderer, Setting, TextComponent} from "obsidian";
+import {ButtonComponent, MarkdownRenderer, Setting, TextComponent} from "obsidian";
 import DocumentFragmentBuilder from "../../classes/DocumentFragmentBuilder";
 import KeyshotsPlugin from "../../plugin";
 
@@ -9,7 +9,7 @@ export interface BaseRegexData {
     readonly only_selections: boolean
 }
 
-export default abstract class RegexModal<T extends BaseRegexData> extends CallbackModal<BaseRegexData> {
+export default abstract class RegexModal<T extends BaseRegexData> extends CallbackModal<T> {
 
     protected editorContent: string
 
@@ -17,13 +17,13 @@ export default abstract class RegexModal<T extends BaseRegexData> extends Callba
     protected case_sensitive: boolean
     protected only_selections: boolean
 
-    protected optionsCtrEl: HTMLElement
+    protected optionsCtrEl!: HTMLElement
 
-    protected patternInput: TextComponent
-    protected footer: Setting
-    protected button: ButtonComponent
+    protected patternInput!: TextComponent
+    protected footer!: Setting
+    protected button!: ButtonComponent
 
-    private previewEl: HTMLElement
+    private previewEl!: HTMLElement
     private preview: boolean
 
     private readonly matchesCountCallback: (data: BaseRegexData) => number
@@ -52,13 +52,13 @@ export default abstract class RegexModal<T extends BaseRegexData> extends Callba
         if (this.pattern === "") return undefined
         try {
             return new RegExp(this.pattern, `gm${this.case_sensitive ? "" : "i"}`)
-        } catch (SyntaxError) {
+        } catch {
             return undefined
         }
     }
 
-    onOpen() {
-        super.onOpen();
+    async onOpen() {
+        await super.onOpen();
         const {containerEl, contentEl} = this;
         containerEl.classList.add("keyshots-regex")
         const dividerEl = contentEl.createEl("div", "content-divider");
@@ -70,10 +70,10 @@ export default abstract class RegexModal<T extends BaseRegexData> extends Callba
             .setName("Preview mode")
             .addToggle(cb => cb
                 .setValue(this.preview)
-                .onChange(v => {
+                .onChange(async v => {
                     this.preview = v;
                     this.plugin.setSetting("modal_regex_last_used_preview", v);
-                    this.updatePreview();
+                    await this.updatePreview();
                 })
             )
         this.footer = new Setting(contentEl)
@@ -88,9 +88,9 @@ export default abstract class RegexModal<T extends BaseRegexData> extends Callba
         this.footer.nameEl.classList.add("matches")
     }
 
-    protected updateModalValidState() {
+    protected async updateModalValidState() {
         const regex = this.getRegex()
-        this.updatePreview()
+        await this.updatePreview()
         if (!regex) {
             this.patternInput.inputEl.classList.add("invalid")
             this.footer.nameEl.classList.add("invalid")
@@ -107,15 +107,22 @@ export default abstract class RegexModal<T extends BaseRegexData> extends Callba
         this.button.setDisabled(false)
     }
 
-    protected updatePreview() {
+    protected async updatePreview() {
         this.previewEl.empty();
         if (this.preview) {
-            MarkdownRenderer.renderMarkdown(this.previewProcessor(
-                this.editorContent.replace(/(^---\n(?:[\s\S]*?|))excalidraw-plugin:.+\n((?:[\s\S]*?\n|)---$)/m,"$1$2")
-            ), this.previewEl, "", new Component()).then();
+            await MarkdownRenderer.render(
+                this.app,
+                this.previewProcessor(
+                    this.editorContent.replace(/(^---\n(?:[\s\S]*?|))excalidraw-plugin:.+\n((?:[\s\S]*?\n|)---$)/m,"$1$2")
+                ),
+                this.previewEl,
+                "",
+                this.component
+            );
             this.previewEl.classList.replace("raw", "markdown-rendered")
         } else {
             const content = this.previewEl.createEl("div")
+            // eslint-disable-next-line no-unsanitized/property, @microsoft/sdl/no-inner-html
             content.innerHTML = this.previewProcessor(this.editorContent)
             this.previewEl.classList.replace("markdown-rendered", "raw")
         }
@@ -124,14 +131,14 @@ export default abstract class RegexModal<T extends BaseRegexData> extends Callba
     protected addPatternInput() {
         new Setting(this.optionsCtrEl)
             .setName("Pattern")
-            .setDesc("Regular Expression pattern to select text for action.")
+            .setDesc("Regular expression pattern to select text for action.")
             .addText(cb => this.patternInput = cb
                 .setValue(this.pattern)
                 .setPlaceholder("(.*)")
-                .onChange(v => {
+                .onChange(async v => {
                     this.pattern = v
                     if (this.getRegex()) this.plugin.setSetting("modal_regex_last_used_pattern", v)
-                    this.updateModalValidState()
+                    await this.updateModalValidState()
                 })
             );
     }
@@ -139,13 +146,13 @@ export default abstract class RegexModal<T extends BaseRegexData> extends Callba
     protected addCaseSensitiveSetting() {
         new Setting(this.optionsCtrEl)
             .setName("Case sensitive")
-            .setDesc("If should RegEx care about difference between capital or non-capital letters.")
+            .setDesc("If should regex care about difference between capital or non-capital letters.")
             .addToggle(cb => cb
                 .setValue(this.case_sensitive)
-                .onChange(v => {
+                .onChange(async v => {
                     this.case_sensitive = v;
                     this.plugin.setSetting("modal_regex_last_used_case_sensitivity", v)
-                    this.updateModalValidState();
+                    await this.updateModalValidState();
                 })
             );
     }
@@ -163,10 +170,10 @@ export default abstract class RegexModal<T extends BaseRegexData> extends Callba
             .setClass("last")
             .addToggle(cb => cb
                 .setValue(this.only_selections)
-                .onChange(v => {
+                .onChange(async v => {
                     this.only_selections = v;
                     this.plugin.setSetting("modal_regex_last_used_selections_only", v);
-                    this.updateModalValidState();
+                    await this.updateModalValidState();
                 })
             );
     }

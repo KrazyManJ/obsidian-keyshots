@@ -12,7 +12,7 @@ export function insertLine(editor: Editor, direction: VerticalDirection) {
             const expandedSelection = sel.clone().expand()
             let replaceText = expandedSelection.getText()
             
-            if (direction > 0) {
+            if (direction === VerticalDirection.DOWN) {
                 replaceText = replaceText + "\n"
             }
             else {
@@ -22,7 +22,7 @@ export function insertLine(editor: Editor, direction: VerticalDirection) {
             return {
                 replaceSelection: expandedSelection,
                 replaceText: replaceText,
-                finalSelection: sel.collapse().setChars(0).moveLines(direction > 0 ? expandedSelection.linesCount : 0)
+                finalSelection: sel.collapse().setChars(0).moveLines(direction === VerticalDirection.DOWN ? expandedSelection.linesCount : 0)
             }
         },
         array => array.sort((a, b) => a.anchor.line - b.anchor.line)

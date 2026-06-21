@@ -64,8 +64,8 @@ import { KEYSHOTS_LUCIDE_ICON } from './constants/SVGs';
 
 export default class KeyshotsPlugin extends Plugin {
 
-    settings: KeyshotsSettings
-    private doubleKeyRegistry: DoubleKeyRegistry
+    settings!: KeyshotsSettings
+    private doubleKeyRegistry!: DoubleKeyRegistry
 
     private keyshotsCommandToObsidianCommand(
         cmd: KeyshotsCommand,
@@ -206,7 +206,7 @@ export default class KeyshotsPlugin extends Plugin {
     }
 
     async loadSettings() {
-        this.settings = Object.assign({}, DEFAULT_KEYSHOTS_SETTINGS, await this.loadData());
+        this.settings = Object.assign({}, DEFAULT_KEYSHOTS_SETTINGS, await this.loadData() as Partial<KeyshotsSettings>);
     }
 
     async saveSettings() {
@@ -215,7 +215,7 @@ export default class KeyshotsPlugin extends Plugin {
 
     setSetting<K extends keyof KeyshotsSettings>(key: K, value: KeyshotsSettings[K]) {
         this.settings[key] = value;
-        this.saveSettings().then();
+        void this.saveSettings();
     }
 }
 
