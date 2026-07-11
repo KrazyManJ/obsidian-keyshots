@@ -43,6 +43,29 @@ body:
   validations:
     required: true
 
+- type: input
+  id: keyshots-version
+  attributes:
+    label: Keyshots
+    description: Plugin version
+    placeholder: "e.g. 1.0.0"
+  validations:
+    required: true
+
+- type: dropdown
+  id: selected-keyshots-preset
+  attributes:
+    label: Selected keyshots preset
+    description: What Keyshots preset are you using?
+    options:
+      - Clear
+      - Visual Studio Code
+      - JetBrains IDEs Family
+      - Microsoft Visual Studio
+      - Keyshots default hotkeys mappings
+  validations:
+    required: true
+
 - type: textarea
   id: additional-context
   attributes:
