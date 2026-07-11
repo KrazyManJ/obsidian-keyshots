@@ -26,10 +26,10 @@ When reporting issues, please:
 
 I welcome pull requests! To submit a PR:
 
-1. **Fork the repository** and create your branch from `dev` (not `master`)
+1. **Fork the repository** and create your branch from `master`
 
     ```bash
-    git checkout dev
+    git checkout master
     git checkout -b feature/your-feature-name
     ```
 
@@ -52,7 +52,7 @@ I welcome pull requests! To submit a PR:
     - Update relevant documentation files
 
 5. **Submit your PR**
-    - Target the `dev` branch (PRs to `master` will be closed)
+    - Target the `master` branch
     - Provide a clear description of the changes
     - Reference any related issues using `#issue-number`
     - Ensure CI checks pass
@@ -63,7 +63,7 @@ I welcome pull requests! To submit a PR:
 -   **Test coverage**: All new code must have accompanying tests with full coverage
 -   **Code quality**: Ensure your code follows the project's style guidelines
 -   **No breaking changes**: Avoid making breaking changes without prior discussion
--   **Branch target**: Always create PRs against the `dev` branch
+-   **Branch target**: Always create PRs against the `master` branch
 
 ## Development Setup
 
@@ -112,7 +112,7 @@ After you submit a pull request:
 
 1. I will review your code as soon as possible
 2. I may request changes or ask questions
-3. Once approved, I will merge your PR into `dev`
+3. Once approved, I will merge your PR into `master`
 4. Changes will be included in the next release
 
 ## Questions?
