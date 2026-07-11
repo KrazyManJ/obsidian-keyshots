@@ -26,6 +26,7 @@ interface EnhancedSetting extends Setting {
 
 export class KeyshotsSettingTab extends PluginSettingTab {
     plugin: KeyshotsPlugin;
+    icon = "keyshots";
     private component: Component = new Component()
 
     constructor(app: App, plugin: KeyshotsPlugin) {
@@ -148,7 +149,6 @@ export class KeyshotsSettingTab extends PluginSettingTab {
                     slider = cb
                         .setValue(this.plugin.settings.shuffle_rounds_amount)
                         .setLimits(1, 50, 1)
-                        .setDynamicTooltip()
                         .onChange(async (value) => {
                             this.plugin.settings.shuffle_rounds_amount = value
                             await this.plugin.saveSettings()

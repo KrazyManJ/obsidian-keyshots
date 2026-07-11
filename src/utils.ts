@@ -4,8 +4,6 @@ import KeyshotsPlugin from "./plugin";
 
 export const HotKey = (key: string, ...mods: Modifier[]): Hotkey => ({key: key, modifiers: mods})
 
-export const satisfies = <T, >() => <U extends T>(u: U) => u;
-
 export function flipBooleanSetting(
     app: App,
     setting: { [k in keyof VaultConfig]: VaultConfig[k] extends boolean ? k : never }[keyof VaultConfig]

@@ -7,6 +7,7 @@ export default defineConfig(
 		'node_modules',
 		'dist',
         'scripts',
+        'coverage',
 		'esbuild.config.mjs',
 		'version-bump.mjs',
 		'versions.json',

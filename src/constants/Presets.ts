@@ -1,8 +1,7 @@
-import {satisfies} from "../utils";
 import PresetInfo from "../model/PresetInfo";
 import * as svgs from "./SVGs";
 
-const presetsInfo = satisfies<Record<string, PresetInfo>>()({
+const presetsInfo = {
     clear: {
         name: "Clear",
         description: "Everything is blank, default preset when you install Keyshots",
@@ -28,7 +27,7 @@ const presetsInfo = satisfies<Record<string, PresetInfo>>()({
         description: "IDE for making Windows desktop apps, or any other programs using C-Family languages or Visual Basic",
         iconSvgContent: svgs.VS_SVG
     },
-})
+} satisfies Record<string, PresetInfo>
 
 export type Preset = keyof typeof presetsInfo
 
