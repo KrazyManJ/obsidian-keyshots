@@ -4,7 +4,7 @@ import KeyshotsCommand from "@/model/KeyshotsCommand";
 import { HotKey } from "@/utils";
 
 
-const CONTAINS_HEADING_REGEX = /^(#{1,6})(.*)$/gm;
+const CONTAINS_HEADING_REGEX = /^(#{1,6})(\s.*)$/gm;
 
 function getHeadingLevelFromLine(line: string): number {
     const match = line.matchAll(CONTAINS_HEADING_REGEX).next().value as unknown as string
@@ -16,6 +16,15 @@ function getHeadingLevelFromLine(line: string): number {
 
 function changeHeadingLevelForSelections(editor: Editor, action: "promote" | "demote") {
     SelectionsProcessing.selectionsProcessorTransaction(editor, sel => {
+
+        if (sel.isOneLine() && !sel.anchor.getLine().startsWith("#") && action === "promote") {
+            return {
+                finalSelection: sel.moveChars(2),
+                replaceSelection: sel.clone().expand(),
+                replaceText: `# ${sel.anchor.getLine()}`    
+            }
+        }
+
         const text = sel.isCaret() ?  sel.anchor.getLine() : sel.clone().expand().getText()
 
         const replaceText = text.replace(CONTAINS_HEADING_REGEX, (_, hashtags: string, title: string) => {
