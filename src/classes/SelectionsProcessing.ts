@@ -184,9 +184,9 @@ export default abstract class SelectionsProcessing {
         SelectionsProcessing.selectionsReplacer(editor, (tx) => {
             const [underI, spaceI] = [tx.indexOf(first), tx.indexOf(second)]
             const replaceFromTo = (s: string, ch1: string, ch2: string) => s.replace(new RegExp(ch1, "gm"), ch2)
-            if (underI !== -1 || spaceI !== -1) return tx
+            if (underI === -1 && spaceI === -1) return tx
             if (underI === -1) return replaceFromTo(tx, second, first)
-            if (spaceI === -1) replaceFromTo(tx, first, second)
+            if (spaceI === -1) return replaceFromTo(tx, first, second)
             if (underI > spaceI) return replaceFromTo(tx, second, first)
             return replaceFromTo(tx, first, second)
         })
