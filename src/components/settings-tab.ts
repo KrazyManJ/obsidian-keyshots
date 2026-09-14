@@ -2,6 +2,10 @@ import {App, Component, MarkdownRenderer, PluginSettingTab, Setting, SettingGrou
 import KeyshotsPlugin from "../plugin";
 import {Preset, PRESETS_INFO} from "../constants/Presets";
 import DEFAULT_KEYSHOTS_SETTINGS from "../constants/DefaultKeyshotsSettings";
+import type {
+    CalloutCursorPosition,
+    CalloutCursorPositionWithoutSelection
+} from "../model/KeyshotsSettings";
 
 
 function getOpenCommands(plugin: KeyshotsPlugin) {
@@ -164,7 +168,57 @@ export class KeyshotsSettingTab extends PluginSettingTab {
                     })
                 )
             )
-            .addSetting(setting => void this.enhanceSetting(setting)
+        )
+
+        this.addSettingGroup(group => group
+            .setHeading("💬 Callout settings")
+            .addSetting(setting => this.enhanceSetting(setting)
+                .setName("Insert line break before callout")
+                .setMarkdownDesc(`
+                    Adds an extra line break before a callout inserted with the
+                    \`Better insert callout\` command.
+                `)
+                .addToggle(cb => cb
+                    .setValue(this.plugin.settings.callout_prepend_line_break)
+                    .onChange(async (value) => {
+                        this.plugin.settings.callout_prepend_line_break = value
+                        await this.plugin.saveSettings()
+                    })
+                )
+            )
+            .addSetting(setting => this.enhanceSetting(setting)
+                .setName("Cursor position with selected text")
+                .setDesc("Choose where the cursor is placed when selected text is converted to a callout.")
+                .addDropdown(cb => cb
+                    .addOptions({
+                        start: "Start of callout content",
+                        end: "End of callout",
+                        title: "Callout title",
+                        below: "Line below callout"
+                    })
+                    .setValue(this.plugin.settings.callout_cursor_position_with_selection)
+                    .onChange(async (value) => {
+                        this.plugin.settings.callout_cursor_position_with_selection = value as CalloutCursorPosition
+                        await this.plugin.saveSettings()
+                    })
+                )
+            )
+            .addSetting(setting => this.enhanceSetting(setting)
+                .setName("Cursor position without selected text")
+                .setDesc("Choose whether typing starts inside the callout or in its title.")
+                .addDropdown(cb => cb
+                    .addOptions({
+                        content: "Inside callout",
+                        title: "Callout title"
+                    })
+                    .setValue(this.plugin.settings.callout_cursor_position_without_selection)
+                    .onChange(async (value) => {
+                        this.plugin.settings.callout_cursor_position_without_selection = value as CalloutCursorPositionWithoutSelection
+                        await this.plugin.saveSettings()
+                    })
+                )
+            )
+            .addSetting(setting => this.enhanceSetting(setting)
                 .setName("Custom callout types list")
                 .setMarkdownDesc(`
                     Adds new callout types defined by user separated by new line (<kbd>Enter</kbd>),
